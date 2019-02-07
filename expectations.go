@@ -19,7 +19,7 @@ type expectation interface {
 type commonExpectation struct {
 	sync.Mutex
 	triggered bool
-	err       error
+	err       error // nolint: structcheck
 }
 
 func (e *commonExpectation) fulfilled() bool {

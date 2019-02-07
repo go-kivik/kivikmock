@@ -56,6 +56,13 @@ func (c *kivikmock) AllDBs(ctx context.Context, opts map[string]interface{}) ([]
 	c.drv.Lock()
 	defer c.drv.Unlock()
 
+	errMsg := func() string {
+		if opts != nil {
+			return fmt.Sprintf("call to AllDBs with options %+v", opts)
+		}
+		return "call to AllDBs"
+	}
+
 	var expected *ExpectedAllDBs
 	var fulfilled int
 	var ok bool
@@ -72,10 +79,7 @@ func (c *kivikmock) AllDBs(ctx context.Context, opts map[string]interface{}) ([]
 				break
 			}
 			next.Unlock()
-			msg := "call to AllDBs"
-			if opts != nil {
-				msg += fmt.Sprintf(" with options %+v", opts)
-			}
+			msg := errMsg()
 			return nil, fmt.Errorf(msg+" was not expected. Next expectation is: %s", next)
 		}
 		if e, ok := next.(*ExpectedAllDBs); ok {
@@ -88,10 +92,7 @@ func (c *kivikmock) AllDBs(ctx context.Context, opts map[string]interface{}) ([]
 	}
 
 	if expected == nil {
-		msg := "call to AllDBs"
-		if opts != nil {
-			msg += fmt.Sprintf(" with options %+v", opts)
-		}
+		msg := errMsg()
 		msg += " was not expected"
 		if fulfilled == len(c.expected) {
 			msg = "all expectations were already fulfilled, " + msg

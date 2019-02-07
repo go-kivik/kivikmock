@@ -17,12 +17,10 @@ func TestExpectedCloseError(t *testing.T) {
 		return
 	}
 	mock.ExpectClose().WillReturnError(fmt.Errorf("Close failed"))
-	if err := client.Close(context.TODO()); err == nil {
-		t.Error("an error was expected when calling Close, but got none")
-	}
-	expectedErr := ""
+	err = client.Close(context.TODO())
+	testy.Error(t, "Close failed", err)
 	err = mock.ExpectationsWereMet()
-	testy.Error(t, expectedErr, err)
+	testy.Error(t, "", err)
 }
 
 // func TestExpectedCloseOrder(t *testing.T) {
@@ -63,7 +61,7 @@ func TestExpectedAllDBsOrder(t *testing.T) {
 		fmt.Println("error creating mock database")
 		return
 	}
-	defer client.Close(context.TODO())
+	defer client.Close(context.TODO()) // nolint: errcheck
 	mock.ExpectAllDBs().WillReturn([]string{"a", "b"})
 	err = mock.ExpectationsWereMet()
 	testy.ErrorRE(t, `should return: \[a b\]`, err)
@@ -76,7 +74,7 @@ func TestExpectedAllDBsUnexpected(t *testing.T) {
 		fmt.Println("error creating mock database")
 		return
 	}
-	defer client.Close(context.TODO())
+	defer client.Close(context.TODO()) // nolint: errcheck
 	_, err = client.AllDBs(context.TODO(), kivik.Options{"Foo": 123})
 	expectedErr := `all expectations were already fulfilled, call to AllDBs with options map[Foo:123] was not expected`
 	testy.Error(t, expectedErr, err)
@@ -89,7 +87,7 @@ func TestExpectedAllDBsUnexpected_out_of_order(t *testing.T) {
 		fmt.Println("error creating mock database")
 		return
 	}
-	defer client.Close(context.TODO())
+	defer client.Close(context.TODO()) // nolint: errcheck
 	mock.ExpectClose()
 	_, err = client.AllDBs(context.TODO(), kivik.Options{"Foo": 123})
 	expectedErr := `call to AllDBs with options map[Foo:123] was not expected. Next expectation is: ExpectedClose => expecting client Close`
@@ -103,7 +101,7 @@ func TestExpectedAllDBsUnexpectedUnorderedError(t *testing.T) {
 		fmt.Println("error creating mock database")
 		return
 	}
-	defer client.Close(context.TODO())
+	defer client.Close(context.TODO()) // nolint: errcheck
 	mock.MatchExpectationsInOrder(false)
 	mock.ExpectAllDBs().WithOptions(kivik.Options{"foo": 321})
 	_, err = client.AllDBs(context.TODO(), kivik.Options{"Foo": 123})
@@ -121,7 +119,7 @@ func TestExpectedAllDBsUnexpectedUnorderedSuccess(t *testing.T) {
 		fmt.Println("error creating mock database")
 		return
 	}
-	defer client.Close(context.TODO())
+	defer client.Close(context.TODO()) // nolint: errcheck
 	mock.MatchExpectationsInOrder(false)
 	mock.ExpectAllDBs().WithOptions(kivik.Options{"foo": 321})
 	mock.ExpectAllDBs().WithOptions(kivik.Options{"Foo": 123})
