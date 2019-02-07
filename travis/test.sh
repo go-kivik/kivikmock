@@ -1,14 +1,6 @@
 #!/bin/bash
 set -euC
 
-if [ "${TRAVIS_OS_NAME:-}" == "osx" ]; then
-    # We don't have docker in OSX, so skip these tests
-    unset KIVIK_TEST_DSN_COUCH16
-    unset KIVIK_TEST_DSN_COUCH17
-    unset KIVIK_TEST_DSN_COUCH20
-    unset KIVIK_TEST_DSN_COUCH21
-fi
-
 function join_list {
     local IFS=","
     echo "$*"
@@ -17,21 +9,20 @@ function join_list {
 case "$1" in
     "standard")
         ./travis/test_version.sh
-        go test -race $(go list ./... | grep -v /vendor/)
+        go test -race ./...
     ;;
     "gopherjs")
-        gopherjs test $(go list ./...)
+        gopherjs test ./...
     ;;
     "linter")
-        diff -u <(echo -n) <(gofmt -e -d $(find . -type f -name '*.go' -not -path "./vendor/*"))
         go install # to make gotype (run by gometalinter) happy
         go test -i
-        gometalinter.v1 --config=.linter.json
+        gometalinter.v2 --config=.linter.json
     ;;
     "coverage")
         echo "" > coverage.txt
 
-        TEST_PKGS=$(go list ./... | grep -v /test)
+        TEST_PKGS=$(go list ./...)
 
         for d in $TEST_PKGS; do
             go test -i $d

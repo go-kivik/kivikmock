@@ -6,39 +6,8 @@ curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 dep ensure
 
-function generate {
-    go get -u github.com/jteeuwen/go-bindata/...
-    go generate $(go list ./... | grep -v /vendor/)
-}
-
-function wait_for_server {
-    printf "Waiting for $1"
-    n=0
-    until [ $n -gt 5 ]; do
-        curl --output /dev/null --silent --head --fail $1 && break
-        printf '.'
-        n=$[$n+1]
-        sleep 1
-    done
-    printf "ready!\n"
-}
-
-function setup_couch22 {
-    if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-        return
-    fi
-    docker pull apache/couchdb:2.2.0
-    docker run -d -p 6004:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=abc123 --name couchdb22 apache/couchdb:2.2.0
-    wait_for_server http://localhost:6004/
-    curl --silent --fail -o /dev/null -X PUT http://admin:abc123@localhost:6004/_users
-    curl --silent --fail -o /dev/null -X PUT http://admin:abc123@localhost:6004/_replicator
-    curl --silent --fail -o /dev/null -X PUT http://admin:abc123@localhost:6004/_global_changes
-}
-
 case "$1" in
     "standard")
-        setup_couch22
-        generate
     ;;
     "gopherjs")
         if [ "$TRAVIS_OS_NAME" == "linux" ]; then
@@ -65,14 +34,11 @@ case "$1" in
         )
 
         go get -u -d -tags=js github.com/gopherjs/jsbuiltin
-        setup_couch22
-        generate
     ;;
     "linter")
-        go get -u gopkg.in/alecthomas/gometalinter.v1
-        gometalinter.v1 --install
+        go get -u gopkg.in/alecthomas/gometalinter.v2
+        gometalinter.v2 --install
     ;;
     "coverage")
-        generate
     ;;
 esac
