@@ -3,6 +3,8 @@ package kivikmock
 import (
 	"fmt"
 	"sync"
+
+	"github.com/go-kivik/kivik"
 )
 
 type expectation interface {
@@ -39,7 +41,50 @@ func (e *ExpectedClose) WillReturnError(err error) *ExpectedClose {
 func (e *ExpectedClose) String() string {
 	msg := "ExpectedClose => expecting client Close"
 	if e.err != nil {
-		return fmt.Sprintf("%s, which should return error: %s", msg, e.err)
+		msg += fmt.Sprintf(", which should return error: %s", e.err)
 	}
 	return msg
+}
+
+// ExpectedAllDBs is used to manage *kivik.Client.AllDBs expectation returned
+// by Mock.ExpectAllDBs.
+type ExpectedAllDBs struct {
+	commonExpectation
+	options map[string]interface{}
+	results []string
+}
+
+func (e *ExpectedAllDBs) String() string {
+	msg := "ExpectedAllDBs => expecting AllDBs which:"
+	if e.options == nil {
+		msg += "\n\t- is without options"
+	} else {
+		msg += fmt.Sprintf("\n\t- is with options %+v", e.options)
+	}
+	if len(e.results) > 0 {
+		msg += fmt.Sprintf("\n\t- should return: %v", e.results)
+	}
+	if e.err != nil {
+		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+	}
+	return msg
+}
+
+// WillReturnError allows setting an error for *kivik.Client.Close action.
+func (e *ExpectedAllDBs) WillReturnError(err error) *ExpectedAllDBs {
+	e.err = err
+	return e
+}
+
+// WithOptions will match the provided options against actual options passed
+// during execution.
+func (e *ExpectedAllDBs) WithOptions(options kivik.Options) *ExpectedAllDBs {
+	e.options = options
+	return e
+}
+
+// WillReturn sets the expected results.
+func (e *ExpectedAllDBs) WillReturn(results []string) *ExpectedAllDBs {
+	e.results = results
+	return e
 }

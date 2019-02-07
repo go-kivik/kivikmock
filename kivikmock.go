@@ -17,6 +17,8 @@ type Mock interface {
 	// ExpectationsWereMet returns an error if any expectations were not met.
 	ExpectationsWereMet() error
 
+	ExpectAllDBs() *ExpectedAllDBs
+
 	// MatchExpectationsInOrder indicates whether to match expectations in the
 	// order they were set.
 	//
@@ -65,6 +67,12 @@ func (c *kivikmock) MatchExpectationsInOrder(b bool) {
 
 func (c *kivikmock) ExpectClose() *ExpectedClose {
 	e := &ExpectedClose{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+func (c *kivikmock) ExpectAllDBs() *ExpectedAllDBs {
+	e := &ExpectedAllDBs{}
 	c.expected = append(c.expected, e)
 	return e
 }
