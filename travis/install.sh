@@ -2,11 +2,9 @@
 set -euC
 set -o xtrace
 
-if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-    brew install glide
-fi
+curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
-glide install
+dep ensure
 
 function generate {
     go get -u github.com/jteeuwen/go-bindata/...
@@ -50,8 +48,6 @@ case "$1" in
             sudo apt-get install -y nodejs
         fi
         npm install
-        # Install Go deps only needed by PouchDB driver/GopherJS
-        glide -y glide.gopherjs.yaml install
         # Then install GopherJS and related dependencies
         go get -u github.com/gopherjs/gopherjs
 
