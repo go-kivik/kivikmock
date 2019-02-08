@@ -17,7 +17,13 @@ type Mock interface {
 	// ExpectationsWereMet returns an error if any expectations were not met.
 	ExpectationsWereMet() error
 
+	// ExpectAllDBs queues an expectation for this client action to be
+	// triggered. *ExpectedAllDBs allows mocking the response.
 	ExpectAllDBs() *ExpectedAllDBs
+
+	// ExpectAuthenticate queues an expectation for this client action to be
+	// triggered. *ExpectAuthenticate allows mocking the response.
+	ExpectAuthenticate() *ExpectedAuthenticate
 
 	// MatchExpectationsInOrder indicates whether to match expectations in the
 	// order they were set.
@@ -73,6 +79,12 @@ func (c *kivikmock) ExpectClose() *ExpectedClose {
 
 func (c *kivikmock) ExpectAllDBs() *ExpectedAllDBs {
 	e := &ExpectedAllDBs{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+func (c *kivikmock) ExpectAuthenticate() *ExpectedAuthenticate {
+	e := &ExpectedAuthenticate{}
 	c.expected = append(c.expected, e)
 	return e
 }

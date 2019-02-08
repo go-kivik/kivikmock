@@ -105,3 +105,50 @@ func (c *kivikmock) AllDBs(ctx context.Context, opts map[string]interface{}) ([]
 
 	return expected.results, expected.err
 }
+
+var _ driver.Authenticator = &kivikmock{}
+
+func (c *kivikmock) Authenticate(ctx context.Context, authenticator interface{}) error {
+	c.drv.Lock()
+	defer c.drv.Unlock()
+
+	var expected *ExpectedAuthenticate
+	var fulfilled int
+	var ok bool
+	for _, next := range c.expected {
+		next.Lock()
+		if next.fulfilled() {
+			next.Unlock()
+			fulfilled++
+			continue
+		}
+
+		if c.ordered {
+			if expected, ok = next.(*ExpectedAuthenticate); ok {
+				break
+			}
+			next.Unlock()
+			return fmt.Errorf("call to Authenticate was not expected. Next expectation is: %s", next)
+		}
+		if e, ok := next.(*ExpectedAuthenticate); ok {
+			if reflect.TypeOf(authenticator).Name() == e.authType {
+				expected = e
+				break
+			}
+		}
+		next.Unlock()
+	}
+
+	if expected == nil {
+		msg := "call to Authenticate was not expected"
+		if fulfilled == len(c.expected) {
+			msg = "all expectations were already fulfilled, " + msg
+		}
+		return errors.New(msg)
+	}
+
+	defer expected.Unlock()
+	expected.triggered = true
+
+	return expected.err
+}
