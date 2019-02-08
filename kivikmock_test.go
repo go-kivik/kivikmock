@@ -2,10 +2,12 @@ package kivikmock
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/flimzy/testy"
+	"github.com/go-kivik/couchdb"
 	"github.com/go-kivik/kivik"
 )
 
@@ -113,7 +115,6 @@ func TestExpectedAllDBsUnexpectedUnorderedError(t *testing.T) {
 }
 
 func TestExpectedAllDBsUnexpectedUnorderedSuccess(t *testing.T) {
-	// Open new mock database
 	client, mock, err := New()
 	if err != nil {
 		fmt.Println("error creating mock database")
@@ -127,4 +128,60 @@ func TestExpectedAllDBsUnexpectedUnorderedSuccess(t *testing.T) {
 	testy.Error(t, "", err)
 	err = mock.ExpectationsWereMet()
 	testy.ErrorRE(t, `map\[foo:321\]`, err)
+}
+
+func TestExpectedAuthenticateError(t *testing.T) {
+	client, mock, err := New()
+	if err != nil {
+		fmt.Println("error creating mock database")
+		return
+	}
+	defer client.Close(context.TODO()) // nolint: errcheck
+	mock.ExpectAuthenticate().WillReturnError(errors.New("auth err"))
+	err = client.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
+	testy.Error(t, "auth err", err)
+	err = mock.ExpectationsWereMet()
+	testy.ErrorRE(t, `map\[foo:321\]`, err)
+}
+
+func TestExpectedAuthenticateOrder(t *testing.T) {
+	client, mock, err := New()
+	if err != nil {
+		fmt.Println("error creating mock database")
+		return
+	}
+	defer client.Close(context.TODO()) // nolint: errcheck
+	mock.ExpectClose()
+	err = client.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
+	testy.Error(t, "call to Authenticate was not expected. Next expectation is: ExpectedClose => expecting client Close", err)
+	err = mock.ExpectationsWereMet()
+	testy.ErrorRE(t, `map\[foo:321\]`, err)
+}
+
+func TestExpectedAuthenticateUnordered(t *testing.T) {
+	client, mock, err := New()
+	if err != nil {
+		fmt.Println("error creating mock database")
+		return
+	}
+	defer client.Close(context.TODO()) // nolint: errcheck
+	mock.MatchExpectationsInOrder(false)
+	mock.ExpectClose()
+	mock.ExpectAuthenticate().WithAuthenticator(couchdb.BasicAuth("foo", "bar"))
+	err = client.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
+	testy.Error(t, "", err)
+	err = mock.ExpectationsWereMet()
+	testy.ErrorRE(t, `ExpectedClose => expecting client Close`, err)
+}
+
+func TestExpectedAuthenticateUnexpected(t *testing.T) {
+	client, mock, err := New()
+	if err != nil {
+		fmt.Println("error creating mock database")
+		return
+	}
+	defer client.Close(context.TODO()) // nolint: errcheck
+	mock.MatchExpectationsInOrder(false)
+	err = client.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
+	testy.Error(t, "all expectations were already fulfilled, call to Authenticate was not expected", err)
 }

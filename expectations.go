@@ -2,6 +2,7 @@ package kivikmock
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 
 	"github.com/go-kivik/kivik"
@@ -86,5 +87,39 @@ func (e *ExpectedAllDBs) WithOptions(options kivik.Options) *ExpectedAllDBs {
 // WillReturn sets the expected results.
 func (e *ExpectedAllDBs) WillReturn(results []string) *ExpectedAllDBs {
 	e.results = results
+	return e
+}
+
+// ExpectedAuthenticate is used to manage *kivik.Client.Authenticate
+// expectation returned by Mock.ExpectAuthenticate.
+type ExpectedAuthenticate struct {
+	commonExpectation
+	authType string
+}
+
+func (e *ExpectedAuthenticate) String() string {
+	msg := "ExpectedAuthenticate => expecting Authenticate which:"
+	if e.authType == "" {
+		msg += "\n\t- has any authenticator"
+	} else {
+		msg += fmt.Sprintf("\n\t- has authenticator of type %s", e.authType)
+	}
+	if e.err != nil {
+		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+	}
+	return msg
+}
+
+// WillReturnError allows setting an error for *kivik.Client.Authenticate action.
+func (e *ExpectedAuthenticate) WillReturnError(err error) *ExpectedAuthenticate {
+	e.err = err
+	return e
+}
+
+// WithAuthenticator will match the the provide authenticator _type_ against
+// that provided. There is no way to validate the authenticated credentials
+// with this method.
+func (e *ExpectedAuthenticate) WithAuthenticator(authenticator interface{}) *ExpectedAuthenticate {
+	e.authType = reflect.TypeOf(authenticator).Name()
 	return e
 }
