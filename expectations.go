@@ -1,6 +1,7 @@
 package kivikmock
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"sync"
@@ -122,4 +123,30 @@ func (e *ExpectedAuthenticate) WillReturnError(err error) *ExpectedAuthenticate 
 func (e *ExpectedAuthenticate) WithAuthenticator(authenticator interface{}) *ExpectedAuthenticate {
 	e.authType = reflect.TypeOf(authenticator).Name()
 	return e
+}
+
+// ExpectedClusterSetup is used to manage *kivik.Client.ClusterSetup
+// expectation returned by Mock.ExpectClusterSetup.
+type ExpectedClusterSetup struct {
+	commonExpectation
+	action interface{}
+}
+
+func (e *ExpectedClusterSetup) String() string {
+	msg := "ExpectedClusterSetup => expecting ClusterSetup which:"
+	if e.action == nil {
+		msg += "\n\t- has any action"
+	} else {
+		msg += "\n\t- has the action:\n\t\t"
+		b, err := json.MarshalIndent(e.action, "\t\t", "  ")
+		if err != nil {
+			msg += fmt.Sprintf("<<unmarshalable object: %s>>", err)
+		} else {
+			msg += fmt.Sprintf("%s", string(b))
+		}
+	}
+	if e.err != nil {
+		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+	}
+	return msg
 }

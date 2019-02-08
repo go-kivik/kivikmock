@@ -25,6 +25,10 @@ type Mock interface {
 	// triggered. *ExpectAuthenticate allows mocking the response.
 	ExpectAuthenticate() *ExpectedAuthenticate
 
+	// ExpectClusterSetup queues an expectation for this client action to be
+	// triggered.
+	ExpectClusterSetup() *ExpectedClusterSetup
+
 	// MatchExpectationsInOrder indicates whether to match expectations in the
 	// order they were set.
 	//
@@ -85,6 +89,12 @@ func (c *kivikmock) ExpectAllDBs() *ExpectedAllDBs {
 
 func (c *kivikmock) ExpectAuthenticate() *ExpectedAuthenticate {
 	e := &ExpectedAuthenticate{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+func (c *kivikmock) ExpectClusterSetup() *ExpectedClusterSetup {
+	e := &ExpectedClusterSetup{}
 	c.expected = append(c.expected, e)
 	return e
 }
