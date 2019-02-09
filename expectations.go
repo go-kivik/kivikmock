@@ -381,3 +381,76 @@ func (e *ExpectedDBExists) WillDelay(delay time.Duration) *ExpectedDBExists {
 	e.delay = delay
 	return e
 }
+
+// ExpectedDestroyDB is used to manage *kivik.Client.DestroyDB expectation
+// returned by Mock.DestroyDB.
+type ExpectedDestroyDB struct {
+	commonExpectation
+	name    string
+	options map[string]interface{}
+}
+
+func (e *ExpectedDestroyDB) String() string {
+	msg := "call to DestroyDB() which:"
+	if e.name == "" {
+		msg += "\n\t- has any name"
+	} else {
+		msg += "\n\t- has name: " + e.name
+	}
+	msg += optionsString(e.options)
+	msg += errorString(e.err)
+	return msg
+}
+
+func (e *ExpectedDestroyDB) method(v bool) string {
+	if !v {
+		return "DestroyDB()"
+	}
+	var name, options string
+	if e.name == "" {
+		name = "?"
+	} else {
+		name = fmt.Sprintf("%q", e.name)
+	}
+	if e.options == nil {
+		options = "?"
+	} else {
+		options = fmt.Sprintf("%v", e.options)
+	}
+	return fmt.Sprintf("DestroyDB(ctx, %s, %s)", name, options)
+}
+
+func (e *ExpectedDestroyDB) met(ex expectation) bool {
+	exp := ex.(*ExpectedDestroyDB)
+	if exp.name == "" && exp.options == nil {
+		return true
+	}
+	nameOK := exp.name == "" || exp.name == e.name
+	optionsOK := exp.options == nil || reflect.DeepEqual(exp.options, e.options)
+	return nameOK && optionsOK
+}
+
+// WithName sets the expectation that DestroyDB will be called with this name.
+func (e *ExpectedDestroyDB) WithName(name string) *ExpectedDestroyDB {
+	e.name = name
+	return e
+}
+
+// WithOptions sets the expectation that DestroyDB will be called with these
+// options.
+func (e *ExpectedDestroyDB) WithOptions(options map[string]interface{}) *ExpectedDestroyDB {
+	e.options = options
+	return e
+}
+
+// WillReturnError causes DestroyDB to return this error.
+func (e *ExpectedDestroyDB) WillReturnError(err error) *ExpectedDestroyDB {
+	e.err = err
+	return e
+}
+
+// WillDelay will cause execution of DestroyDB to delay by duration d.
+func (e *ExpectedDestroyDB) WillDelay(delay time.Duration) *ExpectedDestroyDB {
+	e.delay = delay
+	return e
+}

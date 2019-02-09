@@ -122,3 +122,23 @@ func TestDBExistsMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestDestroyDBMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedDestroyDB{},
+		standard: "DestroyDB()",
+		verbose:  "DestroyDB(ctx, ?, ?)",
+	})
+	tests.Add("name", methodTest{
+		input:    &ExpectedDestroyDB{name: "foo"},
+		standard: "DestroyDB()",
+		verbose:  `DestroyDB(ctx, "foo", ?)`,
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedDestroyDB{options: map[string]interface{}{"foo": 12}},
+		standard: "DestroyDB()",
+		verbose:  `DestroyDB(ctx, ?, map[foo:12])`,
+	})
+	tests.Run(t, testMethod)
+}

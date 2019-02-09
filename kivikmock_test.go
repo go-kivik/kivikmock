@@ -318,3 +318,44 @@ func TestDBExists(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestDestroyDB(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDestroyDB().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DestroyDB(newCanceledContext(), "foo")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("name", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDestroyDB().WithName("foo")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DestroyDB(newCanceledContext(), "foo")
+			testy.Error(t, "", err)
+		},
+	})
+	tests.Add("options", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDestroyDB().WithOptions(kivik.Options{"foo": 123})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DestroyDB(newCanceledContext(), "foo")
+			testy.ErrorRE(t, `map\[foo:123]`, err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDestroyDB().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DestroyDB(newCanceledContext(), "foo")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}

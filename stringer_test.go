@@ -143,3 +143,20 @@ func TestDBExistsString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestDestroyDBString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedDestroyDB{},
+		expected: `call to DestroyDB() which:
+	- has any name
+	- has any options`,
+	})
+	tests.Add("name", stringerTest{
+		input: &ExpectedDestroyDB{name: "foo"},
+		expected: `call to DestroyDB() which:
+	- has name: foo
+	- has any options`,
+	})
+	tests.Run(t, testStringer)
+}

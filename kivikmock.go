@@ -37,6 +37,10 @@ type Mock interface {
 	// triggered.
 	ExpectDBExists() *ExpectedDBExists
 
+	// ExpectDestroyDB queues an expectation for this client action to be
+	// triggered.
+	ExpectDestroyDB() *ExpectedDestroyDB
+
 	// MatchExpectationsInOrder indicates whether to match expectations in the
 	// order they were set.
 	//
@@ -115,6 +119,12 @@ func (c *kivikmock) ExpectClusterStatus() *ExpectedClusterStatus {
 
 func (c *kivikmock) ExpectDBExists() *ExpectedDBExists {
 	e := &ExpectedDBExists{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+func (c *kivikmock) ExpectDestroyDB() *ExpectedDestroyDB {
+	e := &ExpectedDestroyDB{}
 	c.expected = append(c.expected, e)
 	return e
 }

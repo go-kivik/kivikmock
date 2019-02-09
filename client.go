@@ -74,3 +74,13 @@ func (c *kivikmock) DBExists(ctx context.Context, name string, options map[strin
 	}
 	return expected.exists, expected.wait(ctx)
 }
+
+func (c *kivikmock) DestroyDB(ctx context.Context, name string, options map[string]interface{}) error {
+	expected := &ExpectedDestroyDB{
+		name: name,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return err
+	}
+	return expected.wait(ctx)
+}
