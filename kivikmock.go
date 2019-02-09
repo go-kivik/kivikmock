@@ -134,7 +134,7 @@ func (c *kivikmock) nextExpectation(actual expectation) error {
 					break
 				}
 				next.Unlock()
-				return fmt.Errorf("Expectation not met:\nExpected: %s\n  Actual: %s\n",
+				return fmt.Errorf("Expectation not met:\nExpected: %s\n  Actual: %s",
 					next, actual)
 			}
 			next.Unlock()
@@ -160,10 +160,6 @@ func (c *kivikmock) nextExpectation(actual expectation) error {
 
 	reflect.ValueOf(actual).Elem().Set(reflect.ValueOf(expected).Elem())
 	return nil
-}
-
-type equaler interface {
-	equal(expectation) bool
 }
 
 func meets(a, e expectation) bool {

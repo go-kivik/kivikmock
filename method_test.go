@@ -55,7 +55,7 @@ func TestAuthenticateMethod(t *testing.T) {
 		standard: "Authenticate()",
 		verbose:  "Authenticate(ctx, <T>)",
 	})
-	tests.Add("auther", methodTest{
+	tests.Add("authenticator", methodTest{
 		input:    &ExpectedAuthenticate{authType: "foo"},
 		standard: "Authenticate()",
 		verbose:  "Authenticate(ctx, <foo>)",

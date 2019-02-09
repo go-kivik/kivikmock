@@ -24,7 +24,7 @@ func testMock(t *testing.T, test mockTest) {
 	if err != nil {
 		t.Fatal("error creating mock database")
 	}
-	defer client.Close(context.TODO())
+	defer client.Close(context.TODO()) // nolint: errcheck
 	if test.setup != nil {
 		test.setup(mock)
 	}
@@ -130,7 +130,7 @@ func TestAuthenticate(t *testing.T) {
 			testy.Error(t, "auth error", err)
 		},
 	})
-	tests.Add("wrong auther", mockTest{
+	tests.Add("wrong authenticator", mockTest{
 		setup: func(m Mock) {
 			m.ExpectAuthenticate().WithAuthenticator(int(3))
 		},
@@ -140,8 +140,7 @@ func TestAuthenticate(t *testing.T) {
 Expected: call to Authenticate() which:
 	- has an authenticator of type: int
   Actual: call to Authenticate() which:
-	- has an authenticator of type: authFunc
-`
+	- has an authenticator of type: authFunc`
 			testy.Error(t, expected, err)
 		},
 	})

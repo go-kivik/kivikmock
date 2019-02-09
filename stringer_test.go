@@ -62,7 +62,7 @@ func TestAuthenticateString(t *testing.T) {
 		expected: `call to Authenticate() which:
 	- has any authenticator`,
 	})
-	tests.Add("auther", stringerTest{
+	tests.Add("authenticator", stringerTest{
 		input: &ExpectedAuthenticate{authType: "foo"},
 		expected: `call to Authenticate() which:
 	- has an authenticator of type: foo`,
