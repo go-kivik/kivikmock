@@ -157,3 +157,13 @@ func TestDBsStatsMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestPingMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedPing{},
+		standard: "Ping()",
+		verbose:  "Ping(ctx)",
+	})
+	tests.Run(t, testMethod)
+}

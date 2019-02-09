@@ -2,7 +2,6 @@
 - client.DB https://godoc.org/github.com/go-kivik/kivik#Client.DB
 - client.DBUpdates https://godoc.org/github.com/go-kivik/kivik#Client.DBUpdates
 - client.GetReplications https://godoc.org/github.com/go-kivik/kivik#Client.GetReplications
-- client.Ping https://godoc.org/github.com/go-kivik/kivik#Client.Ping
 - client.Replicate https://godoc.org/github.com/go-kivik/kivik#Client.Replicate
 - client.Session https://godoc.org/github.com/go-kivik/kivik#Client.Session
 - client.Version https://godoc.org/github.com/go-kivik/kivik#Client.Version

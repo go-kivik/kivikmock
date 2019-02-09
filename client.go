@@ -85,6 +85,8 @@ func (c *kivikmock) DestroyDB(ctx context.Context, name string, options map[stri
 	return expected.wait(ctx)
 }
 
+var _ driver.DBsStatser = &kivikmock{}
+
 func (c *kivikmock) DBsStats(ctx context.Context, names []string) ([]*driver.DBStats, error) {
 	expected := &ExpectedDBsStats{
 		names: names,
@@ -99,4 +101,12 @@ func (c *kivikmock) DBsStats(ctx context.Context, names []string) ([]*driver.DBS
 	return stats, expected.wait(ctx)
 }
 
-var _ driver.DBsStatser = &kivikmock{}
+var _ driver.Pinger = &kivikmock{}
+
+func (c *kivikmock) Ping(ctx context.Context) (bool, error) {
+	expected := &ExpectedPing{}
+	if err := c.nextExpectation(expected); err != nil {
+		return false, err
+	}
+	return expected.responded, expected.wait(ctx)
+}

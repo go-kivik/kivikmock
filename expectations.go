@@ -498,3 +498,46 @@ func (e *ExpectedDBsStats) WillDelay(delay time.Duration) *ExpectedDBsStats {
 	e.delay = delay
 	return e
 }
+
+// ExpectedPing is used to manage *kivik.Client.Ping expectation returned by
+// Mock.ExpectPing.
+type ExpectedPing struct {
+	commonExpectation
+	responded bool
+}
+
+func (e *ExpectedPing) String() string {
+	msg := "call to Ping()"
+	extra := delayString(e.delay) + errorString(e.err)
+	if extra != "" {
+		msg += " which:" + extra
+	}
+	return msg
+}
+
+func (e *ExpectedPing) method(v bool) string {
+	if v {
+		return "Ping(ctx)"
+	}
+	return "Ping()"
+}
+
+func (e *ExpectedPing) met(_ expectation) bool { return true }
+
+// WillReturn sets the value to be returned by the call to Ping.
+func (e *ExpectedPing) WillReturn(responded bool) *ExpectedPing {
+	e.responded = responded
+	return e
+}
+
+// WillReturnError sets the error to be returned by the call to Ping.
+func (e *ExpectedPing) WillReturnError(err error) *ExpectedPing {
+	e.err = err
+	return e
+}
+
+// WillDelay will cause execution of Ping to delay by duration d.
+func (e *ExpectedPing) WillDelay(delay time.Duration) *ExpectedPing {
+	e.delay = delay
+	return e
+}

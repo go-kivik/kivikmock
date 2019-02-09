@@ -409,3 +409,50 @@ func TestDBsStats(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestPing(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("unreachable", mockTest{
+		setup: func(m Mock) {
+			m.ExpectPing()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			reachable, err := c.Ping(context.TODO())
+			testy.Error(t, "", err)
+			if reachable {
+				t.Errorf("Expected db to be unreachable")
+			}
+		},
+	})
+	tests.Add("reachable", mockTest{
+		setup: func(m Mock) {
+			m.ExpectPing().WillReturn(true)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			reachable, err := c.Ping(context.TODO())
+			testy.Error(t, "", err)
+			if !reachable {
+				t.Errorf("Expected db to be reachable")
+			}
+		},
+	})
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectPing().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Ping(context.TODO())
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectPing().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Ping(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}

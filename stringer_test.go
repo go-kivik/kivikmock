@@ -232,3 +232,22 @@ func TestDBsStatsString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestPingString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input:    &ExpectedPing{},
+		expected: `call to Ping()`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedPing{commonExpectation: commonExpectation{err: errors.New("foo err")}},
+		expected: `call to Ping() which:
+	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedPing{commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to Ping() which:
+	- should delay for: 1s`,
+	})
+	tests.Run(t, testStringer)
+}

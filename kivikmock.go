@@ -45,6 +45,9 @@ type Mock interface {
 	// triggered.
 	ExpectDestroyDB() *ExpectedDestroyDB
 
+	// ExpectPing queues an expectation for Ping() to be triggered.
+	ExpectPing() *ExpectedPing
+
 	// MatchExpectationsInOrder indicates whether to match expectations in the
 	// order they were set.
 	//
@@ -135,6 +138,12 @@ func (c *kivikmock) ExpectDestroyDB() *ExpectedDestroyDB {
 
 func (c *kivikmock) ExpectDBsStats() *ExpectedDBsStats {
 	e := &ExpectedDBsStats{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+func (c *kivikmock) ExpectPing() *ExpectedPing {
+	e := &ExpectedPing{}
 	c.expected = append(c.expected, e)
 	return e
 }
