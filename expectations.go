@@ -51,6 +51,8 @@ func (e *ExpectedClose) method(v bool) string {
 	return "Close()"
 }
 
+func (e *ExpectedClose) equal(_ expectation) bool { return true }
+
 // WillReturnError allows setting an error for *kivik.Client.Close action.
 func (e *ExpectedClose) WillReturnError(err error) *ExpectedClose {
 	e.err = err
