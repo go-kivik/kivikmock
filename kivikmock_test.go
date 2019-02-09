@@ -55,7 +55,7 @@ func TestCloseClient(t *testing.T) {
 	})
 	tests.Add("delay", mockTest{
 		setup: func(m Mock) {
-			m.ExpectClose().WithDelay(time.Second)
+			m.ExpectClose().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			err := c.Close(newCanceledContext())
@@ -100,7 +100,7 @@ func TestAllDBs(t *testing.T) {
 	})
 	tests.Add("delay", mockTest{
 		setup: func(m Mock) {
-			m.ExpectAllDBs().WithDelay(time.Second)
+			m.ExpectAllDBs().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			_, err := c.AllDBs(newCanceledContext())
@@ -146,7 +146,7 @@ Expected: call to Authenticate() which:
 	})
 	tests.Add("delay", mockTest{
 		setup: func(m Mock) {
-			m.ExpectAuthenticate().WithDelay(time.Second)
+			m.ExpectAuthenticate().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			err := c.Authenticate(newCanceledContext(), int(1))
@@ -178,7 +178,7 @@ func TestClusterSetup(t *testing.T) {
 	})
 	tests.Add("delay", mockTest{
 		setup: func(m Mock) {
-			m.ExpectClusterSetup().WithDelay(time.Second)
+			m.ExpectClusterSetup().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			err := c.ClusterSetup(newCanceledContext(), 123)
@@ -231,7 +231,7 @@ func TestClusterStatus(t *testing.T) {
 	})
 	tests.Add("delay", mockTest{
 		setup: func(m Mock) {
-			m.ExpectClusterStatus().WithDelay(time.Second)
+			m.ExpectClusterStatus().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			_, err := c.ClusterStatus(newCanceledContext())
@@ -258,6 +258,103 @@ func TestClusterStatus(t *testing.T) {
 		test: func(t *testing.T, c *kivik.Client) {
 			_, err := c.ClusterStatus(context.TODO())
 			testy.Error(t, "call to ClusterStatus(ctx, ?) was not expected", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
+
+func TestDBExists(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDBExists().WillReturnError(errors.New("existence error"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBExists(context.TODO(), "foo")
+			testy.Error(t, "existence error", err)
+		},
+	})
+	tests.Add("name", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDBExists().WithName("foo")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			exists, err := c.DBExists(context.TODO(), "foo")
+			testy.Error(t, "", err)
+			if exists {
+				t.Errorf("DB shouldn't exist")
+			}
+		},
+	})
+	tests.Add("options", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDBExists().WithOptions(map[string]interface{}{"foo": 123})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBExists(context.TODO(), "foo")
+			testy.ErrorRE(t, `map\[foo:123]`, err)
+		},
+	})
+	tests.Add("exists", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDBExists().WillReturn(true)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			exists, err := c.DBExists(context.TODO(), "foo")
+			testy.ErrorRE(t, "", err)
+			if !exists {
+				t.Errorf("DB should exist")
+			}
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDBExists().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBExists(newCanceledContext(), "foo")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
+
+func TestDestroyDB(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDestroyDB().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DestroyDB(newCanceledContext(), "foo")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("name", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDestroyDB().WithName("foo")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DestroyDB(newCanceledContext(), "foo")
+			testy.Error(t, "", err)
+		},
+	})
+	tests.Add("options", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDestroyDB().WithOptions(kivik.Options{"foo": 123})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DestroyDB(newCanceledContext(), "foo")
+			testy.ErrorRE(t, `map\[foo:123]`, err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDestroyDB().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DestroyDB(newCanceledContext(), "foo")
+			testy.Error(t, "context canceled", err)
 		},
 	})
 	tests.Run(t, testMock)

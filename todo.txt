@@ -1,7 +1,5 @@
-- Delays
 - client.CreateDB https://godoc.org/github.com/go-kivik/kivik#Client.CreateDB
 - client.DB https://godoc.org/github.com/go-kivik/kivik#Client.DB
-- client.DBExists https://godoc.org/github.com/go-kivik/kivik#Client.DBExists
 - client.DBUpdates https://godoc.org/github.com/go-kivik/kivik#Client.DBUpdates
 - client.DBsStats https://godoc.org/github.com/go-kivik/kivik#Client.DBsStats
 - client.DestroyDB https://godoc.org/github.com/go-kivik/kivik#Client.DestroyDB
