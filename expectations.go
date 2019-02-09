@@ -1,26 +1,38 @@
 package kivikmock
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 	"sync"
 
+	"github.com/flimzy/diff"
 	"github.com/go-kivik/kivik"
 )
 
 type expectation interface {
+	fulfill()
 	fulfilled() bool
 	Lock()
 	Unlock()
 	String() string
+	// method should return the name of the method that would trigger this
+	// condition. If verbose is true, the output should disambiguate between
+	// different calls to the same method.
+	method(verbose bool) string
 }
 
 // commonExpectation satisfies the expectation interface, except the String()
-// method.
+// and method() methods.
 type commonExpectation struct {
 	sync.Mutex
 	triggered bool
 	err       error // nolint: structcheck
+}
+
+func (e *commonExpectation) fulfill() {
+	e.triggered = true
 }
 
 func (e *commonExpectation) fulfilled() bool {
@@ -32,6 +44,15 @@ func (e *commonExpectation) fulfilled() bool {
 type ExpectedClose struct {
 	commonExpectation
 }
+
+func (e *ExpectedClose) method(v bool) string {
+	if v {
+		return "Close(ctx)"
+	}
+	return "Close()"
+}
+
+func (e *ExpectedClose) equal(_ expectation) bool { return true }
 
 // WillReturnError allows setting an error for *kivik.Client.Close action.
 func (e *ExpectedClose) WillReturnError(err error) *ExpectedClose {
@@ -53,6 +74,23 @@ type ExpectedAllDBs struct {
 	commonExpectation
 	options map[string]interface{}
 	results []string
+}
+
+func (e *ExpectedAllDBs) method(v bool) string {
+	if v {
+		if e.options == nil {
+			return "AllDBs(ctx, nil)"
+		}
+		return fmt.Sprintf("AllDBs(ctx, %#v)", e.options)
+	}
+	return "AllDBs()"
+}
+
+func (e *ExpectedAllDBs) equal(other expectation) bool {
+	if e.options == nil {
+		return true
+	}
+	return reflect.DeepEqual(e.options, other.(*ExpectedAllDBs).options)
 }
 
 func (e *ExpectedAllDBs) String() string {
@@ -97,17 +135,57 @@ type ExpectedAuthenticate struct {
 	authType string
 }
 
-func (e *ExpectedAuthenticate) String() string {
-	msg := "ExpectedAuthenticate => expecting Authenticate which:"
+func (e *ExpectedAuthenticate) method(v bool) string {
+	if v {
+		return fmt.Sprintf("Authenticate(ctx, <%s>)", e.authType)
+	}
+	return "Authenticate()"
+}
+
+func (e *ExpectedAuthenticate) equal(other expectation) bool {
 	if e.authType == "" {
-		msg += "\n\t- has any authenticator"
-	} else {
-		msg += fmt.Sprintf("\n\t- has authenticator of type %s", e.authType)
+		return true
+	}
+	o, _ := other.(*ExpectedAuthenticate)
+	return e.authType == o.authType
+}
+
+func (e *ExpectedAuthenticate) String() string {
+	msg := "ExpectedAuthenticate => expecting Authenticate"
+	modifiers := []string{}
+	if e.authType != "" {
+		modifiers = append(modifiers, fmt.Sprintf("expects an authenticator of type '%s'", e.authType))
 	}
 	if e.err != nil {
-		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+		modifiers = append(modifiers, "should return an error")
+	}
+	if len(modifiers) > 0 {
+		return msg + " which " + strings.Join(modifiers, " and ")
 	}
 	return msg
+}
+
+// Format satisfies the fmt.Formatter interface.
+func (e *ExpectedAuthenticate) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, e.String()) // nolint: errcheck
+	case 'v':
+		if !f.Flag('+') {
+			fmt.Fprintf(f, "%s", e) // nolint: errcheck
+			return
+		}
+		msg := "ExpectedAuthenticate => expecting Authenticate which:"
+		if e.authType == "" {
+			msg += "\n\t- expects any authenticator"
+		} else {
+			msg += "\n\t- expects an authenticator of type: " + e.authType
+		}
+		if e.err != nil {
+			msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+		}
+		fmt.Fprint(f, msg) // nolint: errcheck
+	}
 }
 
 // WillReturnError allows setting an error for *kivik.Client.Authenticate action.
@@ -121,5 +199,154 @@ func (e *ExpectedAuthenticate) WillReturnError(err error) *ExpectedAuthenticate 
 // with this method.
 func (e *ExpectedAuthenticate) WithAuthenticator(authenticator interface{}) *ExpectedAuthenticate {
 	e.authType = reflect.TypeOf(authenticator).Name()
+	return e
+}
+
+// ExpectedClusterSetup is used to manage *kivik.Client.ClusterSetup
+// expectation returned by Mock.ExpectClusterSetup.
+type ExpectedClusterSetup struct {
+	commonExpectation
+	action interface{}
+}
+
+func (e *ExpectedClusterSetup) method(v bool) string {
+	if v {
+		return fmt.Sprintf("ClusterSetup(ctx, %#v)", e.action)
+	}
+	return "ClusterSetup()"
+}
+
+func (e *ExpectedClusterSetup) equal(actual expectation) bool {
+	if e.action == nil {
+		return true
+	}
+	return diff.AsJSON(e.action, actual.(*ExpectedClusterSetup).action) == nil
+}
+
+// Format satisfies the fmt.Formatter interface
+func (e *ExpectedClusterSetup) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, e.String()) // nolint: errcheck
+	case 'v':
+		if !f.Flag('+') {
+			fmt.Fprintf(f, "%s", e) // nolint: errcheck
+			return
+		}
+		msg := "ExpectedClusterSetup => expecting ClusterSetup which:"
+		if e.action == nil {
+			msg += "\n\t- expects any action"
+		} else {
+			msg += "\n\t- expects the following action:"
+			b, err := json.MarshalIndent(e.action, "\t\t", "  ")
+			if err != nil {
+				msg += fmt.Sprintf("\n\t\t<<unmarshalable: %s>>", err)
+			} else {
+				msg += "\n\t\t" + string(b)
+			}
+		}
+		if e.err != nil {
+			msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+		}
+		fmt.Fprint(f, msg) // nolint: errcheck
+	}
+}
+
+func (e *ExpectedClusterSetup) String() string {
+	msg := "ExpectedClusterSetup => expecting ClusterSetup"
+	modifiers := []string{}
+	if e.action != nil {
+		modifiers = append(modifiers, "has the desired action")
+	}
+	if e.err != nil {
+		modifiers = append(modifiers, "should return an error")
+	}
+	if len(modifiers) > 0 {
+		msg = msg + " which " + strings.Join(modifiers, " and ")
+	}
+	return msg
+}
+
+// WithAction specifies the action to be matched. Note that this expectation
+// is compared with the actual action's marshaled JSON output, so it is not
+// essential that the data types match exactly, in a Go sense.
+func (e *ExpectedClusterSetup) WithAction(action interface{}) *ExpectedClusterSetup {
+	e.action = action
+	return e
+}
+
+// ExpectedClusterStatus is used to manage *kivik.Client.ClusterStatus
+// expectation returned by Mock.ExpectClusterStatus.
+type ExpectedClusterStatus struct {
+	commonExpectation
+	options map[string]interface{}
+	status  string
+	err     error
+}
+
+func (e *ExpectedClusterStatus) method(v bool) string {
+	if v {
+		if e.options == nil {
+			return "ClusterStatus(ctx, nil)"
+		}
+		return fmt.Sprintf("ClusterStatus(ctx, %+v)", e.options)
+	}
+	return "ClusterStatus()"
+}
+
+func (e *ExpectedClusterStatus) String() string {
+	msg := "ExpectedClusterStatus => expecting ClusterStatus"
+	modifiers := []string{}
+	if e.options != nil {
+		modifiers = append(modifiers, "has the desired options")
+	}
+	if e.err != nil {
+		modifiers = append(modifiers, "should return an error")
+	}
+	if len(modifiers) > 0 {
+		msg = msg + " which " + strings.Join(modifiers, " and ")
+	}
+	return msg
+}
+
+// Format satisfies the fmt.Formatter interface
+func (e *ExpectedClusterStatus) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, e.String()) // nolint: errcheck
+	case 'v':
+		if !f.Flag('+') {
+			fmt.Fprintf(f, "%s", e) // nolint: errcheck
+			return
+		}
+		msg := "ExpectedClusterStatus => expecting ClusterStatus which:"
+		if e.options == nil {
+			msg += "\n\t- expects any options"
+		} else {
+			msg += fmt.Sprintf("\n\t- expects the options: %#v", e.options)
+		}
+		if e.err != nil {
+			msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+		}
+		fmt.Fprint(f, msg) // nolint: errcheck
+	}
+}
+
+// WithOptions sets the expectation that ClusterStatus will be called with the
+// provided options.
+func (e *ExpectedClusterStatus) WithOptions(options map[string]interface{}) *ExpectedClusterStatus {
+	e.options = options
+	return e
+}
+
+// WillReturn causes ClusterStatus to mock this return value.
+func (e *ExpectedClusterStatus) WillReturn(status string) *ExpectedClusterStatus {
+	e.status = status
+	return e
+}
+
+// WillReturnError causes ClusterStatus to mock this return error.
+func (e *ExpectedClusterStatus) WillReturnError(err error) *ExpectedClusterStatus {
+	e.err = err
 	return e
 }

@@ -2,6 +2,7 @@ package kivikmock
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/go-kivik/kivik"
 	"github.com/go-kivik/kivik/driver"
@@ -24,6 +25,14 @@ type Mock interface {
 	// ExpectAuthenticate queues an expectation for this client action to be
 	// triggered. *ExpectAuthenticate allows mocking the response.
 	ExpectAuthenticate() *ExpectedAuthenticate
+
+	// ExpectClusterSetup queues an expectation for this client action to be
+	// triggered.
+	ExpectClusterSetup() *ExpectedClusterSetup
+
+	// ExpectClusterStatus queues an expectation for this client action to be
+	// triggered.
+	ExpectClusterStatus() *ExpectedClusterStatus
 
 	// MatchExpectationsInOrder indicates whether to match expectations in the
 	// order they were set.
@@ -87,4 +96,78 @@ func (c *kivikmock) ExpectAuthenticate() *ExpectedAuthenticate {
 	e := &ExpectedAuthenticate{}
 	c.expected = append(c.expected, e)
 	return e
+}
+
+func (c *kivikmock) ExpectClusterSetup() *ExpectedClusterSetup {
+	e := &ExpectedClusterSetup{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+func (c *kivikmock) ExpectClusterStatus() *ExpectedClusterStatus {
+	e := &ExpectedClusterStatus{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+// nextExpectation accepts the expected value `e`, checks that this is a valid
+// expectation, and if so, populates e with the matching expectation. If the
+// expectation is not expected, an error is returned.
+func (c *kivikmock) nextExpectation(e expectation) error {
+	c.drv.Lock()
+	defer c.drv.Unlock()
+
+	var expected expectation
+	var fulfilled int
+	for _, next := range c.expected {
+		next.Lock()
+		if next.fulfilled() {
+			next.Unlock()
+			fulfilled++
+			continue
+		}
+
+		if c.ordered {
+			if reflect.TypeOf(e).Elem().Name() == reflect.TypeOf(next).Elem().Name() {
+				expected = next
+				break
+			}
+			next.Unlock()
+			return fmt.Errorf("call to %s was not expected. Next expectation is: %s", e.method(false), next.method(false))
+		}
+		if equal(e, next) {
+			expected = next
+			break
+		}
+
+		next.Unlock()
+	}
+
+	if expected == nil {
+		if fulfilled == len(c.expected) {
+			return fmt.Errorf("call to %s was not expected, all expectations already fulfilled", e.method(false))
+		}
+		return fmt.Errorf("call to %s was not expected", e.method(!c.ordered))
+	}
+
+	defer expected.Unlock()
+	expected.fulfill()
+
+	reflect.ValueOf(e).Elem().Set(reflect.ValueOf(expected).Elem())
+	return nil
+}
+
+type equaler interface {
+	equal(expectation) bool
+}
+
+func equal(a, b expectation) bool {
+	if reflect.TypeOf(a).Elem().Name() != reflect.TypeOf(b).Elem().Name() {
+		return false
+	}
+	eq, ok := a.(equaler)
+	if ok {
+		return eq.equal(b)
+	}
+	return reflect.DeepEqual(a, b)
 }

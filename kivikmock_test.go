@@ -78,7 +78,7 @@ func TestExpectedAllDBsUnexpected(t *testing.T) {
 	}
 	defer client.Close(context.TODO()) // nolint: errcheck
 	_, err = client.AllDBs(context.TODO(), kivik.Options{"Foo": 123})
-	expectedErr := `all expectations were already fulfilled, call to AllDBs with options map[Foo:123] was not expected`
+	expectedErr := `call to AllDBs() was not expected, all expectations already fulfilled`
 	testy.Error(t, expectedErr, err)
 }
 
@@ -92,7 +92,7 @@ func TestExpectedAllDBsUnexpected_out_of_order(t *testing.T) {
 	defer client.Close(context.TODO()) // nolint: errcheck
 	mock.ExpectClose()
 	_, err = client.AllDBs(context.TODO(), kivik.Options{"Foo": 123})
-	expectedErr := `call to AllDBs with options map[Foo:123] was not expected. Next expectation is: ExpectedClose => expecting client Close`
+	expectedErr := `call to AllDBs() was not expected. Next expectation is: Close()`
 	testy.Error(t, expectedErr, err)
 }
 
@@ -107,7 +107,7 @@ func TestExpectedAllDBsUnexpectedUnorderedError(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	mock.ExpectAllDBs().WithOptions(kivik.Options{"foo": 321})
 	_, err = client.AllDBs(context.TODO(), kivik.Options{"Foo": 123})
-	expectedErr := `call to AllDBs with options map[Foo:123] was not expected`
+	expectedErr := `call to AllDBs(ctx, map[string]interface {}{"Foo":123}) was not expected`
 	testy.Error(t, expectedErr, err)
 	expectedErr = ""
 	err = mock.ExpectationsWereMet()
@@ -153,7 +153,7 @@ func TestExpectedAuthenticateOrder(t *testing.T) {
 	defer client.Close(context.TODO()) // nolint: errcheck
 	mock.ExpectClose()
 	err = client.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
-	testy.Error(t, "call to Authenticate was not expected. Next expectation is: ExpectedClose => expecting client Close", err)
+	testy.Error(t, "call to Authenticate() was not expected. Next expectation is: Close()", err)
 	err = mock.ExpectationsWereMet()
 	testy.ErrorRE(t, `map\[foo:321\]`, err)
 }
@@ -183,5 +183,32 @@ func TestExpectedAuthenticateUnexpected(t *testing.T) {
 	defer client.Close(context.TODO()) // nolint: errcheck
 	mock.MatchExpectationsInOrder(false)
 	err = client.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
-	testy.Error(t, "all expectations were already fulfilled, call to Authenticate was not expected", err)
+	testy.Error(t, "call to Authenticate() was not expected, all expectations already fulfilled", err)
+}
+
+func TestExpectedClusterSetup(t *testing.T) {
+	client, mock, err := New()
+	if err != nil {
+		fmt.Println("error creating mock database")
+		return
+	}
+	defer client.Close(context.TODO()) // nolint: errcheck
+	mock.ExpectClusterSetup().WithAction(map[string]string{"foo": "bar"})
+	err = client.ClusterSetup(context.TODO(), map[string]interface{}{"foo": "bar"})
+	testy.Error(t, "", err)
+}
+
+func TestExpectedClusterStatus(t *testing.T) {
+	client, mock, err := New()
+	if err != nil {
+		fmt.Println("error creating mock database")
+		return
+	}
+	defer client.Close(context.TODO()) // nolint: errcheck
+	mock.ExpectClusterStatus().WithOptions(map[string]interface{}{"foo": 123}).WillReturn("bar")
+	status, err := client.ClusterStatus(context.TODO(), map[string]interface{}{"foo": 123})
+	testy.Error(t, "", err)
+	if status != "bar" {
+		t.Errorf("Unexpected status: %s", status)
+	}
 }
