@@ -1,11 +1,13 @@
 package kivikmock
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/flimzy/diff"
 	"github.com/go-kivik/kivik"
@@ -21,6 +23,8 @@ type expectation interface {
 	// condition. If verbose is true, the output should disambiguate between
 	// different calls to the same method.
 	method(verbose bool) string
+	error() error
+	wait(context.Context) error
 }
 
 // commonExpectation satisfies the expectation interface, except the String()
@@ -29,6 +33,7 @@ type commonExpectation struct {
 	sync.Mutex
 	triggered bool
 	err       error // nolint: structcheck
+	delay     time.Duration
 }
 
 func (e *commonExpectation) fulfill() {
@@ -37,6 +42,26 @@ func (e *commonExpectation) fulfill() {
 
 func (e *commonExpectation) fulfilled() bool {
 	return e.triggered
+}
+
+func (e *commonExpectation) error() error {
+	return e.err
+}
+
+// wait blocks until e.delay expires, or ctx is cancelled. If e.delay expires,
+// e.err is returned, otherwise ctx.Err() is returned.
+func (e *commonExpectation) wait(ctx context.Context) error {
+	if e.delay == 0 {
+		return e.err
+	}
+	t := time.NewTimer(e.delay)
+	defer t.Stop()
+	select {
+	case <-t.C:
+		return e.err
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 // ExpectedClose is used to manage *kivik.Client.Close expectation returned
@@ -66,6 +91,12 @@ func (e *ExpectedClose) String() string {
 		msg += fmt.Sprintf(", which should return error: %s", e.err)
 	}
 	return msg
+}
+
+// WithDelay will cause execution of Close() to delay by duration d.
+func (e *ExpectedClose) WithDelay(d time.Duration) *ExpectedClose {
+	e.delay = d
+	return e
 }
 
 // ExpectedAllDBs is used to manage *kivik.Client.AllDBs expectation returned
@@ -125,6 +156,12 @@ func (e *ExpectedAllDBs) WithOptions(options kivik.Options) *ExpectedAllDBs {
 // WillReturn sets the expected results.
 func (e *ExpectedAllDBs) WillReturn(results []string) *ExpectedAllDBs {
 	e.results = results
+	return e
+}
+
+// WithDelay will cause execution of AllDBs() to delay by duration d.
+func (e *ExpectedAllDBs) WithDelay(d time.Duration) *ExpectedAllDBs {
+	e.delay = d
 	return e
 }
 
@@ -202,6 +239,12 @@ func (e *ExpectedAuthenticate) WithAuthenticator(authenticator interface{}) *Exp
 	return e
 }
 
+// WithDelay will cause execution of Authenticate() to delay by duration d.
+func (e *ExpectedAuthenticate) WithDelay(d time.Duration) *ExpectedAuthenticate {
+	e.delay = d
+	return e
+}
+
 // ExpectedClusterSetup is used to manage *kivik.Client.ClusterSetup
 // expectation returned by Mock.ExpectClusterSetup.
 type ExpectedClusterSetup struct {
@@ -272,6 +315,12 @@ func (e *ExpectedClusterSetup) String() string {
 // essential that the data types match exactly, in a Go sense.
 func (e *ExpectedClusterSetup) WithAction(action interface{}) *ExpectedClusterSetup {
 	e.action = action
+	return e
+}
+
+// WithDelay will cause execution of ClusterSetups() to delay by duration d.
+func (e *ExpectedClusterSetup) WithDelay(d time.Duration) *ExpectedClusterSetup {
+	e.delay = d
 	return e
 }
 
@@ -348,5 +397,11 @@ func (e *ExpectedClusterStatus) WillReturn(status string) *ExpectedClusterStatus
 // WillReturnError causes ClusterStatus to mock this return error.
 func (e *ExpectedClusterStatus) WillReturnError(err error) *ExpectedClusterStatus {
 	e.err = err
+	return e
+}
+
+// WithDelay will cause execution of ClusterStatus() to delay by duration d.
+func (e *ExpectedClusterStatus) WithDelay(d time.Duration) *ExpectedClusterStatus {
+	e.delay = d
 	return e
 }
