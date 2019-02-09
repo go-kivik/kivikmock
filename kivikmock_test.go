@@ -7,206 +7,258 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flimzy/diff"
 	"github.com/flimzy/testy"
 	"github.com/go-kivik/couchdb"
 	"github.com/go-kivik/kivik"
 )
 
-func TestExpectedCloseError(t *testing.T) {
-	// Open new mock database
+type mockTest struct {
+	setup func(Mock)
+	test  func(*testing.T, *kivik.Client)
+	err   string
+}
+
+func testMock(t *testing.T, test mockTest) {
 	client, mock, err := New()
 	if err != nil {
-		fmt.Println("error creating mock database")
-		return
+		t.Fatal("error creating mock database")
 	}
-	mock.ExpectClose().WillReturnError(fmt.Errorf("Close failed"))
-	err = client.Close(context.TODO())
-	testy.Error(t, "Close failed", err)
+	defer client.Close(context.TODO()) // nolint: errcheck
+	if test.setup != nil {
+		test.setup(mock)
+	}
+	if test.test != nil {
+		test.test(t, client)
+	}
 	err = mock.ExpectationsWereMet()
-	testy.Error(t, "", err)
+	testy.ErrorRE(t, test.err, err)
 }
 
-func TestExpectedAllDBsError(t *testing.T) {
-	// Open new mock database
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	mock.ExpectAllDBs().WillReturnError(fmt.Errorf("AllDBs failed"))
-	expectedErr := "AllDBs failed"
-	_, err = client.AllDBs(context.TODO())
-	testy.Error(t, expectedErr, err)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+func TestCloseClient(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("err", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClose().WillReturnError(errors.New("close failed"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.Close(context.TODO())
+			testy.Error(t, "close failed", err)
+		},
+		err: "",
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.Close(context.TODO())
+			testy.Error(t, "call to Close() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClose().WithDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.Close(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+
+	tests.Run(t, testMock)
 }
 
-func TestExpectedAllDBsOrder(t *testing.T) {
-	// Open new mock database
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.ExpectAllDBs().WillReturn([]string{"a", "b"})
-	err = mock.ExpectationsWereMet()
-	testy.ErrorRE(t, `should return: \[a b\]`, err)
+func TestAllDBs(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectAllDBs().WillReturnError(fmt.Errorf("AllDBs failed"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.AllDBs(context.TODO())
+			testy.Error(t, "AllDBs failed", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.AllDBs(context.TODO())
+			testy.Error(t, "call to AllDBs() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("success", func() interface{} {
+		expected := []string{"a", "b", "c"}
+		return mockTest{
+			setup: func(m Mock) {
+				m.ExpectAllDBs().WillReturn(expected)
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				result, err := c.AllDBs(context.TODO())
+				testy.Error(t, "", err)
+				if d := diff.Interface(expected, result); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectAllDBs().WithDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.AllDBs(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("options", mockTest{
+		setup: func(m Mock) {
+			m.ExpectAllDBs().WithOptions(map[string]interface{}{"foo": 123})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.AllDBs(context.TODO(), map[string]interface{}{"foo": 123})
+			testy.Error(t, "", err)
+		},
+	})
+	tests.Run(t, testMock)
 }
 
-func TestExpectedAllDBsUnexpected(t *testing.T) {
-	// Open new mock database
-	client, _, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	_, err = client.AllDBs(context.TODO(), kivik.Options{"Foo": 123})
-	expectedErr := `call to AllDBs() was not expected, all expectations already fulfilled`
-	testy.Error(t, expectedErr, err)
+func TestAuthenticate(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectAuthenticate().WillReturnError(errors.New("auth error"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
+			testy.Error(t, "auth error", err)
+		},
+	})
+	tests.Add("wrong authenticator", mockTest{
+		setup: func(m Mock) {
+			m.ExpectAuthenticate().WithAuthenticator(int(3))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.Authenticate(context.TODO(), couchdb.CookieAuth("foo", "bar"))
+			expected := `Expectation not met:
+Expected: call to Authenticate() which:
+	- has an authenticator of type: int
+  Actual: call to Authenticate() which:
+	- has an authenticator of type: authFunc`
+			testy.Error(t, expected, err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectAuthenticate().WithDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.Authenticate(newCanceledContext(), int(1))
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
 }
 
-func TestExpectedAllDBsUnexpected_out_of_order(t *testing.T) {
-	// Open new mock database
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.ExpectClose()
-	_, err = client.AllDBs(context.TODO(), kivik.Options{"Foo": 123})
-	expectedErr := `call to AllDBs() was not expected. Next expectation is: Close()`
-	testy.Error(t, expectedErr, err)
+func TestClusterSetup(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClusterSetup().WillReturnError(errors.New("setup error"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.ClusterSetup(context.TODO(), 123)
+			testy.Error(t, "setup error", err)
+		},
+	})
+	tests.Add("action", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClusterSetup().WithAction(123)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.ClusterSetup(context.TODO(), 123)
+			testy.Error(t, "", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClusterSetup().WithDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.ClusterSetup(newCanceledContext(), 123)
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.ClusterSetup(context.TODO(), 123)
+			testy.Error(t, "call to ClusterSetup() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Run(t, testMock)
 }
 
-func TestExpectedAllDBsUnexpectedUnorderedError(t *testing.T) {
-	// Open new mock database
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.MatchExpectationsInOrder(false)
-	mock.ExpectAllDBs().WithOptions(kivik.Options{"foo": 321})
-	_, err = client.AllDBs(context.TODO(), kivik.Options{"Foo": 123})
-	expectedErr := `call to AllDBs(ctx, map[string]interface {}{"Foo":123}) was not expected`
-	testy.Error(t, expectedErr, err)
-	expectedErr = ""
-	err = mock.ExpectationsWereMet()
-	testy.Error(t, expectedErr, err)
-}
-
-func TestExpectedAllDBsUnexpectedUnorderedSuccess(t *testing.T) {
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.MatchExpectationsInOrder(false)
-	mock.ExpectAllDBs().WithOptions(kivik.Options{"foo": 321})
-	mock.ExpectAllDBs().WithOptions(kivik.Options{"Foo": 123})
-	_, err = client.AllDBs(context.TODO(), kivik.Options{"Foo": 123})
-	testy.Error(t, "", err)
-	err = mock.ExpectationsWereMet()
-	testy.ErrorRE(t, `map\[foo:321\]`, err)
-}
-
-func TestExpectedAuthenticateError(t *testing.T) {
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.ExpectAuthenticate().WillReturnError(errors.New("auth err"))
-	err = client.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
-	testy.Error(t, "auth err", err)
-	err = mock.ExpectationsWereMet()
-	testy.ErrorRE(t, `map\[foo:321\]`, err)
-}
-
-func TestExpectedAuthenticateOrder(t *testing.T) {
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.ExpectClose()
-	err = client.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
-	testy.Error(t, "call to Authenticate() was not expected. Next expectation is: Close()", err)
-	err = mock.ExpectationsWereMet()
-	testy.ErrorRE(t, `map\[foo:321\]`, err)
-}
-
-func TestExpectedAuthenticateUnordered(t *testing.T) {
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.MatchExpectationsInOrder(false)
-	mock.ExpectClose()
-	mock.ExpectAuthenticate().WithAuthenticator(couchdb.BasicAuth("foo", "bar"))
-	err = client.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
-	testy.Error(t, "", err)
-	err = mock.ExpectationsWereMet()
-	testy.ErrorRE(t, `ExpectedClose => expecting client Close`, err)
-}
-
-func TestExpectedAuthenticateUnexpected(t *testing.T) {
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.MatchExpectationsInOrder(false)
-	err = client.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
-	testy.Error(t, "call to Authenticate() was not expected, all expectations already fulfilled", err)
-}
-
-func TestExpectedClusterSetup(t *testing.T) {
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.ExpectClusterSetup().WithAction(map[string]string{"foo": "bar"})
-	err = client.ClusterSetup(context.TODO(), map[string]interface{}{"foo": "bar"})
-	testy.Error(t, "", err)
-}
-
-func TestExpectedClusterStatus(t *testing.T) {
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.ExpectClusterStatus().WithOptions(map[string]interface{}{"foo": 123}).WillReturn("bar")
-	status, err := client.ClusterStatus(context.TODO(), map[string]interface{}{"foo": 123})
-	testy.Error(t, "", err)
-	if status != "bar" {
-		t.Errorf("Unexpected status: %s", status)
-	}
-}
-
-func TestExpectedClusterStatusDelay(t *testing.T) {
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.ExpectClusterStatus().WithDelay(time.Second)
-	_, err = client.ClusterStatus(newCanceledContext(), map[string]interface{}{"foo": 123})
-	testy.Error(t, "context canceled", err)
+func TestClusterStatus(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClusterStatus().WillReturnError(errors.New("status error"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ClusterStatus(context.TODO())
+			testy.Error(t, "status error", err)
+		},
+	})
+	tests.Add("options", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClusterStatus().WithOptions(map[string]interface{}{"foo": 123})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ClusterStatus(context.TODO())
+			testy.ErrorRE(t, `map\[foo:123]`, err)
+		},
+	})
+	tests.Add("success", func() interface{} {
+		const expected = "oink"
+		return mockTest{
+			setup: func(m Mock) {
+				m.ExpectClusterStatus().WillReturn(expected)
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				result, err := c.ClusterStatus(context.TODO())
+				testy.Error(t, "", err)
+				if result != expected {
+					t.Errorf("Unexpected result: %s", result)
+				}
+			},
+		}
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClusterStatus().WithDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ClusterStatus(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("unordered", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClose()
+			m.ExpectClusterStatus()
+			m.MatchExpectationsInOrder(false)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ClusterStatus(context.TODO())
+			testy.Error(t, "", err)
+		},
+		err: "there is a remaining unmet expectation: call to Close()",
+	})
+	tests.Add("unexpected", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClose()
+			m.MatchExpectationsInOrder(false)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ClusterStatus(context.TODO())
+			testy.Error(t, "call to ClusterStatus(ctx, ?) was not expected", err)
+		},
+	})
+	tests.Run(t, testMock)
 }

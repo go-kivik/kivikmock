@@ -113,7 +113,7 @@ func (c *kivikmock) ExpectClusterStatus() *ExpectedClusterStatus {
 // nextExpectation accepts the expected value `e`, checks that this is a valid
 // expectation, and if so, populates e with the matching expectation. If the
 // expectation is not expected, an error is returned.
-func (c *kivikmock) nextExpectation(e expectation) error {
+func (c *kivikmock) nextExpectation(actual expectation) error {
 	c.drv.Lock()
 	defer c.drv.Unlock()
 
@@ -128,14 +128,19 @@ func (c *kivikmock) nextExpectation(e expectation) error {
 		}
 
 		if c.ordered {
-			if reflect.TypeOf(e).Elem().Name() == reflect.TypeOf(next).Elem().Name() {
-				expected = next
-				break
+			if reflect.TypeOf(actual).Elem().Name() == reflect.TypeOf(next).Elem().Name() {
+				if meets(actual, next) {
+					expected = next
+					break
+				}
+				next.Unlock()
+				return fmt.Errorf("Expectation not met:\nExpected: %s\n  Actual: %s",
+					next, actual)
 			}
 			next.Unlock()
-			return fmt.Errorf("call to %s was not expected. Next expectation is: %s", e.method(false), next.method(false))
+			return fmt.Errorf("call to %s was not expected. Next expectation is: %s", actual.method(false), next.method(false))
 		}
-		if equal(e, next) {
+		if meets(actual, next) {
 			expected = next
 			break
 		}
@@ -145,29 +150,21 @@ func (c *kivikmock) nextExpectation(e expectation) error {
 
 	if expected == nil {
 		if fulfilled == len(c.expected) {
-			return fmt.Errorf("call to %s was not expected, all expectations already fulfilled", e.method(false))
+			return fmt.Errorf("call to %s was not expected, all expectations already fulfilled", actual.method(false))
 		}
-		return fmt.Errorf("call to %s was not expected", e.method(!c.ordered))
+		return fmt.Errorf("call to %s was not expected", actual.method(!c.ordered))
 	}
 
 	defer expected.Unlock()
 	expected.fulfill()
 
-	reflect.ValueOf(e).Elem().Set(reflect.ValueOf(expected).Elem())
+	reflect.ValueOf(actual).Elem().Set(reflect.ValueOf(expected).Elem())
 	return nil
 }
 
-type equaler interface {
-	equal(expectation) bool
-}
-
-func equal(a, b expectation) bool {
-	if reflect.TypeOf(a).Elem().Name() != reflect.TypeOf(b).Elem().Name() {
+func meets(a, e expectation) bool {
+	if reflect.TypeOf(a).Elem().Name() != reflect.TypeOf(e).Elem().Name() {
 		return false
 	}
-	eq, ok := a.(equaler)
-	if ok {
-		return eq.equal(b)
-	}
-	return reflect.DeepEqual(a, b)
+	return a.met(e)
 }

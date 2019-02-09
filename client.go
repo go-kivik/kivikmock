@@ -2,19 +2,20 @@ package kivikmock
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/go-kivik/kivik/driver"
 )
 
 var _ driver.ClientCloser = &kivikmock{}
 
-func (c *kivikmock) Close(_ context.Context) error {
+func (c *kivikmock) Close(ctx context.Context) error {
 	expected := &ExpectedClose{}
 	if err := c.nextExpectation(expected); err != nil {
 		return err
 	}
 
-	return expected.err
+	return expected.wait(ctx)
 }
 
 func (c *kivikmock) AllDBs(ctx context.Context, opts map[string]interface{}) ([]string, error) {
@@ -31,7 +32,9 @@ func (c *kivikmock) AllDBs(ctx context.Context, opts map[string]interface{}) ([]
 var _ driver.Authenticator = &kivikmock{}
 
 func (c *kivikmock) Authenticate(ctx context.Context, authenticator interface{}) error {
-	expected := &ExpectedAuthenticate{}
+	expected := &ExpectedAuthenticate{
+		authType: reflect.TypeOf(authenticator).Name(),
+	}
 	if err := c.nextExpectation(expected); err != nil {
 		return err
 	}
