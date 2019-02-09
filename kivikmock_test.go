@@ -185,6 +185,12 @@ func TestClusterSetup(t *testing.T) {
 			testy.Error(t, "context canceled", err)
 		},
 	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.ClusterSetup(context.TODO(), 123)
+			testy.Error(t, "call to ClusterSetup() was not expected, all expectations already fulfilled", err)
+		},
+	})
 	tests.Run(t, testMock)
 }
 
@@ -232,34 +238,27 @@ func TestClusterStatus(t *testing.T) {
 			testy.Error(t, "context canceled", err)
 		},
 	})
+	tests.Add("unordered", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClose()
+			m.ExpectClusterStatus()
+			m.MatchExpectationsInOrder(false)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ClusterStatus(context.TODO())
+			testy.Error(t, "", err)
+		},
+		err: "there is a remaining unmet expectation: call to Close()",
+	})
+	tests.Add("unexpected", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClose()
+			m.MatchExpectationsInOrder(false)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ClusterStatus(context.TODO())
+			testy.Error(t, "call to ClusterStatus(ctx, ?) was not expected", err)
+		},
+	})
 	tests.Run(t, testMock)
 }
-
-/*
-func TestExpectedClusterStatus(t *testing.T) {
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.ExpectClusterStatus().WithOptions(map[string]interface{}{"foo": 123}).WillReturn("bar")
-	status, err := client.ClusterStatus(context.TODO(), map[string]interface{}{"foo": 123})
-	testy.Error(t, "", err)
-	if status != "bar" {
-		t.Errorf("Unexpected status: %s", status)
-	}
-}
-
-func TestExpectedClusterStatusDelay(t *testing.T) {
-	client, mock, err := New()
-	if err != nil {
-		fmt.Println("error creating mock database")
-		return
-	}
-	defer client.Close(context.TODO()) // nolint: errcheck
-	mock.ExpectClusterStatus().WithDelay(time.Second)
-	_, err = client.ClusterStatus(newCanceledContext(), map[string]interface{}{"foo": 123})
-	testy.Error(t, "context canceled", err)
-}
-*/
