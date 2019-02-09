@@ -6,12 +6,11 @@ import (
 	"testing"
 
 	"github.com/flimzy/diff"
-	"github.com/flimzy/kivik"
 	"github.com/flimzy/testy"
 )
 
 type fmtTest struct {
-	input    fmt.Stringer
+	input    interface{}
 	format   string
 	expected string
 }
@@ -89,41 +88,56 @@ func TestAuthenticateFormatter(t *testing.T) {
 	tests.Add("string empty", fmtTest{
 		input:    &ExpectedAuthenticate{},
 		format:   "%s",
-		expected: `ExpectedAuthenticate => expecting Authenticate`,
+		expected: `Authenticate()`,
 	})
 	tests.Add("default empty", fmtTest{
 		input:    &ExpectedAuthenticate{},
 		format:   "%v",
-		expected: `ExpectedAuthenticate => expecting Authenticate`,
+		expected: `Authenticate()`,
 	})
 	tests.Add("string error", fmtTest{
 		input:    &ExpectedAuthenticate{commonExpectation: commonExpectation{err: errors.New("foo")}},
 		format:   "%s",
-		expected: `ExpectedAuthenticate => expecting Authenticate which should return an error`,
+		expected: `Authenticate()`,
 	})
 	tests.Add("string authenticator", fmtTest{
 		input:    &ExpectedAuthenticate{authType: "foo"},
 		format:   "%s",
-		expected: `ExpectedAuthenticate => expecting Authenticate which expects an authenticator of type 'foo'`,
+		expected: `Authenticate()`,
+	})
+	tests.Add("string+ empty", fmtTest{
+		input:    &ExpectedAuthenticate{},
+		format:   "%+s",
+		expected: "Authenticate(ctx, <T>)",
+	})
+	tests.Add("string+ auther", fmtTest{
+		input:    &ExpectedAuthenticate{authType: "foo"},
+		format:   "%+s",
+		expected: "Authenticate(ctx, <foo>)",
+	})
+	tests.Add("unknown verb", fmtTest{
+		input:    &ExpectedAuthenticate{},
+		format:   "%d",
+		expected: "<<unknown format verb:d>>",
 	})
 	tests.Add("verbose empty", fmtTest{
 		input:  &ExpectedAuthenticate{},
 		format: "%+v",
-		expected: `ExpectedAuthenticate => expecting Authenticate which:
-	- expects any authenticator`,
+		expected: `call to Authenticate() which:
+	- has any authenticator`,
 	})
 	tests.Add("verbose error", fmtTest{
 		input:  &ExpectedAuthenticate{commonExpectation: commonExpectation{err: errors.New("foo")}},
 		format: "%+v",
-		expected: `ExpectedAuthenticate => expecting Authenticate which:
-	- expects any authenticator
+		expected: `call to Authenticate() which:
+	- has any authenticator
 	- should return error: foo`,
 	})
 	tests.Add("verbose authenticator", fmtTest{
 		input:  &ExpectedAuthenticate{authType: "foo"},
 		format: "%+v",
-		expected: `ExpectedAuthenticate => expecting Authenticate which:
-	- expects an authenticator of type: foo`,
+		expected: `call to Authenticate() which:
+	- has an authenticator of type: foo`,
 	})
 
 	tests.Run(t, testFmt)
@@ -131,32 +145,36 @@ func TestAuthenticateFormatter(t *testing.T) {
 
 func TestFormatters(t *testing.T) {
 	tests := testy.NewTable()
-	tests.Add("string ExpectedAllDBs empty", fmtTest{
-		input:  &ExpectedAllDBs{},
-		format: "%s",
-		expected: `ExpectedAllDBs => expecting AllDBs which:
-	- is without options`,
-	})
-	tests.Add("string ExpectedAllDBs options", fmtTest{
-		input:  &ExpectedAllDBs{options: kivik.Options{"foo": "bar"}},
-		format: "%s",
-		expected: `ExpectedAllDBs => expecting AllDBs which:
-	- is with options map[foo:bar]`,
-	})
-	tests.Add("string ExpectedAllDBs return", fmtTest{
-		input:  &ExpectedAllDBs{results: []string{"foo", "bar"}},
-		format: "%s",
-		expected: `ExpectedAllDBs => expecting AllDBs which:
-	- is without options
-	- should return: [foo bar]`,
-	})
-	tests.Add("string ExpectedAllDBs error", fmtTest{
-		input:  &ExpectedAllDBs{commonExpectation: commonExpectation{err: errors.New("foo")}},
-		format: "%s",
-		expected: `ExpectedAllDBs => expecting AllDBs which:
-	- is without options
-	- should return error: foo`,
-	})
+	// NOMERGE
+	// tests.Add("string ExpectedAllDBs empty", fmtTest{
+	// 	input:  &ExpectedAllDBs{},
+	// 	format: "%s",
+	// 	expected: `ExpectedAllDBs => expecting AllDBs which:
+	// - is without options`,
+	// })
+	// NOMERGE
+	// tests.Add("string ExpectedAllDBs options", fmtTest{
+	// 	input:  &ExpectedAllDBs{options: kivik.Options{"foo": "bar"}},
+	// 	format: "%s",
+	// 	expected: `ExpectedAllDBs => expecting AllDBs which:
+	// - is with options map[foo:bar]`,
+	// })
+	// NOMERGE
+	// tests.Add("string ExpectedAllDBs return", fmtTest{
+	// 	input:  &ExpectedAllDBs{results: []string{"foo", "bar"}},
+	// 	format: "%s",
+	// 	expected: `ExpectedAllDBs => expecting AllDBs which:
+	// - is without options
+	// - should return: [foo bar]`,
+	// })
+	// NOMERGE
+	// tests.Add("string ExpectedAllDBs error", fmtTest{
+	// 	input:  &ExpectedAllDBs{commonExpectation: commonExpectation{err: errors.New("foo")}},
+	// 	format: "%s",
+	// 	expected: `ExpectedAllDBs => expecting AllDBs which:
+	// - is without options
+	// - should return error: foo`,
+	// })
 	tests.Add("string ExpectedClose empty", fmtTest{
 		input:    &ExpectedClose{},
 		format:   "%s",

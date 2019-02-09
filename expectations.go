@@ -18,13 +18,16 @@ type expectation interface {
 	fulfilled() bool
 	Lock()
 	Unlock()
-	String() string
+	// fmt.Formatter
 	// method should return the name of the method that would trigger this
 	// condition. If verbose is true, the output should disambiguate between
 	// different calls to the same method.
 	method(verbose bool) string
 	error() error
 	wait(context.Context) error
+	// met is called on the actual value, and returns true if the expectation
+	// is met.
+	met(expectation) bool
 }
 
 // commonExpectation satisfies the expectation interface, except the String()
@@ -77,7 +80,7 @@ func (e *ExpectedClose) method(v bool) string {
 	return "Close()"
 }
 
-func (e *ExpectedClose) equal(_ expectation) bool { return true }
+func (e *ExpectedClose) met(_ expectation) bool { return true }
 
 // WillReturnError allows setting an error for *kivik.Client.Close action.
 func (e *ExpectedClose) WillReturnError(err error) *ExpectedClose {
@@ -117,27 +120,24 @@ func (e *ExpectedAllDBs) method(v bool) string {
 	return "AllDBs()"
 }
 
-func (e *ExpectedAllDBs) equal(other expectation) bool {
-	if e.options == nil {
+func (e *ExpectedAllDBs) met(ex expectation) bool {
+	exp := ex.(*ExpectedAllDBs)
+	if exp.options == nil {
 		return true
 	}
-	return reflect.DeepEqual(e.options, other.(*ExpectedAllDBs).options)
+	return reflect.DeepEqual(e.options, exp.options)
 }
 
-func (e *ExpectedAllDBs) String() string {
-	msg := "ExpectedAllDBs => expecting AllDBs which:"
-	if e.options == nil {
-		msg += "\n\t- is without options"
-	} else {
-		msg += fmt.Sprintf("\n\t- is with options %+v", e.options)
+// Format satisfies the fmt.Formatter interface.
+func (e *ExpectedAllDBs) Format(f fmt.State, verb rune) {
+	msg := e.method(f.Flag('+'))
+	switch verb {
+	case 's':
+		fmt.Fprintf(f, msg)
+		return
+	case 'v':
+
 	}
-	if len(e.results) > 0 {
-		msg += fmt.Sprintf("\n\t- should return: %v", e.results)
-	}
-	if e.err != nil {
-		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
-	}
-	return msg
 }
 
 // WillReturnError allows setting an error for *kivik.Client.Close action.
@@ -172,57 +172,46 @@ type ExpectedAuthenticate struct {
 	authType string
 }
 
-func (e *ExpectedAuthenticate) method(v bool) string {
-	if v {
-		return fmt.Sprintf("Authenticate(ctx, <%s>)", e.authType)
-	}
-	return "Authenticate()"
-}
-
-func (e *ExpectedAuthenticate) equal(other expectation) bool {
-	if e.authType == "" {
-		return true
-	}
-	o, _ := other.(*ExpectedAuthenticate)
-	return e.authType == o.authType
-}
-
-func (e *ExpectedAuthenticate) String() string {
-	msg := "ExpectedAuthenticate => expecting Authenticate"
-	modifiers := []string{}
-	if e.authType != "" {
-		modifiers = append(modifiers, fmt.Sprintf("expects an authenticator of type '%s'", e.authType))
-	}
-	if e.err != nil {
-		modifiers = append(modifiers, "should return an error")
-	}
-	if len(modifiers) > 0 {
-		return msg + " which " + strings.Join(modifiers, " and ")
-	}
-	return msg
-}
-
 // Format satisfies the fmt.Formatter interface.
 func (e *ExpectedAuthenticate) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		fmt.Fprint(f, e.String()) // nolint: errcheck
+		fmt.Fprint(f, e.method(f.Flag('+'))) // nolint: errcheck
 	case 'v':
 		if !f.Flag('+') {
 			fmt.Fprintf(f, "%s", e) // nolint: errcheck
 			return
 		}
-		msg := "ExpectedAuthenticate => expecting Authenticate which:"
+		fmt.Fprintf(f, "call to %s which:", e)
 		if e.authType == "" {
-			msg += "\n\t- expects any authenticator"
+			fmt.Fprint(f, "\n\t- has any authenticator")
 		} else {
-			msg += "\n\t- expects an authenticator of type: " + e.authType
+			fmt.Fprint(f, "\n\t- has an authenticator of type: "+e.authType)
 		}
 		if e.err != nil {
-			msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+			fmt.Fprintf(f, "\n\t- should return error: %s", e.err)
 		}
-		fmt.Fprint(f, msg) // nolint: errcheck
+	default:
+		fmt.Fprintf(f, "<<unknown format verb:%s>>", string(verb))
 	}
+}
+
+func (e *ExpectedAuthenticate) method(v bool) string {
+	if v {
+		if e.authType == "" {
+			return "Authenticate(ctx, <T>)"
+		}
+		return fmt.Sprintf("Authenticate(ctx, <%s>)", e.authType)
+	}
+	return "Authenticate()"
+}
+
+func (e *ExpectedAuthenticate) met(ex expectation) bool {
+	exp := ex.(*ExpectedAuthenticate)
+	if exp.authType == "" {
+		return true
+	}
+	return e.authType == exp.authType
 }
 
 // WillReturnError allows setting an error for *kivik.Client.Authenticate action.
@@ -259,11 +248,12 @@ func (e *ExpectedClusterSetup) method(v bool) string {
 	return "ClusterSetup()"
 }
 
-func (e *ExpectedClusterSetup) equal(actual expectation) bool {
-	if e.action == nil {
+func (e *ExpectedClusterSetup) met(ex expectation) bool {
+	exp := ex.(*ExpectedClusterSetup)
+	if exp.action == nil {
 		return true
 	}
-	return diff.AsJSON(e.action, actual.(*ExpectedClusterSetup).action) == nil
+	return diff.AsJSON(e.action, exp.action) == nil
 }
 
 // Format satisfies the fmt.Formatter interface
@@ -310,6 +300,12 @@ func (e *ExpectedClusterSetup) String() string {
 	return msg
 }
 
+// WillReturnError causes ClusterSetup to mock this return error.
+func (e *ExpectedClusterSetup) WillReturnError(err error) *ExpectedClusterSetup {
+	e.err = err
+	return e
+}
+
 // WithAction specifies the action to be matched. Note that this expectation
 // is compared with the actual action's marshaled JSON output, so it is not
 // essential that the data types match exactly, in a Go sense.
@@ -330,7 +326,14 @@ type ExpectedClusterStatus struct {
 	commonExpectation
 	options map[string]interface{}
 	status  string
-	err     error
+}
+
+func (e *ExpectedClusterStatus) met(ex expectation) bool {
+	exp := ex.(*ExpectedClusterStatus)
+	if exp.options == nil {
+		return true
+	}
+	return reflect.DeepEqual(e.options, exp.options)
 }
 
 func (e *ExpectedClusterStatus) method(v bool) string {
@@ -343,32 +346,17 @@ func (e *ExpectedClusterStatus) method(v bool) string {
 	return "ClusterStatus()"
 }
 
-func (e *ExpectedClusterStatus) String() string {
-	msg := "ExpectedClusterStatus => expecting ClusterStatus"
-	modifiers := []string{}
-	if e.options != nil {
-		modifiers = append(modifiers, "has the desired options")
-	}
-	if e.err != nil {
-		modifiers = append(modifiers, "should return an error")
-	}
-	if len(modifiers) > 0 {
-		msg = msg + " which " + strings.Join(modifiers, " and ")
-	}
-	return msg
-}
-
 // Format satisfies the fmt.Formatter interface
 func (e *ExpectedClusterStatus) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		fmt.Fprint(f, e.String()) // nolint: errcheck
+		fmt.Fprint(f, e.method(f.Flag('+'))) // nolint: errcheck
 	case 'v':
 		if !f.Flag('+') {
 			fmt.Fprintf(f, "%s", e) // nolint: errcheck
 			return
 		}
-		msg := "ExpectedClusterStatus => expecting ClusterStatus which:"
+		msg := "call to ClusterStatus() which:"
 		if e.options == nil {
 			msg += "\n\t- expects any options"
 		} else {
