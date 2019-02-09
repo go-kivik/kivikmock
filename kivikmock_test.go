@@ -445,12 +445,110 @@ func TestPing(t *testing.T) {
 			testy.Error(t, "foo err", err)
 		},
 	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Ping(context.TODO())
+			testy.Error(t, "call to Ping() was not expected, all expectations already fulfilled", err)
+		},
+	})
 	tests.Add("delay", mockTest{
 		setup: func(m Mock) {
 			m.ExpectPing().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			_, err := c.Ping(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
+
+func TestSession(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("session", func() interface{} {
+		expected := &kivik.Session{
+			Name: "bob",
+		}
+		return mockTest{
+			setup: func(m Mock) {
+				m.ExpectSession().WillReturn(expected)
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				session, err := c.Session(context.TODO())
+				testy.Error(t, "", err)
+				if d := diff.Interface(expected, session); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Session(context.TODO())
+			testy.Error(t, "call to Session() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectSession().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Session(context.TODO())
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectSession().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Session(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
+
+func TestVersion(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("version", func() interface{} {
+		expected := &kivik.Version{
+			Version: "1.2",
+		}
+		return mockTest{
+			setup: func(m Mock) {
+				m.ExpectVersion().WillReturn(expected)
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				session, err := c.Version(context.TODO())
+				testy.Error(t, "", err)
+				if d := diff.Interface(expected, session); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Version(context.TODO())
+			testy.Error(t, "call to Version() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectVersion().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Version(context.TODO())
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectVersion().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Version(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
 	})

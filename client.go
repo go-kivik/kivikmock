@@ -110,3 +110,31 @@ func (c *kivikmock) Ping(ctx context.Context) (bool, error) {
 	}
 	return expected.responded, expected.wait(ctx)
 }
+
+var _ driver.Sessioner = &kivikmock{}
+
+func (c *kivikmock) Session(ctx context.Context) (*driver.Session, error) {
+	expected := &ExpectedSession{}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	var s *driver.Session
+	if expected.session != nil {
+		s = new(driver.Session)
+		*s = driver.Session(*expected.session)
+	}
+	return s, expected.wait(ctx)
+}
+
+func (c *kivikmock) Version(ctx context.Context) (*driver.Version, error) {
+	expected := &ExpectedVersion{}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	var v *driver.Version
+	if expected.version != nil {
+		v = new(driver.Version)
+		*v = driver.Version(*expected.version)
+	}
+	return v, expected.wait(ctx)
+}

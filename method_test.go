@@ -167,3 +167,23 @@ func TestPingMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestSessionMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedSession{},
+		standard: "Session()",
+		verbose:  "Session(ctx)",
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestVersionMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedVersion{},
+		standard: "Version()",
+		verbose:  "Version(ctx)",
+	})
+	tests.Run(t, testMethod)
+}

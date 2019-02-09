@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/flimzy/testy"
+	"github.com/go-kivik/kivik"
 )
 
 type stringerTest struct {
@@ -248,6 +249,34 @@ func TestPingString(t *testing.T) {
 		input: &ExpectedPing{commonExpectation: commonExpectation{delay: time.Second}},
 		expected: `call to Ping() which:
 	- should delay for: 1s`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestSessionString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input:    &ExpectedSession{},
+		expected: `call to Session()`,
+	})
+	tests.Add("session", stringerTest{
+		input: &ExpectedSession{session: &kivik.Session{Name: "bob"}},
+		expected: `call to Session() which:
+	- should return: &{bob []   [] []}`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestVersionString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input:    &ExpectedVersion{},
+		expected: `call to Version()`,
+	})
+	tests.Add("session", stringerTest{
+		input: &ExpectedVersion{version: &kivik.Version{Version: "1.2"}},
+		expected: `call to Version() which:
+	- should return: &{1.2  [] []}`,
 	})
 	tests.Run(t, testStringer)
 }

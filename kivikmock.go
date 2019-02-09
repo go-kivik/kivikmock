@@ -48,6 +48,12 @@ type Mock interface {
 	// ExpectPing queues an expectation for Ping() to be triggered.
 	ExpectPing() *ExpectedPing
 
+	// ExpectSession queues an expectation for Session() to be triggered.
+	ExpectSession() *ExpectedSession
+
+	// ExpectVersion queues an expectation for Version() to be triggered.
+	ExpectVersion() *ExpectedVersion
+
 	// MatchExpectationsInOrder indicates whether to match expectations in the
 	// order they were set.
 	//
@@ -144,6 +150,18 @@ func (c *kivikmock) ExpectDBsStats() *ExpectedDBsStats {
 
 func (c *kivikmock) ExpectPing() *ExpectedPing {
 	e := &ExpectedPing{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+func (c *kivikmock) ExpectSession() *ExpectedSession {
+	e := &ExpectedSession{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+func (c *kivikmock) ExpectVersion() *ExpectedVersion {
+	e := &ExpectedVersion{}
 	c.expected = append(c.expected, e)
 	return e
 }

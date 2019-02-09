@@ -541,3 +541,97 @@ func (e *ExpectedPing) WillDelay(delay time.Duration) *ExpectedPing {
 	e.delay = delay
 	return e
 }
+
+// ExpectedSession is used to manage *kivik.Client.Session expectation returned
+// by Mock.ExpectSession.
+type ExpectedSession struct {
+	commonExpectation
+	session *kivik.Session
+}
+
+func (e *ExpectedSession) String() string {
+	msg := "call to Session()"
+	extra := ""
+	if e.session != nil {
+		extra += fmt.Sprintf("\n\t- should return: %v", e.session)
+	}
+	extra += delayString(e.delay) + errorString(e.err)
+	if extra != "" {
+		msg += " which:" + extra
+	}
+	return msg
+}
+
+func (e *ExpectedSession) method(v bool) string {
+	if v {
+		return "Session(ctx)"
+	}
+	return "Session()"
+}
+
+func (e *ExpectedSession) met(_ expectation) bool { return true }
+
+// WillReturnError sets the error to be returned by the call to Session().
+func (e *ExpectedSession) WillReturnError(err error) *ExpectedSession {
+	e.err = err
+	return e
+}
+
+// WillReturn sets the session to be returned by the call to Session().
+func (e *ExpectedSession) WillReturn(session *kivik.Session) *ExpectedSession {
+	e.session = session
+	return e
+}
+
+// WillDelay will cause execution of Session() to delay by duration d.
+func (e *ExpectedSession) WillDelay(delay time.Duration) *ExpectedSession {
+	e.delay = delay
+	return e
+}
+
+// ExpectedVersion is used to manage *kivik.Client.Version expectation returned
+// by Mock.ExpectVersion.
+type ExpectedVersion struct {
+	commonExpectation
+	version *kivik.Version
+}
+
+func (e *ExpectedVersion) String() string {
+	msg := "call to Version()"
+	extra := ""
+	if e.version != nil {
+		extra += fmt.Sprintf("\n\t- should return: %v", e.version)
+	}
+	extra += delayString(e.delay) + errorString(e.err)
+	if extra != "" {
+		msg += " which:" + extra
+	}
+	return msg
+}
+
+func (e *ExpectedVersion) method(v bool) string {
+	if v {
+		return "Version(ctx)"
+	}
+	return "Version()"
+}
+
+func (e *ExpectedVersion) met(_ expectation) bool { return true }
+
+// WillReturnError sets the error to be returned by the call to Version().
+func (e *ExpectedVersion) WillReturnError(err error) *ExpectedVersion {
+	e.err = err
+	return e
+}
+
+// WillReturn sets the session to be returned by the call to Version().
+func (e *ExpectedVersion) WillReturn(version *kivik.Version) *ExpectedVersion {
+	e.version = version
+	return e
+}
+
+// WillDelay will cause execution of Version() to delay by duration d.
+func (e *ExpectedVersion) WillDelay(delay time.Duration) *ExpectedVersion {
+	e.delay = delay
+	return e
+}
