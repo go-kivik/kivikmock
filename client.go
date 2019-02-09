@@ -9,9 +9,6 @@ import (
 var _ driver.ClientCloser = &kivikmock{}
 
 func (c *kivikmock) Close(_ context.Context) error {
-	c.drv.Lock()
-	defer c.drv.Unlock()
-
 	expected := &ExpectedClose{}
 	if err := c.nextExpectation(expected); err != nil {
 		return err
@@ -21,9 +18,6 @@ func (c *kivikmock) Close(_ context.Context) error {
 }
 
 func (c *kivikmock) AllDBs(ctx context.Context, opts map[string]interface{}) ([]string, error) {
-	c.drv.Lock()
-	defer c.drv.Unlock()
-
 	expected := &ExpectedAllDBs{
 		options: opts,
 	}
@@ -37,13 +31,32 @@ func (c *kivikmock) AllDBs(ctx context.Context, opts map[string]interface{}) ([]
 var _ driver.Authenticator = &kivikmock{}
 
 func (c *kivikmock) Authenticate(ctx context.Context, authenticator interface{}) error {
-	c.drv.Lock()
-	defer c.drv.Unlock()
-
 	expected := &ExpectedAuthenticate{}
 	if err := c.nextExpectation(expected); err != nil {
 		return err
 	}
 
 	return expected.err
+}
+
+var _ driver.Cluster = &kivikmock{}
+
+func (c *kivikmock) ClusterSetup(ctx context.Context, action interface{}) error {
+	expected := &ExpectedClusterSetup{
+		action: action,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return err
+	}
+	return expected.err
+}
+
+func (c *kivikmock) ClusterStatus(ctx context.Context, options map[string]interface{}) (string, error) {
+	expected := &ExpectedClusterStatus{
+		options: options,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return "", err
+	}
+	return expected.status, expected.err
 }

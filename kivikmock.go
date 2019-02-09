@@ -30,6 +30,10 @@ type Mock interface {
 	// triggered.
 	ExpectClusterSetup() *ExpectedClusterSetup
 
+	// ExpectClusterStatus queues an expectation for this client action to be
+	// triggered.
+	ExpectClusterStatus() *ExpectedClusterStatus
+
 	// MatchExpectationsInOrder indicates whether to match expectations in the
 	// order they were set.
 	//
@@ -100,9 +104,19 @@ func (c *kivikmock) ExpectClusterSetup() *ExpectedClusterSetup {
 	return e
 }
 
-// nextExpectation populates e with the next matching expectation, or returns
-// an error.
+func (c *kivikmock) ExpectClusterStatus() *ExpectedClusterStatus {
+	e := &ExpectedClusterStatus{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+// nextExpectation accepts the expected value `e`, checks that this is a valid
+// expectation, and if so, populates e with the matching expectation. If the
+// expectation is not expected, an error is returned.
 func (c *kivikmock) nextExpectation(e expectation) error {
+	c.drv.Lock()
+	defer c.drv.Unlock()
+
 	var expected expectation
 	var fulfilled int
 	for _, next := range c.expected {

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/flimzy/diff"
 	"github.com/go-kivik/kivik"
 )
 
@@ -215,6 +216,13 @@ func (e *ExpectedClusterSetup) method(v bool) string {
 	return "ClusterSetup()"
 }
 
+func (e *ExpectedClusterSetup) equal(actual expectation) bool {
+	if e.action == nil {
+		return true
+	}
+	return diff.AsJSON(e.action, actual.(*ExpectedClusterSetup).action) == nil
+}
+
 // Format satisfies the fmt.Formatter interface
 func (e *ExpectedClusterSetup) Format(f fmt.State, verb rune) {
 	switch verb {
@@ -257,4 +265,88 @@ func (e *ExpectedClusterSetup) String() string {
 		msg = msg + " which " + strings.Join(modifiers, " and ")
 	}
 	return msg
+}
+
+// WithAction specifies the action to be matched. Note that this expectation
+// is compared with the actual action's marshaled JSON output, so it is not
+// essential that the data types match exactly, in a Go sense.
+func (e *ExpectedClusterSetup) WithAction(action interface{}) *ExpectedClusterSetup {
+	e.action = action
+	return e
+}
+
+// ExpectedClusterStatus is used to manage *kivik.Client.ClusterStatus
+// expectation returned by Mock.ExpectClusterStatus.
+type ExpectedClusterStatus struct {
+	commonExpectation
+	options map[string]interface{}
+	status  string
+	err     error
+}
+
+func (e *ExpectedClusterStatus) method(v bool) string {
+	if v {
+		if e.options == nil {
+			return "ClusterStatus(ctx, nil)"
+		}
+		return fmt.Sprintf("ClusterStatus(ctx, %+v)", e.options)
+	}
+	return "ClusterStatus()"
+}
+
+func (e *ExpectedClusterStatus) String() string {
+	msg := "ExpectedClusterStatus => expecting ClusterStatus"
+	modifiers := []string{}
+	if e.options != nil {
+		modifiers = append(modifiers, "has the desired options")
+	}
+	if e.err != nil {
+		modifiers = append(modifiers, "should return an error")
+	}
+	if len(modifiers) > 0 {
+		msg = msg + " which " + strings.Join(modifiers, " and ")
+	}
+	return msg
+}
+
+// Format satisfies the fmt.Formatter interface
+func (e *ExpectedClusterStatus) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, e.String()) // nolint: errcheck
+	case 'v':
+		if !f.Flag('+') {
+			fmt.Fprintf(f, "%s", e) // nolint: errcheck
+			return
+		}
+		msg := "ExpectedClusterStatus => expecting ClusterStatus which:"
+		if e.options == nil {
+			msg += "\n\t- expects any options"
+		} else {
+			msg += fmt.Sprintf("\n\t- expects the options: %#v", e.options)
+		}
+		if e.err != nil {
+			msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+		}
+		fmt.Fprint(f, msg) // nolint: errcheck
+	}
+}
+
+// WithOptions sets the expectation that ClusterStatus will be called with the
+// provided options.
+func (e *ExpectedClusterStatus) WithOptions(options map[string]interface{}) *ExpectedClusterStatus {
+	e.options = options
+	return e
+}
+
+// WillReturn causes ClusterStatus to mock this return value.
+func (e *ExpectedClusterStatus) WillReturn(status string) *ExpectedClusterStatus {
+	e.status = status
+	return e
+}
+
+// WillReturnError causes ClusterStatus to mock this return error.
+func (e *ExpectedClusterStatus) WillReturnError(err error) *ExpectedClusterStatus {
+	e.err = err
+	return e
 }

@@ -185,3 +185,30 @@ func TestExpectedAuthenticateUnexpected(t *testing.T) {
 	err = client.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
 	testy.Error(t, "call to Authenticate() was not expected, all expectations already fulfilled", err)
 }
+
+func TestExpectedClusterSetup(t *testing.T) {
+	client, mock, err := New()
+	if err != nil {
+		fmt.Println("error creating mock database")
+		return
+	}
+	defer client.Close(context.TODO()) // nolint: errcheck
+	mock.ExpectClusterSetup().WithAction(map[string]string{"foo": "bar"})
+	err = client.ClusterSetup(context.TODO(), map[string]interface{}{"foo": "bar"})
+	testy.Error(t, "", err)
+}
+
+func TestExpectedClusterStatus(t *testing.T) {
+	client, mock, err := New()
+	if err != nil {
+		fmt.Println("error creating mock database")
+		return
+	}
+	defer client.Close(context.TODO()) // nolint: errcheck
+	mock.ExpectClusterStatus().WithOptions(map[string]interface{}{"foo": 123}).WillReturn("bar")
+	status, err := client.ClusterStatus(context.TODO(), map[string]interface{}{"foo": 123})
+	testy.Error(t, "", err)
+	if status != "bar" {
+		t.Errorf("Unexpected status: %s", status)
+	}
+}
