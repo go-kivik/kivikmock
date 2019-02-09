@@ -359,3 +359,198 @@ func TestDestroyDB(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestDBsStats(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDBsStats().WillReturnError(errors.New("stats error"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBsStats(context.TODO(), []string{"foo"})
+			testy.Error(t, "stats error", err)
+		},
+	})
+	tests.Add("names", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDBsStats().WithNames([]string{"a", "b"})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBsStats(context.TODO(), []string{"foo"})
+			testy.ErrorRE(t, "[a b]", err)
+		},
+	})
+	tests.Add("success", func() interface{} {
+		expected := []*kivik.DBStats{
+			{Name: "foo", Cluster: &kivik.ClusterConfig{Replicas: 5}},
+			{Name: "bar"},
+		}
+		return mockTest{
+			setup: func(m Mock) {
+				m.ExpectDBsStats().WillReturn(expected)
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				result, err := c.DBsStats(context.TODO(), []string{"foo", "bar"})
+				testy.ErrorRE(t, "", err)
+				if d := diff.Interface(expected, result); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDBsStats().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBsStats(newCanceledContext(), []string{"foo"})
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
+
+func TestPing(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("unreachable", mockTest{
+		setup: func(m Mock) {
+			m.ExpectPing()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			reachable, err := c.Ping(context.TODO())
+			testy.Error(t, "", err)
+			if reachable {
+				t.Errorf("Expected db to be unreachable")
+			}
+		},
+	})
+	tests.Add("reachable", mockTest{
+		setup: func(m Mock) {
+			m.ExpectPing().WillReturn(true)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			reachable, err := c.Ping(context.TODO())
+			testy.Error(t, "", err)
+			if !reachable {
+				t.Errorf("Expected db to be reachable")
+			}
+		},
+	})
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectPing().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Ping(context.TODO())
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Ping(context.TODO())
+			testy.Error(t, "call to Ping() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectPing().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Ping(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
+
+func TestSession(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("session", func() interface{} {
+		expected := &kivik.Session{
+			Name: "bob",
+		}
+		return mockTest{
+			setup: func(m Mock) {
+				m.ExpectSession().WillReturn(expected)
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				session, err := c.Session(context.TODO())
+				testy.Error(t, "", err)
+				if d := diff.Interface(expected, session); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Session(context.TODO())
+			testy.Error(t, "call to Session() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectSession().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Session(context.TODO())
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectSession().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Session(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
+
+func TestVersion(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("version", func() interface{} {
+		expected := &kivik.Version{
+			Version: "1.2",
+		}
+		return mockTest{
+			setup: func(m Mock) {
+				m.ExpectVersion().WillReturn(expected)
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				session, err := c.Version(context.TODO())
+				testy.Error(t, "", err)
+				if d := diff.Interface(expected, session); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Version(context.TODO())
+			testy.Error(t, "call to Version() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectVersion().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Version(context.TODO())
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectVersion().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Version(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}

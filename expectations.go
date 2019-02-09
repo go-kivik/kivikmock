@@ -31,9 +31,10 @@ func (e *ExpectedClose) WillReturnError(err error) *ExpectedClose {
 }
 
 func (e *ExpectedClose) String() string {
+	extra := delayString(e.delay) + errorString(e.err)
 	msg := "call to Close()"
-	if e.err != nil {
-		msg += fmt.Sprintf(" which:\n\t- should return error: %s", e.err)
+	if extra != "" {
+		msg += " which:" + extra
 	}
 	return msg
 }
@@ -70,20 +71,12 @@ func (e *ExpectedAllDBs) met(ex expectation) bool {
 	return reflect.DeepEqual(e.options, exp.options)
 }
 
-const anyOptions = "\n\t- has any options"
-
 // String satisfies the fmt.Stringer interface.
 func (e *ExpectedAllDBs) String() string {
-	msg := "call to AllDBs() which:"
-	if e.options == nil {
-		msg += anyOptions
-	} else {
-		msg += fmt.Sprintf("\n\t- has options: %v", e.options)
-	}
-	if e.err != nil {
-		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
-	}
-	return msg
+	return "call to AllDBs() which:" +
+		optionsString(e.options) +
+		delayString(e.delay) +
+		errorString(e.err)
 }
 
 // WillReturnError allows setting an error for *kivik.Client.Close action.
@@ -126,9 +119,8 @@ func (e *ExpectedAuthenticate) String() string {
 	} else {
 		msg += fmt.Sprint("\n\t- has an authenticator of type: " + e.authType)
 	}
-	if e.err != nil {
-		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
-	}
+	msg += delayString(e.delay)
+	msg += errorString(e.err)
 	return msg
 }
 
@@ -202,9 +194,8 @@ func (e *ExpectedClusterSetup) String() string {
 	} else {
 		msg += fmt.Sprintf("\n\t- has the action: %v", e.action)
 	}
-	if e.err != nil {
-		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
-	}
+	msg += delayString(e.delay)
+	msg += errorString(e.err)
 	return msg
 }
 
@@ -256,16 +247,11 @@ func (e *ExpectedClusterStatus) method(v bool) string {
 
 // String satisfies the fmt.Stringer interface
 func (e *ExpectedClusterStatus) String() string {
-	msg := "call to ClusterStatus() which:"
-	if e.options == nil {
-		msg += anyOptions
-	} else {
-		msg += fmt.Sprintf("\n\t- has options: %v", e.options)
-	}
-	if e.err != nil {
-		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
-	}
-	return msg
+	return "call to ClusterStatus() which:" +
+		optionsString(e.options) +
+		delayString(e.delay) +
+		errorString(e.err)
+
 }
 
 // WithOptions sets the expectation that ClusterStatus will be called with the
@@ -309,11 +295,8 @@ func (e *ExpectedDBExists) String() string {
 	} else {
 		msg += "\n\t- has name: " + e.name
 	}
-	if e.options == nil {
-		msg += anyOptions
-	} else {
-		msg += fmt.Sprintf("\n\t- has options: %v", e.options)
-	}
+	msg += optionsString(e.options)
+	msg += delayString(e.delay)
 	if e.err == nil {
 		msg += fmt.Sprintf("\n\t- should return: %t", e.exists)
 	} else {
@@ -398,6 +381,7 @@ func (e *ExpectedDestroyDB) String() string {
 		msg += "\n\t- has name: " + e.name
 	}
 	msg += optionsString(e.options)
+	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
 }
@@ -451,6 +435,203 @@ func (e *ExpectedDestroyDB) WillReturnError(err error) *ExpectedDestroyDB {
 
 // WillDelay will cause execution of DestroyDB to delay by duration d.
 func (e *ExpectedDestroyDB) WillDelay(delay time.Duration) *ExpectedDestroyDB {
+	e.delay = delay
+	return e
+}
+
+// ExpectedDBsStats is used to manage *kivik.Client.DBsStats expectation
+// returned by Mock.ExpectDBsStats.
+type ExpectedDBsStats struct {
+	commonExpectation
+	names []string
+	stats []*kivik.DBStats
+}
+
+func (e *ExpectedDBsStats) String() string {
+	msg := "call to DBsStats() which:"
+	if e.names == nil {
+		msg += "\n\t- has any names"
+	} else {
+		msg += fmt.Sprintf("\n\t- has names: %s", e.names)
+	}
+	return msg + delayString(e.delay) + errorString(e.err)
+}
+
+func (e *ExpectedDBsStats) method(v bool) string {
+	if !v {
+		return "DBsStats()"
+	}
+	if e.names == nil {
+		return "DBsStats(ctx, ?)"
+	}
+	return fmt.Sprintf("DBsStats(ctx, %v)", e.names)
+}
+
+func (e *ExpectedDBsStats) met(ex expectation) bool {
+	exp := ex.(*ExpectedDBsStats)
+	if exp.names == nil {
+		return true
+	}
+	return reflect.DeepEqual(e.names, exp.names)
+}
+
+// WithNames sets the expectation that DBsStats will be called with these names.
+func (e *ExpectedDBsStats) WithNames(names []string) *ExpectedDBsStats {
+	e.names = names
+	return e
+}
+
+// WillReturn sets the value to be returned by the call to DBsStats.
+func (e *ExpectedDBsStats) WillReturn(stats []*kivik.DBStats) *ExpectedDBsStats {
+	e.stats = stats
+	return e
+}
+
+// WillReturnError sets the error to be returned by the call to DBsStats.
+func (e *ExpectedDBsStats) WillReturnError(err error) *ExpectedDBsStats {
+	e.err = err
+	return e
+}
+
+// WillDelay will cause execution of DBsStats to delay by duration d.
+func (e *ExpectedDBsStats) WillDelay(delay time.Duration) *ExpectedDBsStats {
+	e.delay = delay
+	return e
+}
+
+// ExpectedPing is used to manage *kivik.Client.Ping expectation returned by
+// Mock.ExpectPing.
+type ExpectedPing struct {
+	commonExpectation
+	responded bool
+}
+
+func (e *ExpectedPing) String() string {
+	msg := "call to Ping()"
+	extra := delayString(e.delay) + errorString(e.err)
+	if extra != "" {
+		msg += " which:" + extra
+	}
+	return msg
+}
+
+func (e *ExpectedPing) method(v bool) string {
+	if v {
+		return "Ping(ctx)"
+	}
+	return "Ping()"
+}
+
+func (e *ExpectedPing) met(_ expectation) bool { return true }
+
+// WillReturn sets the value to be returned by the call to Ping.
+func (e *ExpectedPing) WillReturn(responded bool) *ExpectedPing {
+	e.responded = responded
+	return e
+}
+
+// WillReturnError sets the error to be returned by the call to Ping.
+func (e *ExpectedPing) WillReturnError(err error) *ExpectedPing {
+	e.err = err
+	return e
+}
+
+// WillDelay will cause execution of Ping to delay by duration d.
+func (e *ExpectedPing) WillDelay(delay time.Duration) *ExpectedPing {
+	e.delay = delay
+	return e
+}
+
+// ExpectedSession is used to manage *kivik.Client.Session expectation returned
+// by Mock.ExpectSession.
+type ExpectedSession struct {
+	commonExpectation
+	session *kivik.Session
+}
+
+func (e *ExpectedSession) String() string {
+	msg := "call to Session()"
+	extra := ""
+	if e.session != nil {
+		extra += fmt.Sprintf("\n\t- should return: %v", e.session)
+	}
+	extra += delayString(e.delay) + errorString(e.err)
+	if extra != "" {
+		msg += " which:" + extra
+	}
+	return msg
+}
+
+func (e *ExpectedSession) method(v bool) string {
+	if v {
+		return "Session(ctx)"
+	}
+	return "Session()"
+}
+
+func (e *ExpectedSession) met(_ expectation) bool { return true }
+
+// WillReturnError sets the error to be returned by the call to Session().
+func (e *ExpectedSession) WillReturnError(err error) *ExpectedSession {
+	e.err = err
+	return e
+}
+
+// WillReturn sets the session to be returned by the call to Session().
+func (e *ExpectedSession) WillReturn(session *kivik.Session) *ExpectedSession {
+	e.session = session
+	return e
+}
+
+// WillDelay will cause execution of Session() to delay by duration d.
+func (e *ExpectedSession) WillDelay(delay time.Duration) *ExpectedSession {
+	e.delay = delay
+	return e
+}
+
+// ExpectedVersion is used to manage *kivik.Client.Version expectation returned
+// by Mock.ExpectVersion.
+type ExpectedVersion struct {
+	commonExpectation
+	version *kivik.Version
+}
+
+func (e *ExpectedVersion) String() string {
+	msg := "call to Version()"
+	extra := ""
+	if e.version != nil {
+		extra += fmt.Sprintf("\n\t- should return: %v", e.version)
+	}
+	extra += delayString(e.delay) + errorString(e.err)
+	if extra != "" {
+		msg += " which:" + extra
+	}
+	return msg
+}
+
+func (e *ExpectedVersion) method(v bool) string {
+	if v {
+		return "Version(ctx)"
+	}
+	return "Version()"
+}
+
+func (e *ExpectedVersion) met(_ expectation) bool { return true }
+
+// WillReturnError sets the error to be returned by the call to Version().
+func (e *ExpectedVersion) WillReturnError(err error) *ExpectedVersion {
+	e.err = err
+	return e
+}
+
+// WillReturn sets the session to be returned by the call to Version().
+func (e *ExpectedVersion) WillReturn(version *kivik.Version) *ExpectedVersion {
+	e.version = version
+	return e
+}
+
+// WillDelay will cause execution of Version() to delay by duration d.
+func (e *ExpectedVersion) WillDelay(delay time.Duration) *ExpectedVersion {
 	e.delay = delay
 	return e
 }

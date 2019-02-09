@@ -84,3 +84,57 @@ func (c *kivikmock) DestroyDB(ctx context.Context, name string, options map[stri
 	}
 	return expected.wait(ctx)
 }
+
+var _ driver.DBsStatser = &kivikmock{}
+
+func (c *kivikmock) DBsStats(ctx context.Context, names []string) ([]*driver.DBStats, error) {
+	expected := &ExpectedDBsStats{
+		names: names,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	stats := make([]*driver.DBStats, len(expected.stats))
+	for i, s := range expected.stats {
+		stats[i] = kivikStats2driverStats(s)
+	}
+	return stats, expected.wait(ctx)
+}
+
+var _ driver.Pinger = &kivikmock{}
+
+func (c *kivikmock) Ping(ctx context.Context) (bool, error) {
+	expected := &ExpectedPing{}
+	if err := c.nextExpectation(expected); err != nil {
+		return false, err
+	}
+	return expected.responded, expected.wait(ctx)
+}
+
+var _ driver.Sessioner = &kivikmock{}
+
+func (c *kivikmock) Session(ctx context.Context) (*driver.Session, error) {
+	expected := &ExpectedSession{}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	var s *driver.Session
+	if expected.session != nil {
+		s = new(driver.Session)
+		*s = driver.Session(*expected.session)
+	}
+	return s, expected.wait(ctx)
+}
+
+func (c *kivikmock) Version(ctx context.Context) (*driver.Version, error) {
+	expected := &ExpectedVersion{}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	var v *driver.Version
+	if expected.version != nil {
+		v = new(driver.Version)
+		*v = driver.Version(*expected.version)
+	}
+	return v, expected.wait(ctx)
+}

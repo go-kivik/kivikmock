@@ -1,13 +1,8 @@
 - client.CreateDB https://godoc.org/github.com/go-kivik/kivik#Client.CreateDB
 - client.DB https://godoc.org/github.com/go-kivik/kivik#Client.DB
 - client.DBUpdates https://godoc.org/github.com/go-kivik/kivik#Client.DBUpdates
-- client.DBsStats https://godoc.org/github.com/go-kivik/kivik#Client.DBsStats
-- client.DestroyDB https://godoc.org/github.com/go-kivik/kivik#Client.DestroyDB
 - client.GetReplications https://godoc.org/github.com/go-kivik/kivik#Client.GetReplications
-- client.Ping https://godoc.org/github.com/go-kivik/kivik#Client.Ping
 - client.Replicate https://godoc.org/github.com/go-kivik/kivik#Client.Replicate
-- client.Session https://godoc.org/github.com/go-kivik/kivik#Client.Session
-- client.Version https://godoc.org/github.com/go-kivik/kivik#Client.Version
 
 - db.AllDocs https://godoc.org/github.com/go-kivik/kivik#DB.AllDocs
 - db.BulkDocs https://godoc.org/github.com/go-kivik/kivik#DB.BulkDocs
