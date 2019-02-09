@@ -119,7 +119,7 @@ func (c *kivikmock) nextExpectation(e expectation) error {
 				break
 			}
 			next.Unlock()
-			return fmt.Errorf("call to %s was not expected. Next expectation is: %s", e.method(), next)
+			return fmt.Errorf("call to %s was not expected. Next expectation is: %s", e.method(false), next.method(false))
 		}
 		if equal(e, next) {
 			expected = next
@@ -131,9 +131,9 @@ func (c *kivikmock) nextExpectation(e expectation) error {
 
 	if expected == nil {
 		if fulfilled == len(c.expected) {
-			return fmt.Errorf("call to %s was not expected, all expectations already fulfilled", e.method())
+			return fmt.Errorf("call to %s was not expected, all expectations already fulfilled", e.method(false))
 		}
-		return fmt.Errorf("call to %s was not expected", e.method())
+		return fmt.Errorf("call to %s was not expected", e.method(!c.ordered))
 	}
 
 	defer expected.Unlock()

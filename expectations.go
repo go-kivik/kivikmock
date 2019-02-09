@@ -17,12 +17,13 @@ type expectation interface {
 	Unlock()
 	String() string
 	// method should return the name of the method that would trigger this
-	// condition.
-	method() string
+	// condition. If verbose is true, the output should disambiguate between
+	// different calls to the same method.
+	method(verbose bool) string
 }
 
 // commonExpectation satisfies the expectation interface, except the String()
-// method.
+// and method() methods.
 type commonExpectation struct {
 	sync.Mutex
 	triggered bool
@@ -43,7 +44,12 @@ type ExpectedClose struct {
 	commonExpectation
 }
 
-func (e *ExpectedClose) method() string { return "Close" }
+func (e *ExpectedClose) method(v bool) string {
+	if v {
+		return "Close(ctx)"
+	}
+	return "Close()"
+}
 
 // WillReturnError allows setting an error for *kivik.Client.Close action.
 func (e *ExpectedClose) WillReturnError(err error) *ExpectedClose {
@@ -67,7 +73,22 @@ type ExpectedAllDBs struct {
 	results []string
 }
 
-func (e *ExpectedAllDBs) method() string { return "AllDBs" }
+func (e *ExpectedAllDBs) method(v bool) string {
+	if v {
+		if e.options == nil {
+			return "AllDBs(ctx, nil)"
+		}
+		return fmt.Sprintf("AllDBs(ctx, %#v)", e.options)
+	}
+	return "AllDBs()"
+}
+
+func (e *ExpectedAllDBs) equal(other expectation) bool {
+	if e.options == nil {
+		return true
+	}
+	return reflect.DeepEqual(e.options, other.(*ExpectedAllDBs).options)
+}
 
 func (e *ExpectedAllDBs) String() string {
 	msg := "ExpectedAllDBs => expecting AllDBs which:"
@@ -111,7 +132,12 @@ type ExpectedAuthenticate struct {
 	authType string
 }
 
-func (e *ExpectedAuthenticate) method() string { return "Authenticate" }
+func (e *ExpectedAuthenticate) method(v bool) string {
+	if v {
+		return fmt.Sprintf("Authenticate(ctx, <%s>)", e.authType)
+	}
+	return "Authenticate()"
+}
 
 func (e *ExpectedAuthenticate) equal(other expectation) bool {
 	if e.authType == "" {
@@ -179,8 +205,14 @@ type ExpectedClusterSetup struct {
 	action interface{}
 }
 
-func (e *ExpectedClusterSetup) method() string { return "ClusterSetup" }
+func (e *ExpectedClusterSetup) method(v bool) string {
+	if v {
+		return fmt.Sprintf("ClusterSetup(ctx, %#v)", e.action)
+	}
+	return "ClusterSetup()"
+}
 
+// Format satisfies the fmt.Formatter interface
 func (e *ExpectedClusterSetup) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
