@@ -138,3 +138,14 @@ func (c *kivikmock) Version(ctx context.Context) (*driver.Version, error) {
 	}
 	return v, expected.wait(ctx)
 }
+
+func (c *kivikmock) DB(ctx context.Context, name string, options map[string]interface{}) (driver.DB, error) {
+	expected := &ExpectedDB{
+		name:    name,
+		options: options,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	return expected.db, expected.wait(ctx)
+}

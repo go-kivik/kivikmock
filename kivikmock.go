@@ -7,8 +7,8 @@ import (
 	"github.com/go-kivik/kivik/driver"
 )
 
-// Mock interface serves to create expectations for database actions to
-// mock and test real database behavior.
+// Mock serves to create expectations for database actions to mock and test
+// real database behavior.
 type Mock interface {
 	// ExpectClose queues an expectation for this client action to be triggered.
 	// *ExpectedClose allows mocking the response.
@@ -32,6 +32,9 @@ type Mock interface {
 	// ExpectClusterStatus queues an expectation for this client action to be
 	// triggered.
 	ExpectClusterStatus() *ExpectedClusterStatus
+
+	// ExpectDB queues an expectation for DB() to be called.
+	ExpectDB() *ExpectedDB
 
 	// ExpectDBExists queues an expectation for this client action to be
 	// triggered.
@@ -65,6 +68,10 @@ type Mock interface {
 	// in any order. Or otherwise if switched to true, any unmatched
 	// expectations will be expected in order
 	MatchExpectationsInOrder(bool)
+
+	// NewDB returns a new DB object, to pass to Mock.ExpectDB.WillReturn or
+	// Mock.ExpectCreateDB.WillReturn.
+	NewDB() MockDB
 }
 
 type kivikmock struct {
@@ -164,4 +171,16 @@ func (c *kivikmock) ExpectVersion() *ExpectedVersion {
 	e := &ExpectedVersion{}
 	c.expected = append(c.expected, e)
 	return e
+}
+
+func (c *kivikmock) ExpectDB() *ExpectedDB {
+	e := &ExpectedDB{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+func (c *kivikmock) NewDB() MockDB {
+	return &db{
+		client: c,
+	}
 }

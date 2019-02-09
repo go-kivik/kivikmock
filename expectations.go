@@ -7,6 +7,7 @@ import (
 
 	"github.com/flimzy/diff"
 	"github.com/go-kivik/kivik"
+	"github.com/go-kivik/kivik/driver"
 )
 
 // ExpectedClose is used to manage *kivik.Client.Close expectation returned
@@ -632,6 +633,67 @@ func (e *ExpectedVersion) WillReturn(version *kivik.Version) *ExpectedVersion {
 
 // WillDelay will cause execution of Version() to delay by duration d.
 func (e *ExpectedVersion) WillDelay(delay time.Duration) *ExpectedVersion {
+	e.delay = delay
+	return e
+}
+
+type ExpectedDB struct {
+	commonExpectation
+	name    string
+	options map[string]interface{}
+	db      driver.DB
+}
+
+func (e *ExpectedDB) String() string {
+	return "call to DB() which:" +
+		nameString(e.name) +
+		optionsString(e.options) +
+		delayString(e.delay)
+}
+
+func (e *ExpectedDB) method(v bool) string {
+	if !v {
+		return "DB()"
+	}
+	var name, options string
+	if e.name == "" {
+		name = "?"
+	} else {
+		name = fmt.Sprintf("%q", e.name)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(ctx, %s%s)", name, options)
+}
+
+func (e *ExpectedDB) met(ex expectation) bool {
+	exp := ex.(*ExpectedDB)
+	nameOK := exp.name == "" || exp.name == e.name
+	optionsOK := exp.options == nil || reflect.DeepEqual(exp.options, e.options)
+	return nameOK && optionsOK
+}
+
+// WithName sets the expectation that DB() will be called with this name.
+func (e *ExpectedDB) WithName(name string) *ExpectedDB {
+	e.name = name
+	return e
+}
+
+// WithOptions set the expectation that DB() will be called with these options.
+func (e *ExpectedDB) WithOptions(options map[string]interface{}) *ExpectedDB {
+	e.options = options
+	return e
+}
+
+// WillReturn sets the return value for the DB() call.
+func (e *ExpectedDB) WillReturn(db driver.DB) *ExpectedDB {
+	e.db = db
+	return e
+}
+
+// WillDelay will cause execution of DB() to delay by duration d.
+func (e *ExpectedDB) WillDelay(delay time.Duration) *ExpectedDB {
 	e.delay = delay
 	return e
 }

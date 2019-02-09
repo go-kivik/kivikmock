@@ -29,6 +29,13 @@ func delayString(delay time.Duration) string {
 	return fmt.Sprintf("\n\t- should delay for: %s", delay)
 }
 
+func nameString(name string) string {
+	if name == "" {
+		return "\n\t- has any name"
+	}
+	return "\n\t- has name: " + name
+}
+
 func kivikStats2driverStats(i *kivik.DBStats) *driver.DBStats {
 	var cluster *driver.ClusterStats
 	if i.Cluster != nil {

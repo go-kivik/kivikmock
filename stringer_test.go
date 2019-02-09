@@ -280,3 +280,39 @@ func TestVersionString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestDBString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedDB{},
+		expected: `call to DB() which:
+	- has any name
+	- has any options`,
+	})
+	tests.Add("name", stringerTest{
+		input: &ExpectedDB{name: "foo"},
+		expected: `call to DB() which:
+	- has name: foo
+	- has any options`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestDBCloseString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("standard", stringerTest{
+		input:    &ExpectedDBClose{},
+		expected: "call to DB.Close()",
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedDBClose{commonExpectation{err: errors.New("foo error")}},
+		expected: `call to DB.Close() which:
+	- should return error: foo error`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedDBClose{commonExpectation{delay: time.Second}},
+		expected: `call to DB.Close() which:
+	- should delay for: 1s`,
+	})
+	tests.Run(t, testStringer)
+}
