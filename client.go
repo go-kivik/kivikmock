@@ -25,7 +25,7 @@ func (c *kivikmock) AllDBs(ctx context.Context, opts map[string]interface{}) ([]
 		return nil, err
 	}
 
-	return expected.results, expected.err
+	return expected.results, expected.wait(ctx)
 }
 
 var _ driver.Authenticator = &kivikmock{}
@@ -36,7 +36,7 @@ func (c *kivikmock) Authenticate(ctx context.Context, authenticator interface{})
 		return err
 	}
 
-	return expected.err
+	return expected.wait(ctx)
 }
 
 var _ driver.Cluster = &kivikmock{}
@@ -48,7 +48,7 @@ func (c *kivikmock) ClusterSetup(ctx context.Context, action interface{}) error 
 	if err := c.nextExpectation(expected); err != nil {
 		return err
 	}
-	return expected.err
+	return expected.wait(ctx)
 }
 
 func (c *kivikmock) ClusterStatus(ctx context.Context, options map[string]interface{}) (string, error) {
@@ -58,5 +58,5 @@ func (c *kivikmock) ClusterStatus(ctx context.Context, options map[string]interf
 	if err := c.nextExpectation(expected); err != nil {
 		return "", err
 	}
-	return expected.status, expected.err
+	return expected.status, expected.wait(ctx)
 }

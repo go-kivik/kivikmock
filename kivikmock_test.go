@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/flimzy/testy"
 	"github.com/go-kivik/couchdb"
@@ -24,21 +25,6 @@ func TestExpectedCloseError(t *testing.T) {
 	err = mock.ExpectationsWereMet()
 	testy.Error(t, "", err)
 }
-
-// func TestExpectedCloseOrder(t *testing.T) {
-// 	// Open new mock database
-// 	client, mock, err := New()
-// 	if err != nil {
-// 		fmt.Println("error creating mock database")
-// 		return
-// 	}
-// 	defer client.Close(context.TODO())
-// 	mock.ExpectClose().WillReturnError(fmt.Errorf("Close failed"))
-// 	client.Begin()
-// 	if err := mock.ExpectationsWereMet(); err == nil {
-// 		t.Error("expected error on ExpectationsWereMet")
-// 	}
-// }
 
 func TestExpectedAllDBsError(t *testing.T) {
 	// Open new mock database
@@ -211,4 +197,16 @@ func TestExpectedClusterStatus(t *testing.T) {
 	if status != "bar" {
 		t.Errorf("Unexpected status: %s", status)
 	}
+}
+
+func TestExpectedClusterStatusDelay(t *testing.T) {
+	client, mock, err := New()
+	if err != nil {
+		fmt.Println("error creating mock database")
+		return
+	}
+	defer client.Close(context.TODO()) // nolint: errcheck
+	mock.ExpectClusterStatus().WithDelay(time.Second)
+	_, err = client.ClusterStatus(newCanceledContext(), map[string]interface{}{"foo": 123})
+	testy.Error(t, "context canceled", err)
 }
