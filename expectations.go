@@ -70,20 +70,11 @@ func (e *ExpectedAllDBs) met(ex expectation) bool {
 	return reflect.DeepEqual(e.options, exp.options)
 }
 
-const anyOptions = "\n\t- has any options"
-
 // String satisfies the fmt.Stringer interface.
 func (e *ExpectedAllDBs) String() string {
-	msg := "call to AllDBs() which:"
-	if e.options == nil {
-		msg += anyOptions
-	} else {
-		msg += fmt.Sprintf("\n\t- has options: %v", e.options)
-	}
-	if e.err != nil {
-		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
-	}
-	return msg
+	return "call to AllDBs() which:" +
+		optionsString(e.options) +
+		errorString(e.err)
 }
 
 // WillReturnError allows setting an error for *kivik.Client.Close action.
@@ -256,16 +247,9 @@ func (e *ExpectedClusterStatus) method(v bool) string {
 
 // String satisfies the fmt.Stringer interface
 func (e *ExpectedClusterStatus) String() string {
-	msg := "call to ClusterStatus() which:"
-	if e.options == nil {
-		msg += anyOptions
-	} else {
-		msg += fmt.Sprintf("\n\t- has options: %v", e.options)
-	}
-	if e.err != nil {
-		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
-	}
-	return msg
+	return "call to ClusterStatus() which:" +
+		optionsString(e.options) +
+		errorString(e.err)
 }
 
 // WithOptions sets the expectation that ClusterStatus will be called with the
@@ -309,11 +293,7 @@ func (e *ExpectedDBExists) String() string {
 	} else {
 		msg += "\n\t- has name: " + e.name
 	}
-	if e.options == nil {
-		msg += anyOptions
-	} else {
-		msg += fmt.Sprintf("\n\t- has options: %v", e.options)
-	}
+	msg += optionsString(e.options)
 	if e.err == nil {
 		msg += fmt.Sprintf("\n\t- should return: %t", e.exists)
 	} else {
@@ -451,6 +431,66 @@ func (e *ExpectedDestroyDB) WillReturnError(err error) *ExpectedDestroyDB {
 
 // WillDelay will cause execution of DestroyDB to delay by duration d.
 func (e *ExpectedDestroyDB) WillDelay(delay time.Duration) *ExpectedDestroyDB {
+	e.delay = delay
+	return e
+}
+
+// ExpectedDBsStats is used to manage *kivik.Client.DBsStats expectation
+// returned by Mock.ExpectDBsStats.
+type ExpectedDBsStats struct {
+	commonExpectation
+	names []string
+	stats []*kivik.DBStats
+}
+
+func (e *ExpectedDBsStats) String() string {
+	msg := "call to DBsStats() which:"
+	if e.names == nil {
+		msg += "\n\t- has any names"
+	} else {
+		msg += fmt.Sprintf("\n\t- has names: %s", e.names)
+	}
+	return msg + errorString(e.err)
+}
+
+func (e *ExpectedDBsStats) method(v bool) string {
+	if !v {
+		return "DBsStats()"
+	}
+	if e.names == nil {
+		return "DBsStats(ctx, ?)"
+	}
+	return fmt.Sprintf("DBsStats(ctx, %v)", e.names)
+}
+
+func (e *ExpectedDBsStats) met(ex expectation) bool {
+	exp := ex.(*ExpectedDBsStats)
+	if exp.names == nil {
+		return true
+	}
+	return reflect.DeepEqual(e.names, exp.names)
+}
+
+// WithNames sets the expectation that DBsStats will be called with these names.
+func (e *ExpectedDBsStats) WithNames(names []string) *ExpectedDBsStats {
+	e.names = names
+	return e
+}
+
+// WillReturn sets the value to be returned by the call to DBsStats.
+func (e *ExpectedDBsStats) WillReturn(stats []*kivik.DBStats) *ExpectedDBsStats {
+	e.stats = stats
+	return e
+}
+
+// WillReturnError sets the error to be returned by the call to DBsStats.
+func (e *ExpectedDBsStats) WillReturnError(err error) *ExpectedDBsStats {
+	e.err = err
+	return e
+}
+
+// WillDelay will cause execution of DBsStats to delay by duration d.
+func (e *ExpectedDBsStats) WillDelay(delay time.Duration) *ExpectedDBsStats {
 	e.delay = delay
 	return e
 }

@@ -142,3 +142,18 @@ func TestDestroyDBMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestDBsStatsMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedDBsStats{},
+		standard: "DBsStats()",
+		verbose:  "DBsStats(ctx, ?)",
+	})
+	tests.Add("names", methodTest{
+		input:    &ExpectedDBsStats{names: []string{"a", "b"}},
+		standard: "DBsStats()",
+		verbose:  `DBsStats(ctx, [a b])`,
+	})
+	tests.Run(t, testMethod)
+}

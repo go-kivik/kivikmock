@@ -160,3 +160,24 @@ func TestDestroyDBString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestDBsStatsString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedDBsStats{},
+		expected: `call to DBsStats() which:
+	- has any names`,
+	})
+	tests.Add("names", stringerTest{
+		input: &ExpectedDBsStats{names: []string{"a", "b"}},
+		expected: `call to DBsStats() which:
+	- has names: [a b]`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedDBsStats{commonExpectation: commonExpectation{err: errors.New("foo err")}},
+		expected: `call to DBsStats() which:
+	- has any names
+	- should return error: foo err`,
+	})
+	tests.Run(t, testStringer)
+}

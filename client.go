@@ -84,3 +84,19 @@ func (c *kivikmock) DestroyDB(ctx context.Context, name string, options map[stri
 	}
 	return expected.wait(ctx)
 }
+
+func (c *kivikmock) DBsStats(ctx context.Context, names []string) ([]*driver.DBStats, error) {
+	expected := &ExpectedDBsStats{
+		names: names,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	stats := make([]*driver.DBStats, len(expected.stats))
+	for i, s := range expected.stats {
+		stats[i] = kivikStats2driverStats(s)
+	}
+	return stats, expected.wait(ctx)
+}
+
+var _ driver.DBsStatser = &kivikmock{}

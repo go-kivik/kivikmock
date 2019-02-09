@@ -37,6 +37,10 @@ type Mock interface {
 	// triggered.
 	ExpectDBExists() *ExpectedDBExists
 
+	// ExpectDBsStats queues an expectation for this client action to be
+	// triggered.
+	ExpectDBsStats() *ExpectedDBsStats
+
 	// ExpectDestroyDB queues an expectation for this client action to be
 	// triggered.
 	ExpectDestroyDB() *ExpectedDestroyDB
@@ -125,6 +129,12 @@ func (c *kivikmock) ExpectDBExists() *ExpectedDBExists {
 
 func (c *kivikmock) ExpectDestroyDB() *ExpectedDestroyDB {
 	e := &ExpectedDestroyDB{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+func (c *kivikmock) ExpectDBsStats() *ExpectedDBsStats {
+	e := &ExpectedDBsStats{}
 	c.expected = append(c.expected, e)
 	return e
 }

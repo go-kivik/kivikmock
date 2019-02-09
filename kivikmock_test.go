@@ -359,3 +359,53 @@ func TestDestroyDB(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestDBsStats(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDBsStats().WillReturnError(errors.New("stats error"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBsStats(context.TODO(), []string{"foo"})
+			testy.Error(t, "stats error", err)
+		},
+	})
+	tests.Add("names", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDBsStats().WithNames([]string{"a", "b"})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBsStats(context.TODO(), []string{"foo"})
+			testy.ErrorRE(t, "[a b]", err)
+		},
+	})
+	tests.Add("success", func() interface{} {
+		expected := []*kivik.DBStats{
+			{Name: "foo", Cluster: &kivik.ClusterConfig{Replicas: 5}},
+			{Name: "bar"},
+		}
+		return mockTest{
+			setup: func(m Mock) {
+				m.ExpectDBsStats().WillReturn(expected)
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				result, err := c.DBsStats(context.TODO(), []string{"foo", "bar"})
+				testy.ErrorRE(t, "", err)
+				if d := diff.Interface(expected, result); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDBsStats().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBsStats(newCanceledContext(), []string{"foo"})
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
