@@ -2,6 +2,7 @@ package kivikmock
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/go-kivik/kivik"
 	"github.com/go-kivik/kivik/driver"
@@ -97,4 +98,62 @@ func (c *kivikmock) ExpectClusterSetup() *ExpectedClusterSetup {
 	e := &ExpectedClusterSetup{}
 	c.expected = append(c.expected, e)
 	return e
+}
+
+// nextExpectation populates e with the next matching expectation, or returns
+// an error.
+func (c *kivikmock) nextExpectation(e expectation) error {
+	var expected expectation
+	var fulfilled int
+	for _, next := range c.expected {
+		next.Lock()
+		if next.fulfilled() {
+			next.Unlock()
+			fulfilled++
+			continue
+		}
+
+		if c.ordered {
+			if reflect.TypeOf(e).Elem().Name() == reflect.TypeOf(next).Elem().Name() {
+				expected = next
+				break
+			}
+			next.Unlock()
+			return fmt.Errorf("call to %v was not expected. Next expectation is: %s", e, next)
+		}
+		if equal(e, next) {
+			expected = next
+			break
+		}
+
+		next.Unlock()
+	}
+
+	if expected == nil {
+		if fulfilled == len(c.expected) {
+			return fmt.Errorf("call to %v was not expected, all expectations already fulfilled", e)
+		}
+		return fmt.Errorf("call to %v was not expected", e)
+	}
+
+	defer expected.Unlock()
+	expected.fulfill()
+
+	reflect.ValueOf(e).Elem().Set(reflect.ValueOf(expected).Elem())
+	return nil
+}
+
+type equaler interface {
+	equal(expectation) bool
+}
+
+func equal(a, b expectation) bool {
+	if reflect.TypeOf(a).Name() != reflect.TypeOf(b).Name() {
+		return false
+	}
+	eq, ok := a.(equaler)
+	if ok {
+		return eq.equal(b)
+	}
+	return reflect.DeepEqual(a, b)
 }

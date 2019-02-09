@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 	"sync"
 
 	"github.com/go-kivik/kivik"
 )
 
 type expectation interface {
+	fulfill()
 	fulfilled() bool
 	Lock()
 	Unlock()
@@ -22,6 +24,10 @@ type commonExpectation struct {
 	sync.Mutex
 	triggered bool
 	err       error // nolint: structcheck
+}
+
+func (e *commonExpectation) fulfill() {
+	e.triggered = true
 }
 
 func (e *commonExpectation) fulfilled() bool {
@@ -132,21 +138,45 @@ type ExpectedClusterSetup struct {
 	action interface{}
 }
 
-func (e *ExpectedClusterSetup) String() string {
-	msg := "ExpectedClusterSetup => expecting ClusterSetup which:"
-	if e.action == nil {
-		msg += "\n\t- has any action"
-	} else {
-		msg += "\n\t- has the action:\n\t\t"
-		b, err := json.MarshalIndent(e.action, "\t\t", "  ")
-		if err != nil {
-			msg += fmt.Sprintf("<<unmarshalable object: %s>>", err)
-		} else {
-			msg += fmt.Sprintf("%s", string(b))
+func (e *ExpectedClusterSetup) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, e.String())
+	case 'v':
+		if !f.Flag('+') {
+			fmt.Fprintf(f, "%s", e)
+			return
 		}
+		msg := "ExpectedClusterSetup => expecting ClusterSetup which:"
+		if e.action == nil {
+			msg += "\n\t- expects any action"
+		} else {
+			msg += "\n\t- expects the following action:"
+			b, err := json.MarshalIndent(e.action, "\t\t", "  ")
+			if err != nil {
+				msg += fmt.Sprintf("\n\t\t<<unmarshalable: %s>>", err)
+			} else {
+				msg += "\n\t\t" + string(b)
+			}
+		}
+		if e.err != nil {
+			msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+		}
+		fmt.Fprint(f, msg)
+	}
+}
+
+func (e *ExpectedClusterSetup) String() string {
+	msg := "ExpectedClusterSetup => expecting ClusterSetup"
+	modifiers := []string{}
+	if e.action != nil {
+		modifiers = append(modifiers, "has the desired action")
 	}
 	if e.err != nil {
-		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+		modifiers = append(modifiers, "should return an error")
+	}
+	if len(modifiers) > 0 {
+		msg = msg + " which " + strings.Join(modifiers, " and ")
 	}
 	return msg
 }
