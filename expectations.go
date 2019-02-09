@@ -105,16 +105,40 @@ type ExpectedAuthenticate struct {
 }
 
 func (e *ExpectedAuthenticate) String() string {
-	msg := "ExpectedAuthenticate => expecting Authenticate which:"
-	if e.authType == "" {
-		msg += "\n\t- has any authenticator"
-	} else {
-		msg += fmt.Sprintf("\n\t- has authenticator of type %s", e.authType)
+	msg := "ExpectedAuthenticate => expecting Authenticate"
+	modifiers := []string{}
+	if e.authType != "" {
+		modifiers = append(modifiers, fmt.Sprintf("expects an authenticator of type '%s'", e.authType))
 	}
 	if e.err != nil {
-		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+		modifiers = append(modifiers, "should return an error")
+	}
+	if len(modifiers) > 0 {
+		return msg + " which " + strings.Join(modifiers, " and ")
 	}
 	return msg
+}
+
+func (e *ExpectedAuthenticate) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, e.String())
+	case 'v':
+		if !f.Flag('+') {
+			fmt.Fprintf(f, "%s", e)
+			return
+		}
+		msg := "ExpectedAuthenticate => expecting Authenticate which:"
+		if e.authType == "" {
+			msg += "\n\t- expects any authenticator"
+		} else {
+			msg += "\n\t- expects an authenticator of type: " + e.authType
+		}
+		if e.err != nil {
+			msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
+		}
+		fmt.Fprint(f, msg)
+	}
 }
 
 // WillReturnError allows setting an error for *kivik.Client.Authenticate action.
