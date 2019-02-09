@@ -2,6 +2,7 @@ package kivikmock
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/go-kivik/kivik"
 	"github.com/go-kivik/kivik/driver"
@@ -19,6 +20,13 @@ func errorString(err error) string {
 		return ""
 	}
 	return fmt.Sprintf("\n\t- should return error: %s", err)
+}
+
+func delayString(delay time.Duration) string {
+	if delay == 0 {
+		return ""
+	}
+	return fmt.Sprintf("\n\t- should delay for: %s", delay)
 }
 
 func kivikStats2driverStats(i *kivik.DBStats) *driver.DBStats {

@@ -31,9 +31,10 @@ func (e *ExpectedClose) WillReturnError(err error) *ExpectedClose {
 }
 
 func (e *ExpectedClose) String() string {
+	extra := delayString(e.delay) + errorString(e.err)
 	msg := "call to Close()"
-	if e.err != nil {
-		msg += fmt.Sprintf(" which:\n\t- should return error: %s", e.err)
+	if extra != "" {
+		msg += " which:" + extra
 	}
 	return msg
 }
@@ -74,6 +75,7 @@ func (e *ExpectedAllDBs) met(ex expectation) bool {
 func (e *ExpectedAllDBs) String() string {
 	return "call to AllDBs() which:" +
 		optionsString(e.options) +
+		delayString(e.delay) +
 		errorString(e.err)
 }
 
@@ -117,9 +119,8 @@ func (e *ExpectedAuthenticate) String() string {
 	} else {
 		msg += fmt.Sprint("\n\t- has an authenticator of type: " + e.authType)
 	}
-	if e.err != nil {
-		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
-	}
+	msg += delayString(e.delay)
+	msg += errorString(e.err)
 	return msg
 }
 
@@ -193,9 +194,8 @@ func (e *ExpectedClusterSetup) String() string {
 	} else {
 		msg += fmt.Sprintf("\n\t- has the action: %v", e.action)
 	}
-	if e.err != nil {
-		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
-	}
+	msg += delayString(e.delay)
+	msg += errorString(e.err)
 	return msg
 }
 
@@ -249,7 +249,9 @@ func (e *ExpectedClusterStatus) method(v bool) string {
 func (e *ExpectedClusterStatus) String() string {
 	return "call to ClusterStatus() which:" +
 		optionsString(e.options) +
+		delayString(e.delay) +
 		errorString(e.err)
+
 }
 
 // WithOptions sets the expectation that ClusterStatus will be called with the
@@ -294,6 +296,7 @@ func (e *ExpectedDBExists) String() string {
 		msg += "\n\t- has name: " + e.name
 	}
 	msg += optionsString(e.options)
+	msg += delayString(e.delay)
 	if e.err == nil {
 		msg += fmt.Sprintf("\n\t- should return: %t", e.exists)
 	} else {
@@ -378,6 +381,7 @@ func (e *ExpectedDestroyDB) String() string {
 		msg += "\n\t- has name: " + e.name
 	}
 	msg += optionsString(e.options)
+	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
 }
@@ -450,7 +454,7 @@ func (e *ExpectedDBsStats) String() string {
 	} else {
 		msg += fmt.Sprintf("\n\t- has names: %s", e.names)
 	}
-	return msg + errorString(e.err)
+	return msg + delayString(e.delay) + errorString(e.err)
 }
 
 func (e *ExpectedDBsStats) method(v bool) string {

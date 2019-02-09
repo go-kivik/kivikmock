@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/flimzy/testy"
 )
@@ -31,6 +32,11 @@ func TestCloseString(t *testing.T) {
 		expected: `call to Close() which:
 	- should return error: foo error`,
 	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedClose{commonExpectation{delay: time.Second}},
+		expected: `call to Close() which:
+	- should delay for: 1s`,
+	})
 	tests.Run(t, testStringer)
 }
 
@@ -51,6 +57,12 @@ func TestAllDBsString(t *testing.T) {
 		expected: `call to AllDBs() which:
 	- has any options
 	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedAllDBs{commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to AllDBs() which:
+	- has any options
+	- should delay for: 1s`,
 	})
 	tests.Run(t, testStringer)
 }
@@ -73,6 +85,12 @@ func TestAuthenticateString(t *testing.T) {
 	- has any authenticator
 	- should return error: foo err`,
 	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedAuthenticate{commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to Authenticate() which:
+	- has any authenticator
+	- should delay for: 1s`,
+	})
 	tests.Run(t, testStringer)
 }
 
@@ -94,6 +112,12 @@ func TestClusterSetupString(t *testing.T) {
 	- has any action
 	- should return error: foo error`,
 	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedClusterSetup{commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to ClusterSetup() which:
+	- has any action
+	- should delay for: 1s`,
+	})
 	tests.Run(t, testStringer)
 }
 
@@ -114,6 +138,12 @@ func TestClusterStatusString(t *testing.T) {
 		expected: `call to ClusterStatus() which:
 	- has any options
 	- should return error: foo error`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedClusterStatus{commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to ClusterStatus() which:
+	- has any options
+	- should delay for: 1s`,
 	})
 	tests.Run(t, testStringer)
 }
@@ -141,6 +171,14 @@ func TestDBExistsString(t *testing.T) {
 	- has any options
 	- should return error: foo err`,
 	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedDBExists{commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to DBExists() which:
+	- has any name
+	- has any options
+	- should delay for: 1s
+	- should return: false`,
+	})
 	tests.Run(t, testStringer)
 }
 
@@ -158,6 +196,13 @@ func TestDestroyDBString(t *testing.T) {
 	- has name: foo
 	- has any options`,
 	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedDestroyDB{commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to DestroyDB() which:
+	- has any name
+	- has any options
+	- should delay for: 1s`,
+	})
 	tests.Run(t, testStringer)
 }
 
@@ -172,6 +217,12 @@ func TestDBsStatsString(t *testing.T) {
 		input: &ExpectedDBsStats{names: []string{"a", "b"}},
 		expected: `call to DBsStats() which:
 	- has names: [a b]`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedDBsStats{commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to DBsStats() which:
+	- has any names
+	- should delay for: 1s`,
 	})
 	tests.Add("error", stringerTest{
 		input: &ExpectedDBsStats{commonExpectation: commonExpectation{err: errors.New("foo err")}},
