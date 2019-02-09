@@ -53,6 +53,15 @@ func TestCloseClient(t *testing.T) {
 			testy.Error(t, "call to Close() was not expected, all expectations already fulfilled", err)
 		},
 	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectClose().WithDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.Close(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
 
 	tests.Run(t, testMock)
 }
@@ -197,7 +206,7 @@ func TestClusterStatus(t *testing.T) {
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			_, err := c.ClusterStatus(context.TODO())
-			testy.ErrorRE(t, `map\[string]interface {}{"foo":123}`, err)
+			testy.ErrorRE(t, `map\[foo:123]`, err)
 		},
 	})
 	tests.Add("success", func() interface{} {

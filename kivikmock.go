@@ -134,7 +134,7 @@ func (c *kivikmock) nextExpectation(actual expectation) error {
 					break
 				}
 				next.Unlock()
-				return fmt.Errorf("Expectation not met:\nExpected: %+v\n  Actual: %+v\n",
+				return fmt.Errorf("Expectation not met:\nExpected: %s\n  Actual: %s\n",
 					next, actual)
 			}
 			next.Unlock()
