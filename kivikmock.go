@@ -119,7 +119,7 @@ func (c *kivikmock) nextExpectation(e expectation) error {
 				break
 			}
 			next.Unlock()
-			return fmt.Errorf("call to %v was not expected. Next expectation is: %s", e, next)
+			return fmt.Errorf("call to %s was not expected. Next expectation is: %s", e.method(), next)
 		}
 		if equal(e, next) {
 			expected = next
@@ -131,9 +131,9 @@ func (c *kivikmock) nextExpectation(e expectation) error {
 
 	if expected == nil {
 		if fulfilled == len(c.expected) {
-			return fmt.Errorf("call to %v was not expected, all expectations already fulfilled", e)
+			return fmt.Errorf("call to %s was not expected, all expectations already fulfilled", e.method())
 		}
-		return fmt.Errorf("call to %v was not expected", e)
+		return fmt.Errorf("call to %s was not expected", e.method())
 	}
 
 	defer expected.Unlock()
@@ -148,7 +148,7 @@ type equaler interface {
 }
 
 func equal(a, b expectation) bool {
-	if reflect.TypeOf(a).Name() != reflect.TypeOf(b).Name() {
+	if reflect.TypeOf(a).Elem().Name() != reflect.TypeOf(b).Elem().Name() {
 		return false
 	}
 	eq, ok := a.(equaler)

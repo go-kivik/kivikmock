@@ -183,5 +183,5 @@ func TestExpectedAuthenticateUnexpected(t *testing.T) {
 	defer client.Close(context.TODO()) // nolint: errcheck
 	mock.MatchExpectationsInOrder(false)
 	err = client.Authenticate(context.TODO(), couchdb.BasicAuth("foo", "bar"))
-	testy.Error(t, "all expectations were already fulfilled, call to Authenticate was not expected", err)
+	testy.Error(t, "call to Authenticate was not expected, all expectations already fulfilled", err)
 }

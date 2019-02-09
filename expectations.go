@@ -16,6 +16,9 @@ type expectation interface {
 	Lock()
 	Unlock()
 	String() string
+	// method should return the name of the method that would trigger this
+	// condition.
+	method() string
 }
 
 // commonExpectation satisfies the expectation interface, except the String()
@@ -40,6 +43,8 @@ type ExpectedClose struct {
 	commonExpectation
 }
 
+func (e *ExpectedClose) method() string { return "Close" }
+
 // WillReturnError allows setting an error for *kivik.Client.Close action.
 func (e *ExpectedClose) WillReturnError(err error) *ExpectedClose {
 	e.err = err
@@ -61,6 +66,8 @@ type ExpectedAllDBs struct {
 	options map[string]interface{}
 	results []string
 }
+
+func (e *ExpectedAllDBs) method() string { return "AllDBs" }
 
 func (e *ExpectedAllDBs) String() string {
 	msg := "ExpectedAllDBs => expecting AllDBs which:"
@@ -102,6 +109,16 @@ func (e *ExpectedAllDBs) WillReturn(results []string) *ExpectedAllDBs {
 type ExpectedAuthenticate struct {
 	commonExpectation
 	authType string
+}
+
+func (e *ExpectedAuthenticate) method() string { return "Authenticate" }
+
+func (e *ExpectedAuthenticate) equal(other expectation) bool {
+	if e.authType == "" {
+		return true
+	}
+	o, _ := other.(*ExpectedAuthenticate)
+	return e.authType == o.authType
 }
 
 func (e *ExpectedAuthenticate) String() string {
@@ -161,6 +178,8 @@ type ExpectedClusterSetup struct {
 	commonExpectation
 	action interface{}
 }
+
+func (e *ExpectedClusterSetup) method() string { return "ClusterSetup" }
 
 func (e *ExpectedClusterSetup) Format(f fmt.State, verb rune) {
 	switch verb {
