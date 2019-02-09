@@ -97,3 +97,28 @@ func TestClusterStatusMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestDBExistsMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedDBExists{},
+		standard: "DBExists()",
+		verbose:  "DBExists(ctx, ?, ?)",
+	})
+	tests.Add("name", methodTest{
+		input:    &ExpectedDBExists{name: "foo"},
+		standard: "DBExists()",
+		verbose:  `DBExists(ctx, "foo", ?)`,
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedDBExists{options: map[string]interface{}{"foo": 321}},
+		standard: "DBExists()",
+		verbose:  `DBExists(ctx, ?, map[foo:321])`,
+	})
+	tests.Add("full", methodTest{
+		input:    &ExpectedDBExists{name: "foo", options: map[string]interface{}{"foo": 321}},
+		standard: "DBExists()",
+		verbose:  `DBExists(ctx, "foo", map[foo:321])`,
+	})
+	tests.Run(t, testMethod)
+}

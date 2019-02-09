@@ -2,7 +2,6 @@ package kivikmock
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/go-kivik/kivik"
 	"github.com/go-kivik/kivik/driver"
@@ -33,6 +32,10 @@ type Mock interface {
 	// ExpectClusterStatus queues an expectation for this client action to be
 	// triggered.
 	ExpectClusterStatus() *ExpectedClusterStatus
+
+	// ExpectDBExists queues an expectation for this client action to be
+	// triggered.
+	ExpectDBExists() *ExpectedDBExists
 
 	// MatchExpectationsInOrder indicates whether to match expectations in the
 	// order they were set.
@@ -110,61 +113,8 @@ func (c *kivikmock) ExpectClusterStatus() *ExpectedClusterStatus {
 	return e
 }
 
-// nextExpectation accepts the expected value `e`, checks that this is a valid
-// expectation, and if so, populates e with the matching expectation. If the
-// expectation is not expected, an error is returned.
-func (c *kivikmock) nextExpectation(actual expectation) error {
-	c.drv.Lock()
-	defer c.drv.Unlock()
-
-	var expected expectation
-	var fulfilled int
-	for _, next := range c.expected {
-		next.Lock()
-		if next.fulfilled() {
-			next.Unlock()
-			fulfilled++
-			continue
-		}
-
-		if c.ordered {
-			if reflect.TypeOf(actual).Elem().Name() == reflect.TypeOf(next).Elem().Name() {
-				if meets(actual, next) {
-					expected = next
-					break
-				}
-				next.Unlock()
-				return fmt.Errorf("Expectation not met:\nExpected: %s\n  Actual: %s",
-					next, actual)
-			}
-			next.Unlock()
-			return fmt.Errorf("call to %s was not expected. Next expectation is: %s", actual.method(false), next.method(false))
-		}
-		if meets(actual, next) {
-			expected = next
-			break
-		}
-
-		next.Unlock()
-	}
-
-	if expected == nil {
-		if fulfilled == len(c.expected) {
-			return fmt.Errorf("call to %s was not expected, all expectations already fulfilled", actual.method(false))
-		}
-		return fmt.Errorf("call to %s was not expected", actual.method(!c.ordered))
-	}
-
-	defer expected.Unlock()
-	expected.fulfill()
-
-	reflect.ValueOf(actual).Elem().Set(reflect.ValueOf(expected).Elem())
-	return nil
-}
-
-func meets(a, e expectation) bool {
-	if reflect.TypeOf(a).Elem().Name() != reflect.TypeOf(e).Elem().Name() {
-		return false
-	}
-	return a.met(e)
+func (c *kivikmock) ExpectDBExists() *ExpectedDBExists {
+	e := &ExpectedDBExists{}
+	c.expected = append(c.expected, e)
+	return e
 }

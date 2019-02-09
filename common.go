@@ -3,6 +3,7 @@ package kivikmock
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"sync"
 	"time"
 )
@@ -59,4 +60,63 @@ func (e *commonExpectation) wait(ctx context.Context) error {
 	case <-ctx.Done():
 		return ctx.Err()
 	}
+}
+
+// nextExpectation accepts the expected value `e`, checks that this is a valid
+// expectation, and if so, populates e with the matching expectation. If the
+// expectation is not expected, an error is returned.
+func (c *kivikmock) nextExpectation(actual expectation) error {
+	c.drv.Lock()
+	defer c.drv.Unlock()
+
+	var expected expectation
+	var fulfilled int
+	for _, next := range c.expected {
+		next.Lock()
+		if next.fulfilled() {
+			next.Unlock()
+			fulfilled++
+			continue
+		}
+
+		if c.ordered {
+			if reflect.TypeOf(actual).Elem().Name() == reflect.TypeOf(next).Elem().Name() {
+				if meets(actual, next) {
+					expected = next
+					break
+				}
+				next.Unlock()
+				return fmt.Errorf("Expectation not met:\nExpected: %s\n  Actual: %s",
+					next, actual)
+			}
+			next.Unlock()
+			return fmt.Errorf("call to %s was not expected. Next expectation is: %s", actual.method(false), next.method(false))
+		}
+		if meets(actual, next) {
+			expected = next
+			break
+		}
+
+		next.Unlock()
+	}
+
+	if expected == nil {
+		if fulfilled == len(c.expected) {
+			return fmt.Errorf("call to %s was not expected, all expectations already fulfilled", actual.method(false))
+		}
+		return fmt.Errorf("call to %s was not expected", actual.method(!c.ordered))
+	}
+
+	defer expected.Unlock()
+	expected.fulfill()
+
+	reflect.ValueOf(actual).Elem().Set(reflect.ValueOf(expected).Elem())
+	return nil
+}
+
+func meets(a, e expectation) bool {
+	if reflect.TypeOf(a).Elem().Name() != reflect.TypeOf(e).Elem().Name() {
+		return false
+	}
+	return a.met(e)
 }

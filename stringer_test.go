@@ -107,13 +107,39 @@ func TestClusterStatusString(t *testing.T) {
 	tests.Add("options", stringerTest{
 		input: &ExpectedClusterStatus{options: map[string]interface{}{"foo": 123}},
 		expected: `call to ClusterStatus() which:
-	- has the options: map[foo:123]`,
+	- has options: map[foo:123]`,
 	})
 	tests.Add("error", stringerTest{
 		input: &ExpectedClusterStatus{commonExpectation: commonExpectation{err: errors.New("foo error")}},
 		expected: `call to ClusterStatus() which:
 	- has any options
 	- should return error: foo error`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestDBExistsString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedDBExists{},
+		expected: `call to DBExists() which:
+	- has any name
+	- has any options
+	- should return: false`,
+	})
+	tests.Add("full", stringerTest{
+		input: &ExpectedDBExists{name: "foo", exists: true, options: map[string]interface{}{"foo": 123}},
+		expected: `call to DBExists() which:
+	- has name: foo
+	- has options: map[foo:123]
+	- should return: true`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedDBExists{commonExpectation: commonExpectation{err: errors.New("foo err")}},
+		expected: `call to DBExists() which:
+	- has any name
+	- has any options
+	- should return error: foo err`,
 	})
 	tests.Run(t, testStringer)
 }

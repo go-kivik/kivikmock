@@ -63,3 +63,14 @@ func (c *kivikmock) ClusterStatus(ctx context.Context, options map[string]interf
 	}
 	return expected.status, expected.wait(ctx)
 }
+
+func (c *kivikmock) DBExists(ctx context.Context, name string, options map[string]interface{}) (bool, error) {
+	expected := &ExpectedDBExists{
+		name:    name,
+		options: options,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return false, err
+	}
+	return expected.exists, expected.wait(ctx)
+}
