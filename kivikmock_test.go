@@ -554,3 +554,54 @@ func TestVersion(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestDB(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("name", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDB().WithName("foo")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").Err()
+			testy.Error(t, "", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").Err()
+			testy.Error(t, "call to DB() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("options", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDB().WithOptions(map[string]interface{}{"foo": 123})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo", kivik.Options{"foo": 123}).Err()
+			testy.Error(t, "", err)
+		},
+	})
+	tests.Add("success", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDB().WillReturn(m.NewDB())
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			err := db.Err()
+			testy.Error(t, "", err)
+			if db.Name() != "foo" {
+				t.Errorf("Unexpected db name: %s", db.Name())
+			}
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectDB().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(newCanceledContext(), "foo").Err()
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}

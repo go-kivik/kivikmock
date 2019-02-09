@@ -187,3 +187,33 @@ func TestVersionMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestDBMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedDB{},
+		standard: "DB()",
+		verbose:  "DB(ctx, ?)",
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedDB{options: map[string]interface{}{"foo": 123}},
+		standard: "DB()",
+		verbose:  "DB(ctx, ?, map[foo:123])",
+	})
+	tests.Add("name", methodTest{
+		input:    &ExpectedDB{name: "foo", options: map[string]interface{}{"foo": 123}},
+		standard: "DB()",
+		verbose:  `DB(ctx, "foo", map[foo:123])`,
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestDBCloseMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedDBClose{},
+		standard: "DB.Close()",
+		verbose:  "DB.Close(ctx)",
+	})
+	tests.Run(t, testMethod)
+}

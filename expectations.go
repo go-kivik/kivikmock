@@ -289,14 +289,10 @@ type ExpectedDBExists struct {
 }
 
 func (e *ExpectedDBExists) String() string {
-	msg := "call to DBExists() which:"
-	if e.name == "" {
-		msg += "\n\t- has any name"
-	} else {
-		msg += "\n\t- has name: " + e.name
-	}
-	msg += optionsString(e.options)
-	msg += delayString(e.delay)
+	msg := "call to DBExists() which:" +
+		nameString(e.name) +
+		optionsString(e.options) +
+		delayString(e.delay)
 	if e.err == nil {
 		msg += fmt.Sprintf("\n\t- should return: %t", e.exists)
 	} else {
@@ -374,16 +370,11 @@ type ExpectedDestroyDB struct {
 }
 
 func (e *ExpectedDestroyDB) String() string {
-	msg := "call to DestroyDB() which:"
-	if e.name == "" {
-		msg += "\n\t- has any name"
-	} else {
-		msg += "\n\t- has name: " + e.name
-	}
-	msg += optionsString(e.options)
-	msg += delayString(e.delay)
-	msg += errorString(e.err)
-	return msg
+	return "call to DestroyDB() which:" +
+		nameString(e.name) +
+		optionsString(e.options) +
+		delayString(e.delay) +
+		errorString(e.err)
 }
 
 func (e *ExpectedDestroyDB) method(v bool) string {
@@ -632,6 +623,72 @@ func (e *ExpectedVersion) WillReturn(version *kivik.Version) *ExpectedVersion {
 
 // WillDelay will cause execution of Version() to delay by duration d.
 func (e *ExpectedVersion) WillDelay(delay time.Duration) *ExpectedVersion {
+	e.delay = delay
+	return e
+}
+
+// ExpectedDB represents an expectation to call the DB() method.
+type ExpectedDB struct {
+	commonExpectation
+	name    string
+	options map[string]interface{}
+	db      MockDB
+}
+
+func (e *ExpectedDB) String() string {
+	msg := "call to DB() which:" +
+		nameString(e.name) +
+		optionsString(e.options)
+	if e.db != nil {
+		msg += fmt.Sprintf("\n\t- should return database with %d expectations", e.db.expectations())
+	}
+	msg += delayString(e.delay)
+	return msg
+}
+
+func (e *ExpectedDB) method(v bool) string {
+	if !v {
+		return "DB()"
+	}
+	var name, options string
+	if e.name == "" {
+		name = "?"
+	} else {
+		name = fmt.Sprintf("%q", e.name)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(ctx, %s%s)", name, options)
+}
+
+func (e *ExpectedDB) met(ex expectation) bool {
+	exp := ex.(*ExpectedDB)
+	nameOK := exp.name == "" || exp.name == e.name
+	optionsOK := exp.options == nil || reflect.DeepEqual(exp.options, e.options)
+	return nameOK && optionsOK
+}
+
+// WithName sets the expectation that DB() will be called with this name.
+func (e *ExpectedDB) WithName(name string) *ExpectedDB {
+	e.name = name
+	return e
+}
+
+// WithOptions set the expectation that DB() will be called with these options.
+func (e *ExpectedDB) WithOptions(options map[string]interface{}) *ExpectedDB {
+	e.options = options
+	return e
+}
+
+// WillReturn sets the return value for the DB() call.
+func (e *ExpectedDB) WillReturn(db MockDB) *ExpectedDB {
+	e.db = db
+	return e
+}
+
+// WillDelay will cause execution of DB() to delay by duration d.
+func (e *ExpectedDB) WillDelay(delay time.Duration) *ExpectedDB {
 	e.delay = delay
 	return e
 }
