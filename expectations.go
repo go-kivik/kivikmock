@@ -164,13 +164,14 @@ func (e *ExpectedAuthenticate) String() string {
 	return msg
 }
 
+// Format satisfies the fmt.Formatter interface.
 func (e *ExpectedAuthenticate) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		fmt.Fprint(f, e.String())
+		fmt.Fprint(f, e.String()) // nolint: errcheck
 	case 'v':
 		if !f.Flag('+') {
-			fmt.Fprintf(f, "%s", e)
+			fmt.Fprintf(f, "%s", e) // nolint: errcheck
 			return
 		}
 		msg := "ExpectedAuthenticate => expecting Authenticate which:"
@@ -182,7 +183,7 @@ func (e *ExpectedAuthenticate) Format(f fmt.State, verb rune) {
 		if e.err != nil {
 			msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
 		}
-		fmt.Fprint(f, msg)
+		fmt.Fprint(f, msg) // nolint: errcheck
 	}
 }
 
@@ -218,10 +219,10 @@ func (e *ExpectedClusterSetup) method(v bool) string {
 func (e *ExpectedClusterSetup) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		fmt.Fprint(f, e.String())
+		fmt.Fprint(f, e.String()) // nolint: errcheck
 	case 'v':
 		if !f.Flag('+') {
-			fmt.Fprintf(f, "%s", e)
+			fmt.Fprintf(f, "%s", e) // nolint: errcheck
 			return
 		}
 		msg := "ExpectedClusterSetup => expecting ClusterSetup which:"
@@ -239,7 +240,7 @@ func (e *ExpectedClusterSetup) Format(f fmt.State, verb rune) {
 		if e.err != nil {
 			msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
 		}
-		fmt.Fprint(f, msg)
+		fmt.Fprint(f, msg) // nolint: errcheck
 	}
 }
 
