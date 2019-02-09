@@ -7,7 +7,6 @@ import (
 
 	"github.com/flimzy/diff"
 	"github.com/go-kivik/kivik"
-	"github.com/go-kivik/kivik/driver"
 )
 
 // ExpectedClose is used to manage *kivik.Client.Close expectation returned
@@ -290,14 +289,10 @@ type ExpectedDBExists struct {
 }
 
 func (e *ExpectedDBExists) String() string {
-	msg := "call to DBExists() which:"
-	if e.name == "" {
-		msg += "\n\t- has any name"
-	} else {
-		msg += "\n\t- has name: " + e.name
-	}
-	msg += optionsString(e.options)
-	msg += delayString(e.delay)
+	msg := "call to DBExists() which:" +
+		nameString(e.name) +
+		optionsString(e.options) +
+		delayString(e.delay)
 	if e.err == nil {
 		msg += fmt.Sprintf("\n\t- should return: %t", e.exists)
 	} else {
@@ -375,16 +370,11 @@ type ExpectedDestroyDB struct {
 }
 
 func (e *ExpectedDestroyDB) String() string {
-	msg := "call to DestroyDB() which:"
-	if e.name == "" {
-		msg += "\n\t- has any name"
-	} else {
-		msg += "\n\t- has name: " + e.name
-	}
-	msg += optionsString(e.options)
-	msg += delayString(e.delay)
-	msg += errorString(e.err)
-	return msg
+	return "call to DestroyDB() which:" +
+		nameString(e.name) +
+		optionsString(e.options) +
+		delayString(e.delay) +
+		errorString(e.err)
 }
 
 func (e *ExpectedDestroyDB) method(v bool) string {
@@ -637,18 +627,23 @@ func (e *ExpectedVersion) WillDelay(delay time.Duration) *ExpectedVersion {
 	return e
 }
 
+// ExpectedDB represents an expectation to call the DB() method.
 type ExpectedDB struct {
 	commonExpectation
 	name    string
 	options map[string]interface{}
-	db      driver.DB
+	db      MockDB
 }
 
 func (e *ExpectedDB) String() string {
-	return "call to DB() which:" +
+	msg := "call to DB() which:" +
 		nameString(e.name) +
-		optionsString(e.options) +
-		delayString(e.delay)
+		optionsString(e.options)
+	if e.db != nil {
+		msg += fmt.Sprintf("\n\t- should return database with %d expectations", e.db.expectations())
+	}
+	msg += delayString(e.delay)
+	return msg
 }
 
 func (e *ExpectedDB) method(v bool) string {
@@ -687,7 +682,7 @@ func (e *ExpectedDB) WithOptions(options map[string]interface{}) *ExpectedDB {
 }
 
 // WillReturn sets the return value for the DB() call.
-func (e *ExpectedDB) WillReturn(db driver.DB) *ExpectedDB {
+func (e *ExpectedDB) WillReturn(db MockDB) *ExpectedDB {
 	e.db = db
 	return e
 }

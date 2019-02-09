@@ -8,6 +8,9 @@ type MockDB interface {
 	// ExpectClose queues an expectation Close() to be called on this database.
 	ExpectClose() *ExpectedDBClose
 	driver.DB
+
+	// expectations returns the number of expectations registered in this db.
+	expectations() int
 }
 
 type db struct {
@@ -19,8 +22,13 @@ type db struct {
 var _ MockDB = &db{}
 var _ driver.DB = &db{}
 
+func (db *db) expectations() int {
+	return db.count
+}
+
 func (db *db) ExpectClose() *ExpectedDBClose {
 	e := &ExpectedDBClose{}
+	db.count++
 	db.client.expected = append(db.client.expected, e)
 	return e
 }

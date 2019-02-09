@@ -295,6 +295,13 @@ func TestDBString(t *testing.T) {
 	- has name: foo
 	- has any options`,
 	})
+	tests.Add("db", stringerTest{
+		input: &ExpectedDB{db: &db{count: 50}},
+		expected: `call to DB() which:
+	- has any name
+	- has any options
+	- should return database with 50 expectations`,
+	})
 	tests.Run(t, testStringer)
 }
 
