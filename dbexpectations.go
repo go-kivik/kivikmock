@@ -79,6 +79,9 @@ func (e *ExpectedAllDocs) method(v bool) string {
 
 func (e *ExpectedAllDocs) met(ex expectation) bool {
 	exp := ex.(*ExpectedAllDocs)
+	if e.db.name != exp.db.name {
+		return false
+	}
 	return reflect.DeepEqual(e.options, exp.options)
 }
 
@@ -157,6 +160,9 @@ func (e *ExpectedBulkGet) method(v bool) string {
 
 func (e *ExpectedBulkGet) met(ex expectation) bool {
 	exp := ex.(*ExpectedBulkGet)
+	if e.db.name != exp.db.name {
+		return false
+	}
 	return reflect.DeepEqual(e.options, exp.options)
 }
 
@@ -217,6 +223,9 @@ func (e *ExpectedFind) method(v bool) string {
 
 func (e *ExpectedFind) met(ex expectation) bool {
 	exp := ex.(*ExpectedFind)
+	if e.db.name != exp.db.name {
+		return false
+	}
 	return exp.query == nil || diff.AsJSON(e.query, exp.query) == nil
 }
 
@@ -298,6 +307,9 @@ func (e *ExpectedCreateIndex) method(v bool) string {
 
 func (e *ExpectedCreateIndex) met(ex expectation) bool {
 	exp := ex.(*ExpectedCreateIndex)
+	if e.db.name != exp.db.name {
+		return false
+	}
 	if exp.ddoc != "" && exp.ddoc != e.ddoc {
 		return false
 	}
@@ -364,7 +376,10 @@ func (e *ExpectedGetIndexes) method(v bool) string {
 	return fmt.Sprintf("DB(%s).GetIndexes(ctx)", e.db.name)
 }
 
-func (e *ExpectedGetIndexes) met(_ expectation) bool { return true }
+func (e *ExpectedGetIndexes) met(ex expectation) bool {
+	exp := ex.(*ExpectedGetIndexes)
+	return e.db.name == exp.db.name
+}
 
 // WillReturn sets the indexes that will be returned by the call to
 // DB.GetIndexes().
@@ -425,6 +440,9 @@ func (e *ExpectedDeleteIndex) method(v bool) string {
 
 func (e *ExpectedDeleteIndex) met(ex expectation) bool {
 	exp := ex.(*ExpectedDeleteIndex)
+	if e.db.name != exp.db.name {
+		return false
+	}
 	if exp.ddoc != "" && exp.ddoc != e.ddoc {
 		return false
 	}
@@ -458,3 +476,21 @@ func (e *ExpectedDeleteIndex) WillDelay(delay time.Duration) *ExpectedDeleteInde
 	e.delay = delay
 	return e
 }
+
+//
+// type ExpectedExplain struct {
+// 	commonExpectation
+// 	db    *MockDB
+// 	query interface{}
+// 	plan  *driver.QueryPlan
+// }
+//
+// func (e *ExpectedExplain) String() string       { return "" }
+// func (e *ExpectedExplain) method(v bool) string { return "" }
+// func (e *ExpectedExplain) met(ex expectation) bool {
+// 	exp := ex.(*ExpectedExplain)
+// 	if e.db.name != exp.db.name {
+// 		return false
+// 	}
+// 	return false
+// }

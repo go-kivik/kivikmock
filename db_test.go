@@ -64,7 +64,6 @@ func TestCloseDB(t *testing.T) {
 		},
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
-
 	tests.Run(t, testMock)
 }
 
@@ -264,6 +263,23 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			testy.Error(t, "context deadline exceeded", rows.Err())
 		},
 	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectAllDocs()
+			foo.ExpectAllDocs()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			_, err := foo.AllDocs(context.TODO())
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
 	tests.Run(t, testMock)
 }
 
@@ -340,6 +356,23 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 			_, err := db.BulkGet(newCanceledContext(), []kivik.BulkGetReference{})
 			testy.Error(t, "context canceled", err)
 		},
+	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectBulkGet()
+			foo.ExpectBulkGet()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			_, err := foo.BulkGet(context.TODO(), []kivik.BulkGetReference{})
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Run(t, testMock)
 }
@@ -419,6 +452,23 @@ func TestFind(t *testing.T) { // nolint: gocyclo
 			testy.Error(t, "context canceled", err)
 		},
 	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectFind()
+			foo.ExpectFind()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			_, err := foo.Find(context.TODO(), 1)
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
 	tests.Run(t, testMock)
 }
 
@@ -490,6 +540,23 @@ func TestCreateIndex(t *testing.T) {
 			testy.Error(t, "context canceled", err)
 		},
 	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectCreateIndex()
+			foo.ExpectCreateIndex()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			err := foo.CreateIndex(context.TODO(), "foo", "bar", 123)
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
 	tests.Run(t, testMock)
 }
 
@@ -547,6 +614,23 @@ func TestGetIndexes(t *testing.T) {
 			testy.Error(t, "context canceled", err)
 		},
 	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectGetIndexes()
+			foo.ExpectGetIndexes()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			_, err := foo.GetIndexes(context.TODO())
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
 	tests.Run(t, testMock)
 }
 
@@ -595,6 +679,23 @@ func TestDeleteIndex(t *testing.T) {
 			err := c.DB(context.TODO(), "foo").DeleteIndex(newCanceledContext(), "foo", "bar")
 			testy.Error(t, "context canceled", err)
 		},
+	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectDeleteIndex()
+			foo.ExpectDeleteIndex()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			err := foo.DeleteIndex(context.TODO(), "foo", "bar")
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Run(t, testMock)
 }

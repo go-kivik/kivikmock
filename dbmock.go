@@ -83,6 +83,15 @@ func (db *MockDB) ExpectDeleteIndex() *ExpectedDeleteIndex {
 	return e
 }
 
+// func (db *MockDB) ExpectExplain() *ExpectedExplain {
+// 	e := &ExpectedExplain{
+// 		db: db,
+// 	}
+// 	db.count++
+// 	db.client.expected = append(db.client.expected, e)
+// 	return e
+// }
+
 // NewRows returns a new, empty set of rows, which can be returned by any of
 // the row-returning expectations.
 func (db *MockDB) NewRows() *Rows {

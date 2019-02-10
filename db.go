@@ -28,6 +28,7 @@ func (db *driverDB) Close(ctx context.Context) error {
 
 func (db *driverDB) AllDocs(ctx context.Context, options map[string]interface{}) (driver.Rows, error) {
 	expected := &ExpectedAllDocs{
+		db:      db.MockDB,
 		options: options,
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -41,6 +42,7 @@ func (db *driverDB) AllDocs(ctx context.Context, options map[string]interface{})
 
 func (db *driverDB) BulkGet(ctx context.Context, docs []driver.BulkGetReference, options map[string]interface{}) (driver.Rows, error) {
 	expected := &ExpectedBulkGet{
+		db:      db.MockDB,
 		options: options,
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -54,6 +56,7 @@ func (db *driverDB) BulkGet(ctx context.Context, docs []driver.BulkGetReference,
 
 func (db *driverDB) Find(ctx context.Context, query interface{}) (driver.Rows, error) {
 	expected := &ExpectedFind{
+		db:    db.MockDB,
 		query: query,
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -67,6 +70,7 @@ func (db *driverDB) Find(ctx context.Context, query interface{}) (driver.Rows, e
 
 func (db *driverDB) CreateIndex(ctx context.Context, ddoc, name string, index interface{}) error {
 	expected := &ExpectedCreateIndex{
+		db:    db.MockDB,
 		ddoc:  ddoc,
 		name:  name,
 		index: index,
@@ -78,7 +82,9 @@ func (db *driverDB) CreateIndex(ctx context.Context, ddoc, name string, index in
 }
 
 func (db *driverDB) GetIndexes(ctx context.Context) ([]driver.Index, error) {
-	expected := &ExpectedGetIndexes{}
+	expected := &ExpectedGetIndexes{
+		db: db.MockDB,
+	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
@@ -91,6 +97,7 @@ func (db *driverDB) GetIndexes(ctx context.Context) ([]driver.Index, error) {
 
 func (db *driverDB) DeleteIndex(ctx context.Context, ddoc, name string) error {
 	expected := &ExpectedDeleteIndex{
+		db:   db.MockDB,
 		ddoc: ddoc,
 		name: name,
 	}
@@ -101,6 +108,14 @@ func (db *driverDB) DeleteIndex(ctx context.Context, ddoc, name string) error {
 }
 
 func (db *driverDB) Explain(ctx context.Context, query interface{}) (*driver.QueryPlan, error) {
+	// expected := &ExpectedExplain{
+	// 	db:    db.MockDB,
+	// 	query: query,
+	// }
+	// if err := db.client.nextExpectation(expected); err != nil {
+	// 	return nil, err
+	// }
+	// return expected.plan, expected.wait(ctx)
 	return nil, errors.New("unimplemented")
 }
 
