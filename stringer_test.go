@@ -522,3 +522,30 @@ func TestDeleteIndexString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestExplainString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedExplain{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).Explain() which:
+	- has any query`,
+	})
+	tests.Add("query", stringerTest{
+		input: &ExpectedExplain{db: &MockDB{name: "foo"}, query: map[string]string{"foo": "bar"}},
+		expected: `call to DB(foo#0).Explain() which:
+	- has query: map[foo:bar]`,
+	})
+	tests.Add("plan", stringerTest{
+		input: &ExpectedExplain{db: &MockDB{name: "foo"}, plan: &kivik.QueryPlan{DBName: "foo"}},
+		expected: `call to DB(foo#0).Explain() which:
+	- has any query
+	- should return query plan: &{foo map[] map[] map[] 0 0 [] map[]}`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedExplain{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).Explain() which:
+	- has any query
+	- should return error: foo err`,
+	})
+	tests.Run(t, testStringer)
+}
