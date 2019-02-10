@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/flimzy/testy"
+	"github.com/go-kivik/kivik/driver"
 )
 
 type methodTest struct {
@@ -249,6 +250,26 @@ func TestAllDocsMethod(t *testing.T) {
 		input:    &ExpectedAllDocs{options: map[string]interface{}{"foo": 123}},
 		standard: "DB.AllDocs()",
 		verbose:  "DB.AllDocs(ctx, map[foo:123])",
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestBulkGetMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedBulkGet{},
+		standard: "DB.BulkGet()",
+		verbose:  "DB.BulkGet(ctx, ?)",
+	})
+	tests.Add("docs", methodTest{
+		input:    &ExpectedBulkGet{docs: []driver.BulkGetReference{{ID: "foo"}}},
+		standard: "DB.BulkGet()",
+		verbose:  "DB.BulkGet(ctx, [{foo  }])",
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedBulkGet{options: map[string]interface{}{"foo": 123}},
+		standard: "DB.BulkGet()",
+		verbose:  "DB.BulkGet(ctx, ?, map[foo:123])",
 	})
 	tests.Run(t, testMethod)
 }

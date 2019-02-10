@@ -10,12 +10,15 @@ type MockDB interface {
 
 	// ExpectAllDocs queues an expectation for AllDocs() to be called.
 	ExpectAllDocs() *ExpectedAllDocs
-	driver.DB
+
+	// ExpectBulkGet queues an expectation for BulkGet() to be called.
+	ExpectBulkGet() *ExpectedBulkGet
 
 	// expectations returns the number of expectations registered in this db.
 	expectations() int
 
 	NewRows() *Rows
+	driver.DB
 }
 
 type db struct {
@@ -40,6 +43,13 @@ func (db *db) ExpectClose() *ExpectedDBClose {
 
 func (db *db) ExpectAllDocs() *ExpectedAllDocs {
 	e := &ExpectedAllDocs{}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+func (db *db) ExpectBulkGet() *ExpectedBulkGet {
+	e := &ExpectedBulkGet{}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
 	return e

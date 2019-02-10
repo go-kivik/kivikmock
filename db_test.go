@@ -249,3 +249,80 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 	})
 	tests.Run(t, testMock)
 }
+
+func TestBulkGet(t *testing.T) { // nolint: gocyclo
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectBulkGet().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.BulkGet(context.TODO(), []kivik.BulkGetReference{})
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.BulkGet(context.TODO(), []kivik.BulkGetReference{})
+			testy.Error(t, "call to DB.BulkGet() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("rows", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectBulkGet().WillReturnRows(db.NewRows().
+				AddRow(&driver.Row{ID: "foo"}).
+				AddRow(&driver.Row{ID: "bar"}).
+				AddRow(&driver.Row{ID: "baz"}))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			rows, err := db.BulkGet(context.TODO(), []kivik.BulkGetReference{})
+			testy.Error(t, "", err)
+			ids := []string{}
+			for rows.Next() {
+				ids = append(ids, rows.ID())
+			}
+			expected := []string{"foo", "bar", "baz"}
+			if d := diff.Interface(expected, ids); d != nil {
+				t.Error(d)
+			}
+		},
+	})
+	tests.Add("options", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectBulkGet().WithOptions(map[string]interface{}{"foo": 123}).
+				WillReturnRows(db.NewRows())
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.BulkGet(context.TODO(), []kivik.BulkGetReference{})
+			testy.ErrorRE(t, `map\[foo:123]`, err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectBulkGet().WillDelay(time.Second).
+				WillReturnRows(db.NewRows())
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.BulkGet(newCanceledContext(), []kivik.BulkGetReference{})
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}

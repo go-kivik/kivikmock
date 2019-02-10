@@ -374,3 +374,41 @@ func TestAllDocsString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestBulkGetString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedBulkGet{},
+		expected: `call to DB.BulkGet() which:
+	- has any doc references
+	- has any options
+	- should return: 0 results`,
+	})
+	tests.Add("docs", stringerTest{
+		input: &ExpectedBulkGet{docs: []driver.BulkGetReference{
+			{ID: "foo"},
+			{ID: "bar"},
+		}},
+		expected: `call to DB.BulkGet() which:
+	- has doc references: [{foo  } {bar  }]
+	- has any options
+	- should return: 0 results`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedBulkGet{
+			rows: &Rows{results: []*delayedRow{
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+				{delay: 15},
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+			},
+			},
+		},
+		expected: `call to DB.BulkGet() which:
+	- has any doc references
+	- has any options
+	- should return: 4 results`,
+	})
+	tests.Run(t, testStringer)
+}
