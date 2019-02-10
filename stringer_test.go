@@ -549,3 +549,54 @@ func TestExplainString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestCreateDocString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).CreateDoc() which:
+	- has any doc
+	- has any options`,
+	})
+	tests.Add("doc", stringerTest{
+		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, doc: map[string]string{"foo": "bar"}},
+		expected: `call to DB(foo#0).CreateDoc() which:
+	- has doc: map[foo:bar]
+	- has any options`,
+	})
+	tests.Add("options", stringerTest{
+		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": "bar"}},
+		expected: `call to DB(foo#0).CreateDoc() which:
+	- has any doc
+	- has options: map[foo:bar]`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).CreateDoc() which:
+	- has any doc
+	- has any options
+	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to DB(foo#0).CreateDoc() which:
+	- has any doc
+	- has any options
+	- should delay for: 1s`,
+	})
+	tests.Add("docID", stringerTest{
+		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, docID: "foo"},
+		expected: `call to DB(foo#0).CreateDoc() which:
+	- has any doc
+	- has any options
+	- should return docID: foo`,
+	})
+	tests.Add("rev", stringerTest{
+		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, rev: "1-foo"},
+		expected: `call to DB(foo#0).CreateDoc() which:
+	- has any doc
+	- has any options
+	- should return rev: 1-foo`,
+	})
+	tests.Run(t, testStringer)
+}

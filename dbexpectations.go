@@ -36,8 +36,9 @@ func (e *ExpectedDBClose) WillReturnError(err error) *ExpectedDBClose {
 }
 
 func (e *ExpectedDBClose) String() string {
-	extra := delayString(e.delay) + errorString(e.err)
 	msg := fmt.Sprintf("call to DB(%s#%d).Close()", e.db.name, e.db.id)
+	extra := delayString(e.delay)
+	extra += errorString(e.err)
 	if extra != "" {
 		msg += " which:" + extra
 	}
@@ -278,6 +279,7 @@ func (e *ExpectedCreateIndex) String() string {
 	} else {
 		msg += fmt.Sprintf("\n\t- has index: %v", e.index)
 	}
+	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
 }
@@ -362,6 +364,7 @@ func (e *ExpectedGetIndexes) String() string {
 	if e.indexes != nil {
 		extra += fmt.Sprintf("\n\t- should return indexes: %v", e.indexes)
 	}
+	extra += delayString(e.delay)
 	extra += errorString(e.err)
 	if extra != "" {
 		msg += " which:" + extra
@@ -416,6 +419,7 @@ func (e *ExpectedDeleteIndex) String() string {
 		msg += "\n\t- has ddoc: " + e.ddoc
 	}
 	msg += nameString(e.name)
+	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
 }
@@ -495,6 +499,7 @@ func (e *ExpectedExplain) String() string {
 	if e.plan != nil {
 		msg += fmt.Sprintf("\n\t- should return query plan: %v", e.plan)
 	}
+	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
 }
@@ -537,6 +542,92 @@ func (e *ExpectedExplain) WillReturnError(err error) *ExpectedExplain {
 
 // WillDelay causes the Explain() call to delay.
 func (e *ExpectedExplain) WillDelay(delay time.Duration) *ExpectedExplain {
+	e.delay = delay
+	return e
+}
+
+// ExpectedCreateDoc represents an expectation for a call to CreateDoc().
+type ExpectedCreateDoc struct {
+	commonExpectation
+	db         *MockDB
+	doc        interface{}
+	options    map[string]interface{}
+	docID, rev string
+}
+
+func (e *ExpectedCreateDoc) String() string {
+	msg := fmt.Sprintf("call to DB(%s#%d).CreateDoc() which:", e.db.name, e.db.id)
+	if e.doc == nil {
+		msg += "\n\t- has any doc"
+	} else {
+		msg += fmt.Sprintf("\n\t- has doc: %v", e.doc)
+	}
+	msg += optionsString(e.options)
+	if e.docID != "" {
+		msg += "\n\t- should return docID: " + e.docID
+	}
+	if e.rev != "" {
+		msg += "\n\t- should return rev: " + e.rev
+	}
+	msg += delayString(e.delay)
+	msg += errorString(e.err)
+	return msg
+}
+
+func (e *ExpectedCreateDoc) method(v bool) string {
+	if !v {
+		return "DB.CreateDoc()"
+	}
+	var doc, options string
+	if e.doc == nil {
+		doc = "?"
+	} else {
+		doc = fmt.Sprintf("%v", e.doc)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(%s).CreateDoc(ctx, %s%s)", e.db.name, doc, options)
+}
+
+func (e *ExpectedCreateDoc) met(ex expectation) bool {
+	exp := ex.(*ExpectedCreateDoc)
+	if e.db.name != exp.db.name {
+		return false
+	}
+	if exp.doc != nil && diff.AsJSON(e.doc, exp.doc) != nil {
+		return false
+	}
+	return exp.options == nil || reflect.DeepEqual(e.options, exp.options)
+}
+
+// WithDoc sets the expected doc for the call to CreateDoc().
+func (e *ExpectedCreateDoc) WithDoc(doc interface{}) *ExpectedCreateDoc {
+	e.doc = doc
+	return e
+}
+
+// WithOptions sets the expected options for the call to CreateDoc().
+func (e *ExpectedCreateDoc) WithOptions(options map[string]interface{}) *ExpectedCreateDoc {
+	e.options = options
+	return e
+}
+
+// WillReturn sets the values that will be returned by the call to CreateDoc().
+func (e *ExpectedCreateDoc) WillReturn(docID, rev string) *ExpectedCreateDoc {
+	e.docID = docID
+	e.rev = rev
+	return e
+}
+
+// WillReturnError sets the error value that will be returned by the call to CreateDoc().
+func (e *ExpectedCreateDoc) WillReturnError(err error) *ExpectedCreateDoc {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to CreateDoc() to delay.
+func (e *ExpectedCreateDoc) WillDelay(delay time.Duration) *ExpectedCreateDoc {
 	e.delay = delay
 	return e
 }

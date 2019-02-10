@@ -93,6 +93,16 @@ func (db *MockDB) ExpectExplain() *ExpectedExplain {
 	return e
 }
 
+// ExpectCreateDoc queues an expectation to call the Createdoc() method.
+func (db *MockDB) ExpectCreateDoc() *ExpectedCreateDoc {
+	e := &ExpectedCreateDoc{
+		db: db,
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
 // NewRows returns a new, empty set of rows, which can be returned by any of
 // the row-returning expectations.
 func (db *MockDB) NewRows() *Rows {
