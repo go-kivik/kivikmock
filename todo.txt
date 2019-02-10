@@ -3,19 +3,16 @@
 - client.Replicate https://godoc.org/github.com/go-kivik/kivik#Client.Replicate
 
 - db.BulkDocs https://godoc.org/github.com/go-kivik/kivik#DB.BulkDocs
-- db.BulkGet https://godoc.org/github.com/go-kivik/kivik#DB.BulkGet
 - db.Changes https://godoc.org/github.com/go-kivik/kivik#DB.Changes
 - db.Compact https://godoc.org/github.com/go-kivik/kivik#DB.Compact
 - db.CompactView https://godoc.org/github.com/go-kivik/kivik#DB.CompactView
 - db.Copy https://godoc.org/github.com/go-kivik/kivik#DB.Copy
 - db.CreateDoc https://godoc.org/github.com/go-kivik/kivik#DB.CreateDoc
-- db.CreateIndex https://godoc.org/github.com/go-kivik/kivik#DB.CreateIndex
 - db.Delete https://godoc.org/github.com/go-kivik/kivik#DB.Delete
 - db.DeleteAttachment https://godoc.org/github.com/go-kivik/kivik#DB.DeleteAttachment
 - db.DeleteIndex https://godoc.org/github.com/go-kivik/kivik#DB.DeleteIndex
 - db.DesignDocs https://godoc.org/github.com/go-kivik/kivik#DB.DesignDocs
 - db.Explain https://godoc.org/github.com/go-kivik/kivik#DB.Explain
-- db.Find https://godoc.org/github.com/go-kivik/kivik#DB.Find
 - db.Flush https://godoc.org/github.com/go-kivik/kivik#DB.Flush
 - db.Get https://godoc.org/github.com/go-kivik/kivik#DB.Get
 - db.GetAttachment https://godoc.org/github.com/go-kivik/kivik#DB.GetAttachment

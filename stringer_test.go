@@ -374,3 +374,106 @@ func TestAllDocsString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestBulkGetString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedBulkGet{},
+		expected: `call to DB.BulkGet() which:
+	- has any doc references
+	- has any options
+	- should return: 0 results`,
+	})
+	tests.Add("docs", stringerTest{
+		input: &ExpectedBulkGet{docs: []driver.BulkGetReference{
+			{ID: "foo"},
+			{ID: "bar"},
+		}},
+		expected: `call to DB.BulkGet() which:
+	- has doc references: [{foo  } {bar  }]
+	- has any options
+	- should return: 0 results`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedBulkGet{
+			rows: &Rows{results: []*delayedRow{
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+				{delay: 15},
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+			},
+			},
+		},
+		expected: `call to DB.BulkGet() which:
+	- has any doc references
+	- has any options
+	- should return: 4 results`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestFindString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedFind{},
+		expected: `call to DB.Find() which:
+	- has any query
+	- should return: 0 results`,
+	})
+	tests.Add("query", stringerTest{
+		input: &ExpectedFind{query: map[string]string{"foo": "bar"}},
+		expected: `call to DB.Find() which:
+	- has query: map[foo:bar]
+	- should return: 0 results`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedFind{
+			rows: &Rows{results: []*delayedRow{
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+				{delay: 15},
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+			},
+			},
+		},
+		expected: `call to DB.Find() which:
+	- has any query
+	- should return: 4 results`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestCreateIndexString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedCreateIndex{},
+		expected: `call to DB.CreateIndex() which:
+	- has any ddoc
+	- has any name
+	- has any index`,
+	})
+	tests.Add("ddoc", stringerTest{
+		input: &ExpectedCreateIndex{ddoc: "foo"},
+		expected: `call to DB.CreateIndex() which:
+	- has ddoc: foo
+	- has any name
+	- has any index`,
+	})
+	tests.Add("name", stringerTest{
+		input: &ExpectedCreateIndex{name: "foo"},
+		expected: `call to DB.CreateIndex() which:
+	- has any ddoc
+	- has name: foo
+	- has any index`,
+	})
+	tests.Add("index", stringerTest{
+		input: &ExpectedCreateIndex{index: map[string]string{"foo": "bar"}},
+		expected: `call to DB.CreateIndex() which:
+	- has any ddoc
+	- has any name
+	- has index: map[foo:bar]`,
+	})
+	tests.Run(t, testStringer)
+}

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/flimzy/testy"
+	"github.com/go-kivik/kivik/driver"
 )
 
 type methodTest struct {
@@ -249,6 +250,66 @@ func TestAllDocsMethod(t *testing.T) {
 		input:    &ExpectedAllDocs{options: map[string]interface{}{"foo": 123}},
 		standard: "DB.AllDocs()",
 		verbose:  "DB.AllDocs(ctx, map[foo:123])",
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestBulkGetMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedBulkGet{},
+		standard: "DB.BulkGet()",
+		verbose:  "DB.BulkGet(ctx, ?)",
+	})
+	tests.Add("docs", methodTest{
+		input:    &ExpectedBulkGet{docs: []driver.BulkGetReference{{ID: "foo"}}},
+		standard: "DB.BulkGet()",
+		verbose:  "DB.BulkGet(ctx, [{foo  }])",
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedBulkGet{options: map[string]interface{}{"foo": 123}},
+		standard: "DB.BulkGet()",
+		verbose:  "DB.BulkGet(ctx, ?, map[foo:123])",
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestFindMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedFind{},
+		standard: "DB.Find()",
+		verbose:  "DB.Find(ctx, ?)",
+	})
+	tests.Add("query", methodTest{
+		input:    &ExpectedFind{query: map[string]string{"foo": "bar"}},
+		standard: "DB.Find()",
+		verbose:  "DB.Find(ctx, map[foo:bar])",
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestCreateIndexMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedCreateIndex{},
+		standard: "DB.CreateIndex()",
+		verbose:  "DB.CreateIndex(ctx, ?, ?, ?)",
+	})
+	tests.Add("name", methodTest{
+		input:    &ExpectedCreateIndex{name: "foo"},
+		standard: "DB.CreateIndex()",
+		verbose:  `DB.CreateIndex(ctx, ?, "foo", ?)`,
+	})
+	tests.Add("ddoc", methodTest{
+		input:    &ExpectedCreateIndex{ddoc: "foo"},
+		standard: "DB.CreateIndex()",
+		verbose:  `DB.CreateIndex(ctx, "foo", ?, ?)`,
+	})
+	tests.Add("index", methodTest{
+		input:    &ExpectedCreateIndex{index: map[string]string{"foo": "bar"}},
+		standard: "DB.CreateIndex()",
+		verbose:  `DB.CreateIndex(ctx, ?, ?, map[foo:bar])`,
 	})
 	tests.Run(t, testMethod)
 }
