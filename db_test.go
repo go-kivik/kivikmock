@@ -51,7 +51,7 @@ func TestCloseDB(t *testing.T) {
 	tests.Run(t, testMock)
 }
 
-func TestAllDocs(t *testing.T) {
+func TestAllDocs(t *testing.T) { // nolint: gocyclo
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
 		setup: func(m Mock) {
