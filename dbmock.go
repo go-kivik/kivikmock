@@ -1,16 +1,11 @@
 package kivikmock
 
-import "github.com/go-kivik/kivik/driver"
-
 // MockDB serves to create expectations for database actions to
 // mock and test real database behavior.
 type MockDB struct {
 	client *kivikmock
 	count  int
-	driver.DB
 }
-
-var _ driver.DB = &MockDB{}
 
 func (db *MockDB) expectations() int {
 	return db.count

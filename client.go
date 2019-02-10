@@ -147,7 +147,7 @@ func (c *kivikmock) DB(ctx context.Context, name string, options map[string]inte
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
 	}
-	return expected.db, expected.wait(ctx)
+	return &driverDB{MockDB: expected.db}, expected.wait(ctx)
 }
 
 func (c *kivikmock) CreateDB(ctx context.Context, name string, options map[string]interface{}) error {
