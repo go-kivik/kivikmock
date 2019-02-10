@@ -605,3 +605,63 @@ func TestDB(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestCreateDB(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			m.ExpectCreateDB().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.CreateDB(context.TODO(), "foo").Err()
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("name", mockTest{
+		setup: func(m Mock) {
+			m.ExpectCreateDB().WithName("foo")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.CreateDB(context.TODO(), "foo").Err()
+			testy.Error(t, "", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.CreateDB(context.TODO(), "foo").Err()
+			testy.Error(t, "call to CreateDB() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("options", mockTest{
+		setup: func(m Mock) {
+			m.ExpectCreateDB().WithOptions(map[string]interface{}{"foo": 123})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.CreateDB(context.TODO(), "foo", kivik.Options{"foo": 123}).Err()
+			testy.Error(t, "", err)
+		},
+	})
+	tests.Add("success", mockTest{
+		setup: func(m Mock) {
+			m.ExpectCreateDB().WillReturn(m.NewDB())
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.CreateDB(context.TODO(), "foo")
+			err := db.Err()
+			testy.Error(t, "", err)
+			if db.Name() != "foo" {
+				t.Errorf("Unexpected db name: %s", db.Name())
+			}
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			m.ExpectCreateDB().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.CreateDB(newCanceledContext(), "foo").Err()
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}

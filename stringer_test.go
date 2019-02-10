@@ -281,6 +281,30 @@ func TestVersionString(t *testing.T) {
 	tests.Run(t, testStringer)
 }
 
+func TestCreateDBString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedCreateDB{},
+		expected: `call to CreateDB() which:
+	- has any name
+	- has any options`,
+	})
+	tests.Add("name", stringerTest{
+		input: &ExpectedCreateDB{name: "foo"},
+		expected: `call to CreateDB() which:
+	- has name: foo
+	- has any options`,
+	})
+	tests.Add("db", stringerTest{
+		input: &ExpectedCreateDB{db: &db{count: 50}},
+		expected: `call to CreateDB() which:
+	- has any name
+	- has any options
+	- should return database with 50 expectations`,
+	})
+	tests.Run(t, testStringer)
+}
+
 func TestDBString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", stringerTest{
