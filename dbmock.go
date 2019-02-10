@@ -3,7 +3,7 @@ package kivikmock
 // MockDB serves to create expectations for database actions to
 // mock and test real database behavior.
 type MockDB struct {
-	client *kivikmock
+	client *MockClient
 	count  int
 }
 

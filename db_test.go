@@ -15,7 +15,7 @@ import (
 func TestCloseDB(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectClose().WillReturnError(errors.New("foo err"))
@@ -27,7 +27,7 @@ func TestCloseDB(t *testing.T) {
 		err: "",
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -37,7 +37,7 @@ func TestCloseDB(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectClose().WillDelay(time.Second)
@@ -54,7 +54,7 @@ func TestCloseDB(t *testing.T) {
 func TestAllDocs(t *testing.T) { // nolint: gocyclo
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturnError(errors.New("foo err"))
@@ -66,7 +66,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -77,7 +77,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows close error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturnRows(db.NewRows().CloseError(errors.New("bar err")))
@@ -90,7 +90,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows offset", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturnRows(db.NewRows().Offset(123))
@@ -105,7 +105,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows totalrows", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturnRows(db.NewRows().TotalRows(123))
@@ -120,7 +120,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows update seq", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturnRows(db.NewRows().UpdateSeq("1-xxx"))
@@ -135,7 +135,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows warning", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturnRows(db.NewRows().Warning("Caution!"))
@@ -150,7 +150,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturnRows(db.NewRows().
@@ -173,7 +173,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("row error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturnRows(db.NewRows().
@@ -196,7 +196,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WithOptions(map[string]interface{}{"foo": 123}).
@@ -209,7 +209,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillDelay(time.Second).
@@ -222,7 +222,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("row delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturnRows(db.NewRows().
@@ -253,7 +253,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 func TestBulkGet(t *testing.T) { // nolint: gocyclo
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkGet().WillReturnError(errors.New("foo err"))
@@ -265,7 +265,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -276,7 +276,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkGet().WillReturnRows(db.NewRows().
@@ -299,7 +299,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkGet().WithOptions(map[string]interface{}{"foo": 123}).
@@ -312,7 +312,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkGet().WillDelay(time.Second).
@@ -330,7 +330,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 func TestFind(t *testing.T) { // nolint: gocyclo
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectFind().WillReturnError(errors.New("foo err"))
@@ -342,7 +342,7 @@ func TestFind(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("unmatched query", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectFind().WithQuery(123)
@@ -354,7 +354,7 @@ func TestFind(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectFind().WillReturnRows(db.NewRows().
@@ -377,7 +377,7 @@ func TestFind(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("query", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectFind().WithQuery(map[string]interface{}{"foo": "123"}).
@@ -390,7 +390,7 @@ func TestFind(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectFind().WillDelay(time.Second).
@@ -408,7 +408,7 @@ func TestFind(t *testing.T) { // nolint: gocyclo
 func TestCreateIndex(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateIndex().WillReturnError(errors.New("foo err"))
@@ -419,7 +419,7 @@ func TestCreateIndex(t *testing.T) {
 		},
 	})
 	tests.Add("unmatched index", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateIndex().WithIndex(321)
@@ -430,7 +430,7 @@ func TestCreateIndex(t *testing.T) {
 		},
 	})
 	tests.Add("ddoc", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateIndex().WithDDoc("moo")
@@ -441,7 +441,7 @@ func TestCreateIndex(t *testing.T) {
 		},
 	})
 	tests.Add("name", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateIndex().WithName("moo")
@@ -452,7 +452,7 @@ func TestCreateIndex(t *testing.T) {
 		},
 	})
 	tests.Add("index", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateIndex().WithIndex("moo")
@@ -463,7 +463,7 @@ func TestCreateIndex(t *testing.T) {
 		},
 	})
 	tests.Add("delya", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateIndex().WillDelay(time.Second)

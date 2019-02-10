@@ -7,9 +7,19 @@ import (
 	"github.com/go-kivik/kivik/driver"
 )
 
-var _ driver.ClientCloser = &kivikmock{}
+type driverClient struct {
+	*MockClient
+}
 
-func (c *kivikmock) Close(ctx context.Context) error {
+var _ driver.Client = &driverClient{}
+var _ driver.ClientCloser = &driverClient{}
+var _ driver.Authenticator = &driverClient{}
+var _ driver.Cluster = &driverClient{}
+var _ driver.DBsStatser = &driverClient{}
+var _ driver.Pinger = &driverClient{}
+var _ driver.Sessioner = &driverClient{}
+
+func (c *driverClient) Close(ctx context.Context) error {
 	expected := &ExpectedClose{}
 	if err := c.nextExpectation(expected); err != nil {
 		return err
@@ -18,7 +28,7 @@ func (c *kivikmock) Close(ctx context.Context) error {
 	return expected.wait(ctx)
 }
 
-func (c *kivikmock) AllDBs(ctx context.Context, opts map[string]interface{}) ([]string, error) {
+func (c *driverClient) AllDBs(ctx context.Context, opts map[string]interface{}) ([]string, error) {
 	expected := &ExpectedAllDBs{
 		options: opts,
 	}
@@ -29,9 +39,7 @@ func (c *kivikmock) AllDBs(ctx context.Context, opts map[string]interface{}) ([]
 	return expected.results, expected.wait(ctx)
 }
 
-var _ driver.Authenticator = &kivikmock{}
-
-func (c *kivikmock) Authenticate(ctx context.Context, authenticator interface{}) error {
+func (c *driverClient) Authenticate(ctx context.Context, authenticator interface{}) error {
 	expected := &ExpectedAuthenticate{
 		authType: reflect.TypeOf(authenticator).Name(),
 	}
@@ -42,9 +50,7 @@ func (c *kivikmock) Authenticate(ctx context.Context, authenticator interface{})
 	return expected.wait(ctx)
 }
 
-var _ driver.Cluster = &kivikmock{}
-
-func (c *kivikmock) ClusterSetup(ctx context.Context, action interface{}) error {
+func (c *driverClient) ClusterSetup(ctx context.Context, action interface{}) error {
 	expected := &ExpectedClusterSetup{
 		action: action,
 	}
@@ -54,7 +60,7 @@ func (c *kivikmock) ClusterSetup(ctx context.Context, action interface{}) error 
 	return expected.wait(ctx)
 }
 
-func (c *kivikmock) ClusterStatus(ctx context.Context, options map[string]interface{}) (string, error) {
+func (c *driverClient) ClusterStatus(ctx context.Context, options map[string]interface{}) (string, error) {
 	expected := &ExpectedClusterStatus{
 		options: options,
 	}
@@ -64,7 +70,7 @@ func (c *kivikmock) ClusterStatus(ctx context.Context, options map[string]interf
 	return expected.status, expected.wait(ctx)
 }
 
-func (c *kivikmock) DBExists(ctx context.Context, name string, options map[string]interface{}) (bool, error) {
+func (c *driverClient) DBExists(ctx context.Context, name string, options map[string]interface{}) (bool, error) {
 	expected := &ExpectedDBExists{
 		name:    name,
 		options: options,
@@ -75,7 +81,7 @@ func (c *kivikmock) DBExists(ctx context.Context, name string, options map[strin
 	return expected.exists, expected.wait(ctx)
 }
 
-func (c *kivikmock) DestroyDB(ctx context.Context, name string, options map[string]interface{}) error {
+func (c *driverClient) DestroyDB(ctx context.Context, name string, options map[string]interface{}) error {
 	expected := &ExpectedDestroyDB{
 		name: name,
 	}
@@ -85,9 +91,7 @@ func (c *kivikmock) DestroyDB(ctx context.Context, name string, options map[stri
 	return expected.wait(ctx)
 }
 
-var _ driver.DBsStatser = &kivikmock{}
-
-func (c *kivikmock) DBsStats(ctx context.Context, names []string) ([]*driver.DBStats, error) {
+func (c *driverClient) DBsStats(ctx context.Context, names []string) ([]*driver.DBStats, error) {
 	expected := &ExpectedDBsStats{
 		names: names,
 	}
@@ -101,9 +105,7 @@ func (c *kivikmock) DBsStats(ctx context.Context, names []string) ([]*driver.DBS
 	return stats, expected.wait(ctx)
 }
 
-var _ driver.Pinger = &kivikmock{}
-
-func (c *kivikmock) Ping(ctx context.Context) (bool, error) {
+func (c *driverClient) Ping(ctx context.Context) (bool, error) {
 	expected := &ExpectedPing{}
 	if err := c.nextExpectation(expected); err != nil {
 		return false, err
@@ -111,9 +113,7 @@ func (c *kivikmock) Ping(ctx context.Context) (bool, error) {
 	return expected.responded, expected.wait(ctx)
 }
 
-var _ driver.Sessioner = &kivikmock{}
-
-func (c *kivikmock) Session(ctx context.Context) (*driver.Session, error) {
+func (c *driverClient) Session(ctx context.Context) (*driver.Session, error) {
 	expected := &ExpectedSession{}
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func (c *kivikmock) Session(ctx context.Context) (*driver.Session, error) {
 	return s, expected.wait(ctx)
 }
 
-func (c *kivikmock) Version(ctx context.Context) (*driver.Version, error) {
+func (c *driverClient) Version(ctx context.Context) (*driver.Version, error) {
 	expected := &ExpectedVersion{}
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
@@ -139,7 +139,7 @@ func (c *kivikmock) Version(ctx context.Context) (*driver.Version, error) {
 	return v, expected.wait(ctx)
 }
 
-func (c *kivikmock) DB(ctx context.Context, name string, options map[string]interface{}) (driver.DB, error) {
+func (c *driverClient) DB(ctx context.Context, name string, options map[string]interface{}) (driver.DB, error) {
 	expected := &ExpectedDB{
 		name:    name,
 		options: options,
@@ -150,7 +150,7 @@ func (c *kivikmock) DB(ctx context.Context, name string, options map[string]inte
 	return &driverDB{MockDB: expected.db}, expected.wait(ctx)
 }
 
-func (c *kivikmock) CreateDB(ctx context.Context, name string, options map[string]interface{}) error {
+func (c *driverClient) CreateDB(ctx context.Context, name string, options map[string]interface{}) error {
 	expected := &ExpectedCreateDB{
 		name:    name,
 		options: options,
