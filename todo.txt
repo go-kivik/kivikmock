@@ -2,7 +2,6 @@
 - client.GetReplications https://godoc.org/github.com/go-kivik/kivik#Client.GetReplications
 - client.Replicate https://godoc.org/github.com/go-kivik/kivik#Client.Replicate
 
-- db.AllDocs https://godoc.org/github.com/go-kivik/kivik#DB.AllDocs
 - db.BulkDocs https://godoc.org/github.com/go-kivik/kivik#DB.BulkDocs
 - db.BulkGet https://godoc.org/github.com/go-kivik/kivik#DB.BulkGet
 - db.Changes https://godoc.org/github.com/go-kivik/kivik#DB.Changes
