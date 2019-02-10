@@ -108,3 +108,18 @@ func (r *Rows) AddDelay(delay time.Duration) *Rows {
 	r.results = append(r.results, &delayedRow{delay: delay})
 	return r
 }
+
+// rowCount calculates the rows remaining in this iterator
+func (r *Rows) rowCount() int {
+	if r == nil || r.results == nil {
+		return 0
+	}
+	var count int
+	for _, result := range r.results {
+		if result != nil && result.Row != nil {
+			count++
+		}
+	}
+
+	return count
+}

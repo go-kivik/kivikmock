@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/flimzy/diff"
 	"github.com/go-kivik/kivik/driver"
 )
 
@@ -54,15 +55,7 @@ type ExpectedAllDocs struct {
 func (e *ExpectedAllDocs) String() string {
 	msg := "call to DB.AllDocs() which:"
 	msg += optionsString(e.options)
-	var count int
-	if e.rows != nil {
-		for _, r := range e.rows.results {
-			if r != nil && r.Row != nil {
-				count++
-			}
-		}
-	}
-	msg += fmt.Sprintf("\n\t- should return: %d results", count)
+	msg += fmt.Sprintf("\n\t- should return: %d results", e.rows.rowCount())
 	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
@@ -180,6 +173,65 @@ func (e *ExpectedBulkGet) WillReturnError(err error) *ExpectedBulkGet {
 
 // WillDelay causes BulkGet() to delay execution by the specified duration.
 func (e *ExpectedBulkGet) WillDelay(delay time.Duration) *ExpectedBulkGet {
+	e.delay = delay
+	return e
+}
+
+// ExpectedFind represents an expectation to call DB.Find().
+type ExpectedFind struct {
+	commonExpectation
+	query interface{}
+	rows  *Rows
+}
+
+func (e *ExpectedFind) String() string {
+	msg := "call to DB.Find() which:"
+	if e.query == nil {
+		msg += "\n\t- has any query"
+	} else {
+		msg += fmt.Sprintf("\n\t- has query: %v", e.query)
+	}
+	msg += fmt.Sprintf("\n\t- should return: %d results", e.rows.rowCount())
+	msg += delayString(e.delay)
+	msg += errorString(e.err)
+	return msg
+}
+
+func (e *ExpectedFind) method(v bool) string {
+	if !v {
+		return "DB.Find()"
+	}
+	if e.query == nil {
+		return "DB.Find(ctx, ?)"
+	}
+	return fmt.Sprintf("DB.Find(ctx, %v)", e.query)
+}
+
+func (e *ExpectedFind) met(ex expectation) bool {
+	exp := ex.(*ExpectedFind)
+	return exp.query == nil || diff.AsJSON(e.query, exp.query) == nil
+}
+
+// WithQuery sets the expected query for the Find() call.
+func (e *ExpectedFind) WithQuery(query interface{}) *ExpectedFind {
+	e.query = query
+	return e
+}
+
+// WillReturnRows sets rows to be returned by Find().
+func (e *ExpectedFind) WillReturnRows(rows *Rows) *ExpectedFind {
+	e.rows = rows
+	return e
+}
+
+// WillReturnError sets the error that will be returned by Find().
+func (e *ExpectedFind) WillReturnError(err error) *ExpectedFind {
+	e.err = err
+	return e
+}
+
+// WillDelay causes Find() to delay execution by the specified duration.
+func (e *ExpectedFind) WillDelay(delay time.Duration) *ExpectedFind {
 	e.delay = delay
 	return e
 }

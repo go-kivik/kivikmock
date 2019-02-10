@@ -326,3 +326,81 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 	})
 	tests.Run(t, testMock)
 }
+
+func TestFind(t *testing.T) { // nolint: gocyclo
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectFind().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.Find(context.TODO(), nil)
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("unmatched query", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectFind().WithQuery(123)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.Find(context.TODO(), 321)
+			testy.ErrorRE(t, "has query: 123", err)
+		},
+	})
+	tests.Add("rows", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectFind().WillReturnRows(db.NewRows().
+				AddRow(&driver.Row{ID: "foo"}).
+				AddRow(&driver.Row{ID: "bar"}).
+				AddRow(&driver.Row{ID: "baz"}))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			rows, err := db.Find(context.TODO(), 7)
+			testy.Error(t, "", err)
+			ids := []string{}
+			for rows.Next() {
+				ids = append(ids, rows.ID())
+			}
+			expected := []string{"foo", "bar", "baz"}
+			if d := diff.Interface(expected, ids); d != nil {
+				t.Error(d)
+			}
+		},
+	})
+	tests.Add("query", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectFind().WithQuery(map[string]interface{}{"foo": "123"}).
+				WillReturnRows(db.NewRows())
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.Find(context.TODO(), map[string]string{"foo": "123"})
+			testy.ErrorRE(t, "", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectFind().WillDelay(time.Second).
+				WillReturnRows(db.NewRows())
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.Find(newCanceledContext(), 0)
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}

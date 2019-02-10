@@ -412,3 +412,35 @@ func TestBulkGetString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestFindString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedFind{},
+		expected: `call to DB.Find() which:
+	- has any query
+	- should return: 0 results`,
+	})
+	tests.Add("query", stringerTest{
+		input: &ExpectedFind{query: map[string]string{"foo": "bar"}},
+		expected: `call to DB.Find() which:
+	- has query: map[foo:bar]
+	- should return: 0 results`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedFind{
+			rows: &Rows{results: []*delayedRow{
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+				{delay: 15},
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+			},
+			},
+		},
+		expected: `call to DB.Find() which:
+	- has any query
+	- should return: 4 results`,
+	})
+	tests.Run(t, testStringer)
+}

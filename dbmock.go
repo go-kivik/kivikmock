@@ -14,6 +14,9 @@ type MockDB interface {
 	// ExpectBulkGet queues an expectation for BulkGet() to be called.
 	ExpectBulkGet() *ExpectedBulkGet
 
+	// ExpectFind queues an expectation for Find() to be called.
+	ExpectFind() *ExpectedFind
+
 	// expectations returns the number of expectations registered in this db.
 	expectations() int
 
@@ -50,6 +53,13 @@ func (db *db) ExpectAllDocs() *ExpectedAllDocs {
 
 func (db *db) ExpectBulkGet() *ExpectedBulkGet {
 	e := &ExpectedBulkGet{}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+func (db *db) ExpectFind() *ExpectedFind {
+	e := &ExpectedFind{}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
 	return e

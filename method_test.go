@@ -273,3 +273,18 @@ func TestBulkGetMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestFindMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedFind{},
+		standard: "DB.Find()",
+		verbose:  "DB.Find(ctx, ?)",
+	})
+	tests.Add("query", methodTest{
+		input:    &ExpectedFind{query: map[string]string{"foo": "bar"}},
+		standard: "DB.Find()",
+		verbose:  "DB.Find(ctx, map[foo:bar])",
+	})
+	tests.Run(t, testMethod)
+}
