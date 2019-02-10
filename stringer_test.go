@@ -297,7 +297,7 @@ func TestCreateDBString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("db", stringerTest{
-		input: &ExpectedCreateDB{db: &db{count: 50}},
+		input: &ExpectedCreateDB{db: &MockDB{count: 50}},
 		expected: `call to CreateDB() which:
 	- has any name
 	- has any options
@@ -321,7 +321,7 @@ func TestDBString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("db", stringerTest{
-		input: &ExpectedDB{db: &db{count: 50}},
+		input: &ExpectedDB{db: &MockDB{count: 50}},
 		expected: `call to DB() which:
 	- has any name
 	- has any options

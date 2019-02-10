@@ -632,7 +632,7 @@ type ExpectedDB struct {
 	commonExpectation
 	name    string
 	options map[string]interface{}
-	db      MockDB
+	db      *MockDB
 }
 
 func (e *ExpectedDB) String() string {
@@ -682,7 +682,7 @@ func (e *ExpectedDB) WithOptions(options map[string]interface{}) *ExpectedDB {
 }
 
 // WillReturn sets the return value for the DB() call.
-func (e *ExpectedDB) WillReturn(db MockDB) *ExpectedDB {
+func (e *ExpectedDB) WillReturn(db *MockDB) *ExpectedDB {
 	e.db = db
 	return e
 }
@@ -711,7 +711,7 @@ type ExpectedCreateDB struct {
 	commonExpectation
 	name       string
 	options    map[string]interface{}
-	db         MockDB
+	db         *MockDB
 	expectedDB *ExpectedDB
 }
 
@@ -763,7 +763,7 @@ func (e *ExpectedCreateDB) WithOptions(options map[string]interface{}) *Expected
 }
 
 // WillReturn sets the return value for the DB() call.
-func (e *ExpectedCreateDB) WillReturn(db MockDB) *ExpectedCreateDB {
+func (e *ExpectedCreateDB) WillReturn(db *MockDB) *ExpectedCreateDB {
 	e.expectedDB.db = db
 	return e
 }

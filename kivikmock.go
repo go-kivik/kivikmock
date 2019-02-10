@@ -74,7 +74,7 @@ type Mock interface {
 
 	// NewDB returns a new DB object, to pass to Mock.ExpectDB.WillReturn or
 	// Mock.ExpectCreateDB.WillReturn.
-	NewDB() MockDB
+	NewDB() *MockDB
 }
 
 type kivikmock struct {
@@ -191,8 +191,8 @@ func (c *kivikmock) ExpectDB() *ExpectedDB {
 	return e
 }
 
-func (c *kivikmock) NewDB() MockDB {
-	return &db{
+func (c *kivikmock) NewDB() *MockDB {
+	return &MockDB{
 		client: c,
 	}
 }
