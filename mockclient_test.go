@@ -14,7 +14,7 @@ import (
 )
 
 type mockTest struct {
-	setup func(Mock)
+	setup func(*MockClient)
 	test  func(*testing.T, *kivik.Client)
 	err   string
 }
@@ -38,7 +38,7 @@ func testMock(t *testing.T, test mockTest) {
 func TestCloseClient(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("err", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectClose().WillReturnError(errors.New("close failed"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -54,7 +54,7 @@ func TestCloseClient(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectClose().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -69,7 +69,7 @@ func TestCloseClient(t *testing.T) {
 func TestAllDBs(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectAllDBs().WillReturnError(fmt.Errorf("AllDBs failed"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -86,7 +86,7 @@ func TestAllDBs(t *testing.T) {
 	tests.Add("success", func() interface{} {
 		expected := []string{"a", "b", "c"}
 		return mockTest{
-			setup: func(m Mock) {
+			setup: func(m *MockClient) {
 				m.ExpectAllDBs().WillReturn(expected)
 			},
 			test: func(t *testing.T, c *kivik.Client) {
@@ -99,7 +99,7 @@ func TestAllDBs(t *testing.T) {
 		}
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectAllDBs().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -108,7 +108,7 @@ func TestAllDBs(t *testing.T) {
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectAllDBs().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -122,7 +122,7 @@ func TestAllDBs(t *testing.T) {
 func TestAuthenticate(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectAuthenticate().WillReturnError(errors.New("auth error"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -131,7 +131,7 @@ func TestAuthenticate(t *testing.T) {
 		},
 	})
 	tests.Add("wrong authenticator", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectAuthenticate().WithAuthenticator(int(3))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -145,7 +145,7 @@ Expected: call to Authenticate() which:
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectAuthenticate().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -159,7 +159,7 @@ Expected: call to Authenticate() which:
 func TestClusterSetup(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectClusterSetup().WillReturnError(errors.New("setup error"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -168,7 +168,7 @@ func TestClusterSetup(t *testing.T) {
 		},
 	})
 	tests.Add("action", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectClusterSetup().WithAction(123)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -177,7 +177,7 @@ func TestClusterSetup(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectClusterSetup().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -197,7 +197,7 @@ func TestClusterSetup(t *testing.T) {
 func TestClusterStatus(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectClusterStatus().WillReturnError(errors.New("status error"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -206,7 +206,7 @@ func TestClusterStatus(t *testing.T) {
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectClusterStatus().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -217,7 +217,7 @@ func TestClusterStatus(t *testing.T) {
 	tests.Add("success", func() interface{} {
 		const expected = "oink"
 		return mockTest{
-			setup: func(m Mock) {
+			setup: func(m *MockClient) {
 				m.ExpectClusterStatus().WillReturn(expected)
 			},
 			test: func(t *testing.T, c *kivik.Client) {
@@ -230,7 +230,7 @@ func TestClusterStatus(t *testing.T) {
 		}
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectClusterStatus().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -239,7 +239,7 @@ func TestClusterStatus(t *testing.T) {
 		},
 	})
 	tests.Add("unordered", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectClose()
 			m.ExpectClusterStatus()
 			m.MatchExpectationsInOrder(false)
@@ -251,7 +251,7 @@ func TestClusterStatus(t *testing.T) {
 		err: "there is a remaining unmet expectation: call to Close()",
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectClose()
 			m.MatchExpectationsInOrder(false)
 		},
@@ -266,7 +266,7 @@ func TestClusterStatus(t *testing.T) {
 func TestDBExists(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDBExists().WillReturnError(errors.New("existence error"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -275,7 +275,7 @@ func TestDBExists(t *testing.T) {
 		},
 	})
 	tests.Add("name", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDBExists().WithName("foo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -287,7 +287,7 @@ func TestDBExists(t *testing.T) {
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDBExists().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -296,7 +296,7 @@ func TestDBExists(t *testing.T) {
 		},
 	})
 	tests.Add("exists", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDBExists().WillReturn(true)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -308,7 +308,7 @@ func TestDBExists(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDBExists().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -322,7 +322,7 @@ func TestDBExists(t *testing.T) {
 func TestDestroyDB(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDestroyDB().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -331,7 +331,7 @@ func TestDestroyDB(t *testing.T) {
 		},
 	})
 	tests.Add("name", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDestroyDB().WithName("foo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -340,7 +340,7 @@ func TestDestroyDB(t *testing.T) {
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDestroyDB().WithOptions(kivik.Options{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -349,7 +349,7 @@ func TestDestroyDB(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDestroyDB().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -363,7 +363,7 @@ func TestDestroyDB(t *testing.T) {
 func TestDBsStats(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDBsStats().WillReturnError(errors.New("stats error"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -372,7 +372,7 @@ func TestDBsStats(t *testing.T) {
 		},
 	})
 	tests.Add("names", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDBsStats().WithNames([]string{"a", "b"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -386,7 +386,7 @@ func TestDBsStats(t *testing.T) {
 			{Name: "bar"},
 		}
 		return mockTest{
-			setup: func(m Mock) {
+			setup: func(m *MockClient) {
 				m.ExpectDBsStats().WillReturn(expected)
 			},
 			test: func(t *testing.T, c *kivik.Client) {
@@ -399,7 +399,7 @@ func TestDBsStats(t *testing.T) {
 		}
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDBsStats().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -413,7 +413,7 @@ func TestDBsStats(t *testing.T) {
 func TestPing(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("unreachable", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectPing()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -425,7 +425,7 @@ func TestPing(t *testing.T) {
 		},
 	})
 	tests.Add("reachable", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectPing().WillReturn(true)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -437,7 +437,7 @@ func TestPing(t *testing.T) {
 		},
 	})
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectPing().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -452,7 +452,7 @@ func TestPing(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectPing().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -470,7 +470,7 @@ func TestSession(t *testing.T) {
 			Name: "bob",
 		}
 		return mockTest{
-			setup: func(m Mock) {
+			setup: func(m *MockClient) {
 				m.ExpectSession().WillReturn(expected)
 			},
 			test: func(t *testing.T, c *kivik.Client) {
@@ -489,7 +489,7 @@ func TestSession(t *testing.T) {
 		},
 	})
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectSession().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -498,7 +498,7 @@ func TestSession(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectSession().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -516,7 +516,7 @@ func TestVersion(t *testing.T) {
 			Version: "1.2",
 		}
 		return mockTest{
-			setup: func(m Mock) {
+			setup: func(m *MockClient) {
 				m.ExpectVersion().WillReturn(expected)
 			},
 			test: func(t *testing.T, c *kivik.Client) {
@@ -535,7 +535,7 @@ func TestVersion(t *testing.T) {
 		},
 	})
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectVersion().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -544,7 +544,7 @@ func TestVersion(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectVersion().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -558,7 +558,7 @@ func TestVersion(t *testing.T) {
 func TestDB(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("name", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDB().WithName("foo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -573,7 +573,7 @@ func TestDB(t *testing.T) {
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDB().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -582,7 +582,7 @@ func TestDB(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDB().WillReturn(m.NewDB())
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -595,7 +595,7 @@ func TestDB(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectDB().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -609,7 +609,7 @@ func TestDB(t *testing.T) {
 func TestCreateDB(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectCreateDB().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -618,7 +618,7 @@ func TestCreateDB(t *testing.T) {
 		},
 	})
 	tests.Add("name", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectCreateDB().WithName("foo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -633,7 +633,7 @@ func TestCreateDB(t *testing.T) {
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectCreateDB().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -642,7 +642,7 @@ func TestCreateDB(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectCreateDB().WillReturn(m.NewDB())
 		},
 		test: func(t *testing.T, c *kivik.Client) {
@@ -655,7 +655,7 @@ func TestCreateDB(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m Mock) {
+		setup: func(m *MockClient) {
 			m.ExpectCreateDB().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {

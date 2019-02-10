@@ -1,81 +1,59 @@
 package kivikmock
 
-import "github.com/go-kivik/kivik/driver"
-
 // MockDB serves to create expectations for database actions to
 // mock and test real database behavior.
-type MockDB interface {
-	// ExpectClose queues an expectation for Close() to be called on this database.
-	ExpectClose() *ExpectedDBClose
-
-	// ExpectAllDocs queues an expectation for AllDocs() to be called.
-	ExpectAllDocs() *ExpectedAllDocs
-
-	// ExpectBulkGet queues an expectation for BulkGet() to be called.
-	ExpectBulkGet() *ExpectedBulkGet
-
-	// ExpectFind queues an expectation for Find() to be called.
-	ExpectFind() *ExpectedFind
-
-	// ExpectCreateIndex queues an expectation for CreateIndex() to be called.
-	ExpectCreateIndex() *ExpectedCreateIndex
-
-	// expectations returns the number of expectations registered in this db.
-	expectations() int
-
-	NewRows() *Rows
-	driver.DB
-}
-
-type db struct {
-	client *kivikmock
+type MockDB struct {
+	client *MockClient
 	count  int
-	driver.DB
 }
 
-var _ MockDB = &db{}
-var _ driver.DB = &db{}
-
-func (db *db) expectations() int {
+func (db *MockDB) expectations() int {
 	return db.count
 }
 
-func (db *db) ExpectClose() *ExpectedDBClose {
+// ExpectClose queues an expectation for DB.Close() to be called.
+func (db *MockDB) ExpectClose() *ExpectedDBClose {
 	e := &ExpectedDBClose{}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
 	return e
 }
 
-func (db *db) ExpectAllDocs() *ExpectedAllDocs {
+// ExpectAllDocs queues an expectation that DB.AllDocs() will be called.
+func (db *MockDB) ExpectAllDocs() *ExpectedAllDocs {
 	e := &ExpectedAllDocs{}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
 	return e
 }
 
-func (db *db) ExpectBulkGet() *ExpectedBulkGet {
+// ExpectBulkGet queues an expectation that DB.BulkGet() will be called.
+func (db *MockDB) ExpectBulkGet() *ExpectedBulkGet {
 	e := &ExpectedBulkGet{}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
 	return e
 }
 
-func (db *db) ExpectFind() *ExpectedFind {
+// ExpectFind queues an expectation that DB.Find() will be called.
+func (db *MockDB) ExpectFind() *ExpectedFind {
 	e := &ExpectedFind{}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
 	return e
 }
 
-func (db *db) ExpectCreateIndex() *ExpectedCreateIndex {
+// ExpectCreateIndex queues an expectation that DB.CreateIndex will be called.
+func (db *MockDB) ExpectCreateIndex() *ExpectedCreateIndex {
 	e := &ExpectedCreateIndex{}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
 	return e
 }
 
-func (db *db) NewRows() *Rows {
+// NewRows returns a new, empty set of rows, which can be returned by any of
+// the row-returning expectations.
+func (db *MockDB) NewRows() *Rows {
 	return &Rows{
 		results: make([]*delayedRow, 0),
 	}
