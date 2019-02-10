@@ -52,11 +52,21 @@ func (e *commonExpectation) wait(ctx context.Context) error {
 	if e.delay == 0 {
 		return e.err
 	}
-	t := time.NewTimer(e.delay)
+	if err := pause(ctx, e.delay); err != nil {
+		return err
+	}
+	return e.err
+}
+
+func pause(ctx context.Context, delay time.Duration) error {
+	if delay == 0 {
+		return nil
+	}
+	t := time.NewTimer(delay)
 	defer t.Stop()
 	select {
 	case <-t.C:
-		return e.err
+		return nil
 	case <-ctx.Done():
 		return ctx.Err()
 	}

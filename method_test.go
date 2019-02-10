@@ -237,3 +237,18 @@ func TestDBCloseMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestAllDocsMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedAllDocs{},
+		standard: "DB.AllDocs()",
+		verbose:  "DB.AllDocs(ctx)",
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedAllDocs{options: map[string]interface{}{"foo": 123}},
+		standard: "DB.AllDocs()",
+		verbose:  "DB.AllDocs(ctx, map[foo:123])",
+	})
+	tests.Run(t, testMethod)
+}

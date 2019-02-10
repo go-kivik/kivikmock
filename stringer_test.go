@@ -8,6 +8,7 @@ import (
 
 	"github.com/flimzy/testy"
 	"github.com/go-kivik/kivik"
+	"github.com/go-kivik/kivik/driver"
 )
 
 type stringerTest struct {
@@ -344,6 +345,32 @@ func TestDBCloseString(t *testing.T) {
 		input: &ExpectedDBClose{commonExpectation{delay: time.Second}},
 		expected: `call to DB.Close() which:
 	- should delay for: 1s`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestAllDocsString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedAllDocs{},
+		expected: `call to DB.AllDocs() which:
+	- has any options
+	- should return: 0 results`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedAllDocs{
+			rows: &Rows{results: []*delayedRow{
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+				{delay: 15},
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+			},
+			},
+		},
+		expected: `call to DB.AllDocs() which:
+	- has any options
+	- should return: 4 results`,
 	})
 	tests.Run(t, testStringer)
 }
