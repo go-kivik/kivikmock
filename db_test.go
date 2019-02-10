@@ -404,3 +404,74 @@ func TestFind(t *testing.T) { // nolint: gocyclo
 	})
 	tests.Run(t, testMock)
 }
+
+func TestCreateIndex(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCreateIndex().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").CreateIndex(context.TODO(), "foo", "bar", 123)
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("unmatched index", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCreateIndex().WithIndex(321)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").CreateIndex(context.TODO(), "foo", "bar", 123)
+			testy.ErrorRE(t, "has index: 321", err)
+		},
+	})
+	tests.Add("ddoc", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCreateIndex().WithDDoc("moo")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").CreateIndex(context.TODO(), "foo", "bar", 123)
+			testy.ErrorRE(t, "has ddoc: moo", err)
+		},
+	})
+	tests.Add("name", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCreateIndex().WithName("moo")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").CreateIndex(context.TODO(), "foo", "bar", 123)
+			testy.ErrorRE(t, "has name: moo", err)
+		},
+	})
+	tests.Add("index", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCreateIndex().WithIndex("moo")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").CreateIndex(context.TODO(), "foo", "bar", "moo")
+			testy.Error(t, "", err)
+		},
+	})
+	tests.Add("delya", mockTest{
+		setup: func(m Mock) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCreateIndex().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").CreateIndex(newCanceledContext(), "foo", "bar", "moo")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}

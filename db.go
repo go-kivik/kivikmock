@@ -60,7 +60,15 @@ func (db *db) Find(ctx context.Context, query interface{}) (driver.Rows, error) 
 }
 
 func (db *db) CreateIndex(ctx context.Context, ddoc, name string, index interface{}) error {
-	return errors.New("unimplemented")
+	expected := &ExpectedCreateIndex{
+		ddoc:  ddoc,
+		name:  name,
+		index: index,
+	}
+	if err := db.client.nextExpectation(expected); err != nil {
+		return err
+	}
+	return expected.wait(ctx)
 }
 
 func (db *db) GetIndexes(ctx context.Context) ([]driver.Index, error) {

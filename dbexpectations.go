@@ -235,3 +235,95 @@ func (e *ExpectedFind) WillDelay(delay time.Duration) *ExpectedFind {
 	e.delay = delay
 	return e
 }
+
+// ExpectedCreateIndex represents an expectation to call DB.CreateIndex().
+type ExpectedCreateIndex struct {
+	commonExpectation
+	ddoc, name string
+	index      interface{}
+}
+
+func (e *ExpectedCreateIndex) String() string {
+	msg := "call to DB.CreateIndex() which:"
+	if e.ddoc == "" {
+		msg += "\n\t- has any ddoc"
+	} else {
+		msg += "\n\t- has ddoc: " + e.ddoc
+	}
+	if e.name == "" {
+		msg += "\n\t- has any name"
+	} else {
+		msg += "\n\t- has name: " + e.name
+	}
+	if e.index == nil {
+		msg += "\n\t- has any index"
+	} else {
+		msg += fmt.Sprintf("\n\t- has index: %v", e.index)
+	}
+	msg += errorString(e.err)
+	return msg
+}
+
+func (e *ExpectedCreateIndex) method(v bool) string {
+	if !v {
+		return "DB.CreateIndex()"
+	}
+	var ddoc, name, index string
+	if e.ddoc == "" {
+		ddoc = "?"
+	} else {
+		ddoc = fmt.Sprintf("%q", e.ddoc)
+	}
+	if e.name == "" {
+		name = "?"
+	} else {
+		name = fmt.Sprintf("%q", e.name)
+	}
+	if e.index == nil {
+		index = "?"
+	} else {
+		index = fmt.Sprintf("%v", e.index)
+	}
+	return fmt.Sprintf("DB.CreateIndex(ctx, %s, %s, %s)", ddoc, name, index)
+}
+
+func (e *ExpectedCreateIndex) met(ex expectation) bool {
+	exp := ex.(*ExpectedCreateIndex)
+	if exp.ddoc != "" && exp.ddoc != e.ddoc {
+		return false
+	}
+	if exp.name != "" && exp.name != e.name {
+		return false
+	}
+	return exp.index == nil || diff.AsJSON(exp.index, e.index) == nil
+}
+
+// WithDDoc sets the expected ddoc value for the DB.CreateIndex() call.
+func (e *ExpectedCreateIndex) WithDDoc(ddoc string) *ExpectedCreateIndex {
+	e.ddoc = ddoc
+	return e
+}
+
+// WithName sets the expected name value for the DB.CreateIndex() call.
+func (e *ExpectedCreateIndex) WithName(name string) *ExpectedCreateIndex {
+	e.name = name
+	return e
+}
+
+// WithIndex sets the expected index value for the DB.CreateIndex() call.
+func (e *ExpectedCreateIndex) WithIndex(index interface{}) *ExpectedCreateIndex {
+	e.index = index
+	return e
+}
+
+// WillReturnError sets the error to be returned by the DB.CreateIndex() call.
+func (e *ExpectedCreateIndex) WillReturnError(err error) *ExpectedCreateIndex {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the DB.CreateIndex() call to delay.
+func (e *ExpectedCreateIndex) WillDelay(delay time.Duration) *ExpectedCreateIndex {
+	e.delay = delay
+	return e
+}

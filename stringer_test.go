@@ -444,3 +444,36 @@ func TestFindString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestCreateIndexString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedCreateIndex{},
+		expected: `call to DB.CreateIndex() which:
+	- has any ddoc
+	- has any name
+	- has any index`,
+	})
+	tests.Add("ddoc", stringerTest{
+		input: &ExpectedCreateIndex{ddoc: "foo"},
+		expected: `call to DB.CreateIndex() which:
+	- has ddoc: foo
+	- has any name
+	- has any index`,
+	})
+	tests.Add("name", stringerTest{
+		input: &ExpectedCreateIndex{name: "foo"},
+		expected: `call to DB.CreateIndex() which:
+	- has any ddoc
+	- has name: foo
+	- has any index`,
+	})
+	tests.Add("index", stringerTest{
+		input: &ExpectedCreateIndex{index: map[string]string{"foo": "bar"}},
+		expected: `call to DB.CreateIndex() which:
+	- has any ddoc
+	- has any name
+	- has index: map[foo:bar]`,
+	})
+	tests.Run(t, testStringer)
+}

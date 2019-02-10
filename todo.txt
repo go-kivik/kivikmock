@@ -8,7 +8,6 @@
 - db.CompactView https://godoc.org/github.com/go-kivik/kivik#DB.CompactView
 - db.Copy https://godoc.org/github.com/go-kivik/kivik#DB.Copy
 - db.CreateDoc https://godoc.org/github.com/go-kivik/kivik#DB.CreateDoc
-- db.CreateIndex https://godoc.org/github.com/go-kivik/kivik#DB.CreateIndex
 - db.Delete https://godoc.org/github.com/go-kivik/kivik#DB.Delete
 - db.DeleteAttachment https://godoc.org/github.com/go-kivik/kivik#DB.DeleteAttachment
 - db.DeleteIndex https://godoc.org/github.com/go-kivik/kivik#DB.DeleteIndex

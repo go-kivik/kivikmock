@@ -288,3 +288,28 @@ func TestFindMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestCreateIndexMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedCreateIndex{},
+		standard: "DB.CreateIndex()",
+		verbose:  "DB.CreateIndex(ctx, ?, ?, ?)",
+	})
+	tests.Add("name", methodTest{
+		input:    &ExpectedCreateIndex{name: "foo"},
+		standard: "DB.CreateIndex()",
+		verbose:  `DB.CreateIndex(ctx, ?, "foo", ?)`,
+	})
+	tests.Add("ddoc", methodTest{
+		input:    &ExpectedCreateIndex{ddoc: "foo"},
+		standard: "DB.CreateIndex()",
+		verbose:  `DB.CreateIndex(ctx, "foo", ?, ?)`,
+	})
+	tests.Add("index", methodTest{
+		input:    &ExpectedCreateIndex{index: map[string]string{"foo": "bar"}},
+		standard: "DB.CreateIndex()",
+		verbose:  `DB.CreateIndex(ctx, ?, ?, map[foo:bar])`,
+	})
+	tests.Run(t, testMethod)
+}
