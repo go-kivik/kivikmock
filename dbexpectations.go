@@ -37,7 +37,7 @@ func (e *ExpectedDBClose) WillReturnError(err error) *ExpectedDBClose {
 
 func (e *ExpectedDBClose) String() string {
 	extra := delayString(e.delay) + errorString(e.err)
-	msg := fmt.Sprintf("call to DB(%s).Close()", e.db.name)
+	msg := fmt.Sprintf("call to DB(%s#%d).Close()", e.db.name, e.db.id)
 	if extra != "" {
 		msg += " which:" + extra
 	}
@@ -59,7 +59,7 @@ type ExpectedAllDocs struct {
 }
 
 func (e *ExpectedAllDocs) String() string {
-	msg := fmt.Sprintf("call to DB(%s).AllDocs() which:", e.db.name)
+	msg := fmt.Sprintf("call to DB(%s#%d).AllDocs() which:", e.db.name, e.db.id)
 	msg += optionsString(e.options)
 	msg += fmt.Sprintf("\n\t- should return: %d results", e.rows.rowCount())
 	msg += delayString(e.delay)
@@ -116,7 +116,7 @@ type ExpectedBulkGet struct {
 }
 
 func (e *ExpectedBulkGet) String() string {
-	msg := fmt.Sprintf("call to DB(%s).BulkGet() which:", e.db.name)
+	msg := fmt.Sprintf("call to DB(%s#%d).BulkGet() which:", e.db.name, e.db.id)
 	if e.docs == nil {
 		msg += "\n\t- has any doc references"
 	} else {
@@ -193,7 +193,7 @@ type ExpectedFind struct {
 }
 
 func (e *ExpectedFind) String() string {
-	msg := fmt.Sprintf("call to DB(%s).Find() which:", e.db.name)
+	msg := fmt.Sprintf("call to DB(%s#%d).Find() which:", e.db.name, e.db.id)
 	if e.query == nil {
 		msg += "\n\t- has any query"
 	} else {
@@ -253,7 +253,7 @@ type ExpectedCreateIndex struct {
 }
 
 func (e *ExpectedCreateIndex) String() string {
-	msg := fmt.Sprintf("call to DB(%s).CreateIndex() which:", e.db.name)
+	msg := fmt.Sprintf("call to DB(%s#%d).CreateIndex() which:", e.db.name, e.db.id)
 	if e.ddoc == "" {
 		msg += "\n\t- has any ddoc"
 	} else {
@@ -345,7 +345,7 @@ type ExpectedGetIndexes struct {
 }
 
 func (e *ExpectedGetIndexes) String() string {
-	msg := fmt.Sprintf("call to DB(%s).GetIndexes()", e.db.name)
+	msg := fmt.Sprintf("call to DB(%s#%d).GetIndexes()", e.db.name, e.db.id)
 	var extra string
 	if e.indexes != nil {
 		extra += fmt.Sprintf("\n\t- should return indexes: %v", e.indexes)
@@ -394,7 +394,7 @@ type ExpectedDeleteIndex struct {
 }
 
 func (e *ExpectedDeleteIndex) String() string {
-	msg := fmt.Sprintf("call to DB(%s).DeleteIndex() which:", e.db.name)
+	msg := fmt.Sprintf("call to DB(%s#%d).DeleteIndex() which:", e.db.name, e.db.id)
 	if e.ddoc == "" {
 		msg += "\n\t- has any ddoc"
 	} else {

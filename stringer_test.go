@@ -334,16 +334,16 @@ func TestDBCloseString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("standard", stringerTest{
 		input:    &ExpectedDBClose{db: &MockDB{name: "foo"}},
-		expected: "call to DB(foo).Close()",
+		expected: "call to DB(foo#0).Close()",
 	})
 	tests.Add("error", stringerTest{
 		input: &ExpectedDBClose{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{err: errors.New("foo error")}},
-		expected: `call to DB(foo).Close() which:
+		expected: `call to DB(foo#0).Close() which:
 	- should return error: foo error`,
 	})
 	tests.Add("delay", stringerTest{
 		input: &ExpectedDBClose{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{delay: time.Second}},
-		expected: `call to DB(foo).Close() which:
+		expected: `call to DB(foo#0).Close() which:
 	- should delay for: 1s`,
 	})
 	tests.Run(t, testStringer)
@@ -353,7 +353,7 @@ func TestAllDocsString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", stringerTest{
 		input: &ExpectedAllDocs{db: &MockDB{name: "foo"}},
-		expected: `call to DB(foo).AllDocs() which:
+		expected: `call to DB(foo#0).AllDocs() which:
 	- has any options
 	- should return: 0 results`,
 	})
@@ -369,7 +369,7 @@ func TestAllDocsString(t *testing.T) {
 			},
 			},
 		},
-		expected: `call to DB(foo).AllDocs() which:
+		expected: `call to DB(foo#0).AllDocs() which:
 	- has any options
 	- should return: 4 results`,
 	})
@@ -380,7 +380,7 @@ func TestBulkGetString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", stringerTest{
 		input: &ExpectedBulkGet{db: &MockDB{name: "foo"}},
-		expected: `call to DB(foo).BulkGet() which:
+		expected: `call to DB(foo#0).BulkGet() which:
 	- has any doc references
 	- has any options
 	- should return: 0 results`,
@@ -390,7 +390,7 @@ func TestBulkGetString(t *testing.T) {
 			{ID: "foo"},
 			{ID: "bar"},
 		}},
-		expected: `call to DB(foo).BulkGet() which:
+		expected: `call to DB(foo#0).BulkGet() which:
 	- has doc references: [{foo  } {bar  }]
 	- has any options
 	- should return: 0 results`,
@@ -407,7 +407,7 @@ func TestBulkGetString(t *testing.T) {
 			},
 			},
 		},
-		expected: `call to DB(foo).BulkGet() which:
+		expected: `call to DB(foo#0).BulkGet() which:
 	- has any doc references
 	- has any options
 	- should return: 4 results`,
@@ -419,13 +419,13 @@ func TestFindString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", stringerTest{
 		input: &ExpectedFind{db: &MockDB{name: "foo"}},
-		expected: `call to DB(foo).Find() which:
+		expected: `call to DB(foo#0).Find() which:
 	- has any query
 	- should return: 0 results`,
 	})
 	tests.Add("query", stringerTest{
 		input: &ExpectedFind{db: &MockDB{name: "foo"}, query: map[string]string{"foo": "bar"}},
-		expected: `call to DB(foo).Find() which:
+		expected: `call to DB(foo#0).Find() which:
 	- has query: map[foo:bar]
 	- should return: 0 results`,
 	})
@@ -441,7 +441,7 @@ func TestFindString(t *testing.T) {
 			},
 			},
 		},
-		expected: `call to DB(foo).Find() which:
+		expected: `call to DB(foo#0).Find() which:
 	- has any query
 	- should return: 4 results`,
 	})
@@ -452,28 +452,28 @@ func TestCreateIndexString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", stringerTest{
 		input: &ExpectedCreateIndex{db: &MockDB{name: "foo"}},
-		expected: `call to DB(foo).CreateIndex() which:
+		expected: `call to DB(foo#0).CreateIndex() which:
 	- has any ddoc
 	- has any name
 	- has any index`,
 	})
 	tests.Add("ddoc", stringerTest{
 		input: &ExpectedCreateIndex{db: &MockDB{name: "foo"}, ddoc: "foo"},
-		expected: `call to DB(foo).CreateIndex() which:
+		expected: `call to DB(foo#0).CreateIndex() which:
 	- has ddoc: foo
 	- has any name
 	- has any index`,
 	})
 	tests.Add("name", stringerTest{
 		input: &ExpectedCreateIndex{db: &MockDB{name: "foo"}, name: "foo"},
-		expected: `call to DB(foo).CreateIndex() which:
+		expected: `call to DB(foo#0).CreateIndex() which:
 	- has any ddoc
 	- has name: foo
 	- has any index`,
 	})
 	tests.Add("index", stringerTest{
 		input: &ExpectedCreateIndex{db: &MockDB{name: "foo"}, index: map[string]string{"foo": "bar"}},
-		expected: `call to DB(foo).CreateIndex() which:
+		expected: `call to DB(foo#0).CreateIndex() which:
 	- has any ddoc
 	- has any name
 	- has index: map[foo:bar]`,
@@ -485,16 +485,16 @@ func TestExpectedGetIndexesString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", stringerTest{
 		input:    &ExpectedGetIndexes{db: &MockDB{name: "foo"}},
-		expected: `call to DB(foo).GetIndexes()`,
+		expected: `call to DB(foo#0).GetIndexes()`,
 	})
 	tests.Add("error", stringerTest{
 		input: &ExpectedGetIndexes{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{err: errors.New("foo err")}},
-		expected: `call to DB(foo).GetIndexes() which:
+		expected: `call to DB(foo#0).GetIndexes() which:
 	- should return error: foo err`,
 	})
 	tests.Add("indexes", stringerTest{
 		input: &ExpectedGetIndexes{db: &MockDB{name: "foo"}, indexes: []kivik.Index{{Name: "foo"}}},
-		expected: `call to DB(foo).GetIndexes() which:
+		expected: `call to DB(foo#0).GetIndexes() which:
 	- should return indexes: [{ foo  <nil>}]`,
 	})
 	tests.Run(t, testStringer)
@@ -504,19 +504,19 @@ func TestDeleteIndexString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", stringerTest{
 		input: &ExpectedDeleteIndex{db: &MockDB{name: "foo"}},
-		expected: `call to DB(foo).DeleteIndex() which:
+		expected: `call to DB(foo#0).DeleteIndex() which:
 	- has any ddoc
 	- has any name`,
 	})
 	tests.Add("ddoc", stringerTest{
 		input: &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, ddoc: "foo"},
-		expected: `call to DB(foo).DeleteIndex() which:
+		expected: `call to DB(foo#0).DeleteIndex() which:
 	- has ddoc: foo
 	- has any name`,
 	})
 	tests.Add("name", stringerTest{
 		input: &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, name: "foo"},
-		expected: `call to DB(foo).DeleteIndex() which:
+		expected: `call to DB(foo#0).DeleteIndex() which:
 	- has any ddoc
 	- has name: foo`,
 	})

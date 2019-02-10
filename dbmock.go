@@ -4,6 +4,7 @@ package kivikmock
 // mock and test real database behavior.
 type MockDB struct {
 	name   string
+	id     int
 	client *MockClient
 	count  int
 }
