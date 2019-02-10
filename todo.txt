@@ -10,7 +10,6 @@
 - db.CreateDoc https://godoc.org/github.com/go-kivik/kivik#DB.CreateDoc
 - db.Delete https://godoc.org/github.com/go-kivik/kivik#DB.Delete
 - db.DeleteAttachment https://godoc.org/github.com/go-kivik/kivik#DB.DeleteAttachment
-- db.DeleteIndex https://godoc.org/github.com/go-kivik/kivik#DB.DeleteIndex
 - db.DesignDocs https://godoc.org/github.com/go-kivik/kivik#DB.DesignDocs
 - db.Explain https://godoc.org/github.com/go-kivik/kivik#DB.Explain
 - db.Flush https://godoc.org/github.com/go-kivik/kivik#DB.Flush
