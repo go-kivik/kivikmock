@@ -7,7 +7,6 @@
 - db.Compact https://godoc.org/github.com/go-kivik/kivik#DB.Compact
 - db.CompactView https://godoc.org/github.com/go-kivik/kivik#DB.CompactView
 - db.Copy https://godoc.org/github.com/go-kivik/kivik#DB.Copy
-- db.CreateDoc https://godoc.org/github.com/go-kivik/kivik#DB.CreateDoc
 - db.Delete https://godoc.org/github.com/go-kivik/kivik#DB.Delete
 - db.DeleteAttachment https://godoc.org/github.com/go-kivik/kivik#DB.DeleteAttachment
 - db.DesignDocs https://godoc.org/github.com/go-kivik/kivik#DB.DesignDocs

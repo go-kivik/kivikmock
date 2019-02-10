@@ -122,6 +122,18 @@ func (db *driverDB) Explain(ctx context.Context, query interface{}) (*driver.Que
 	return plan, expected.wait(ctx)
 }
 
+func (db *driverDB) CreateDoc(ctx context.Context, doc interface{}, options map[string]interface{}) (string, string, error) {
+	expected := &ExpectedCreateDoc{
+		db:      db.MockDB,
+		doc:     doc,
+		options: options,
+	}
+	if err := db.client.nextExpectation(expected); err != nil {
+		return "", "", err
+	}
+	return expected.docID, expected.rev, expected.wait(ctx)
+}
+
 func (db *driverDB) Changes(ctx context.Context, options map[string]interface{}) (driver.Changes, error) {
 	return nil, errors.New("unimplemented")
 }
@@ -132,10 +144,6 @@ func (db *driverDB) Compact(ctx context.Context) error {
 
 func (db *driverDB) CompactView(ctx context.Context, view string) error {
 	return errors.New("unimplemented")
-}
-
-func (db *driverDB) CreateDoc(ctx context.Context, doc interface{}, options map[string]interface{}) (string, string, error) {
-	return "", "", errors.New("unimplemented")
 }
 
 func (db *driverDB) Delete(ctx context.Context, _, _ string, options map[string]interface{}) (string, error) {

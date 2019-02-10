@@ -358,3 +358,23 @@ func TestExplainMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestCreateDocMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedCreateDoc{db: &MockDB{name: "foo"}},
+		standard: "DB.CreateDoc()",
+		verbose:  "DB(foo).CreateDoc(ctx, ?)",
+	})
+	tests.Add("docs", methodTest{
+		input:    &ExpectedCreateDoc{db: &MockDB{name: "foo"}, doc: map[string]string{"foo": "bar"}},
+		standard: "DB.CreateDoc()",
+		verbose:  "DB(foo).CreateDoc(ctx, map[foo:bar])",
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedCreateDoc{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": "bar"}},
+		standard: "DB.CreateDoc()",
+		verbose:  "DB(foo).CreateDoc(ctx, ?, map[foo:bar])",
+	})
+	tests.Run(t, testMethod)
+}

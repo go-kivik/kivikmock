@@ -781,3 +781,86 @@ func TestExplain(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestCreateDoc(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCreateDoc().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, _, err := c.DB(context.TODO(), "foo").CreateDoc(context.TODO(), "foo")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("return", func() interface{} {
+		docID, rev := "foo", "1-xxx"
+		return mockTest{
+			setup: func(m *MockClient) {
+				db := m.NewDB()
+				m.ExpectDB().WillReturn(db)
+				db.ExpectCreateDoc().WillReturn(docID, rev)
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				i, r, err := c.DB(context.TODO(), "foo").CreateDoc(context.TODO(), "foo")
+				testy.Error(t, "", err)
+				if i != docID || r != rev {
+					t.Errorf("Unexpected docID/Rev: %s/%s", i, r)
+				}
+			},
+		}
+	})
+	tests.Add("mismatched doc", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCreateDoc().WithDoc("foo")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, _, err := c.DB(context.TODO(), "foo").CreateDoc(context.TODO(), "bar")
+			testy.ErrorRE(t, "has doc: foo", err)
+		},
+	})
+	tests.Add("options", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCreateDoc().WithOptions(map[string]interface{}{"foo": "bar"})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, _, err := c.DB(context.TODO(), "foo").CreateDoc(context.TODO(), "bar", map[string]interface{}{})
+			testy.ErrorRE(t, `has options: map\[foo:bar]`, err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCreateDoc().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, _, err := c.DB(context.TODO(), "foo").CreateDoc(newCanceledContext(), 123)
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectCreateDoc()
+			foo.ExpectCreateDoc()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			_, _, err := foo.CreateDoc(context.TODO(), 123)
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
+	tests.Run(t, testMock)
+}
