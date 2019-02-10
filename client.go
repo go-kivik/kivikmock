@@ -147,6 +147,7 @@ func (c *driverClient) DB(ctx context.Context, name string, options map[string]i
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
 	}
+	expected.db.name = name
 	return &driverDB{MockDB: expected.db}, expected.wait(ctx)
 }
 

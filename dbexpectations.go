@@ -14,6 +14,7 @@ import (
 // by Mock.ExpectClose.
 type ExpectedDBClose struct {
 	commonExpectation
+	db *MockDB
 }
 
 func (e *ExpectedDBClose) method(v bool) string {
@@ -23,7 +24,10 @@ func (e *ExpectedDBClose) method(v bool) string {
 	return "DB.Close()"
 }
 
-func (e *ExpectedDBClose) met(_ expectation) bool { return true }
+func (e *ExpectedDBClose) met(ex expectation) bool {
+	exp := ex.(*ExpectedDBClose)
+	return e.db.name == exp.db.name
+}
 
 // WillReturnError allows setting an error for *kivik.Client.Close action.
 func (e *ExpectedDBClose) WillReturnError(err error) *ExpectedDBClose {
@@ -33,7 +37,7 @@ func (e *ExpectedDBClose) WillReturnError(err error) *ExpectedDBClose {
 
 func (e *ExpectedDBClose) String() string {
 	extra := delayString(e.delay) + errorString(e.err)
-	msg := "call to DB.Close()"
+	msg := fmt.Sprintf("call to DB(%s).Close()", e.db.name)
 	if extra != "" {
 		msg += " which:" + extra
 	}
@@ -49,12 +53,13 @@ func (e *ExpectedDBClose) WillDelay(d time.Duration) *ExpectedDBClose {
 // ExpectedAllDocs represents an expectation to call DB.AllDocs().
 type ExpectedAllDocs struct {
 	commonExpectation
+	db      *MockDB
 	options map[string]interface{}
 	rows    *Rows
 }
 
 func (e *ExpectedAllDocs) String() string {
-	msg := "call to DB.AllDocs() which:"
+	msg := fmt.Sprintf("call to DB(%s).AllDocs() which:", e.db.name)
 	msg += optionsString(e.options)
 	msg += fmt.Sprintf("\n\t- should return: %d results", e.rows.rowCount())
 	msg += delayString(e.delay)
@@ -67,9 +72,9 @@ func (e *ExpectedAllDocs) method(v bool) string {
 		return "DB.AllDocs()"
 	}
 	if e.options == nil {
-		return "DB.AllDocs(ctx)"
+		return fmt.Sprintf("DB(%s).AllDocs(ctx)", e.db.name)
 	}
-	return fmt.Sprintf("DB.AllDocs(ctx, %v)", e.options)
+	return fmt.Sprintf("DB(%s).AllDocs(ctx, %v)", e.db.name, e.options)
 }
 
 func (e *ExpectedAllDocs) met(ex expectation) bool {
@@ -104,13 +109,14 @@ func (e *ExpectedAllDocs) WillDelay(delay time.Duration) *ExpectedAllDocs {
 // ExpectedBulkGet represents an expectation to call DB.BulkGet().
 type ExpectedBulkGet struct {
 	commonExpectation
+	db      *MockDB
 	docs    []driver.BulkGetReference
 	options map[string]interface{}
 	rows    *Rows
 }
 
 func (e *ExpectedBulkGet) String() string {
-	msg := "call to DB.BulkGet() which:"
+	msg := fmt.Sprintf("call to DB(%s).BulkGet() which:", e.db.name)
 	if e.docs == nil {
 		msg += "\n\t- has any doc references"
 	} else {
@@ -146,7 +152,7 @@ func (e *ExpectedBulkGet) method(v bool) string {
 	} else {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB.BulkGet(ctx, %s%s)", docs, options)
+	return fmt.Sprintf("DB(%s).BulkGet(ctx, %s%s)", e.db.name, docs, options)
 }
 
 func (e *ExpectedBulkGet) met(ex expectation) bool {
@@ -181,12 +187,13 @@ func (e *ExpectedBulkGet) WillDelay(delay time.Duration) *ExpectedBulkGet {
 // ExpectedFind represents an expectation to call DB.Find().
 type ExpectedFind struct {
 	commonExpectation
+	db    *MockDB
 	query interface{}
 	rows  *Rows
 }
 
 func (e *ExpectedFind) String() string {
-	msg := "call to DB.Find() which:"
+	msg := fmt.Sprintf("call to DB(%s).Find() which:", e.db.name)
 	if e.query == nil {
 		msg += "\n\t- has any query"
 	} else {
@@ -203,9 +210,9 @@ func (e *ExpectedFind) method(v bool) string {
 		return "DB.Find()"
 	}
 	if e.query == nil {
-		return "DB.Find(ctx, ?)"
+		return fmt.Sprintf("DB(%s).Find(ctx, ?)", e.db.name)
 	}
-	return fmt.Sprintf("DB.Find(ctx, %v)", e.query)
+	return fmt.Sprintf("DB(%s).Find(ctx, %v)", e.db.name, e.query)
 }
 
 func (e *ExpectedFind) met(ex expectation) bool {
@@ -240,12 +247,13 @@ func (e *ExpectedFind) WillDelay(delay time.Duration) *ExpectedFind {
 // ExpectedCreateIndex represents an expectation to call DB.CreateIndex().
 type ExpectedCreateIndex struct {
 	commonExpectation
+	db         *MockDB
 	ddoc, name string
 	index      interface{}
 }
 
 func (e *ExpectedCreateIndex) String() string {
-	msg := "call to DB.CreateIndex() which:"
+	msg := fmt.Sprintf("call to DB(%s).CreateIndex() which:", e.db.name)
 	if e.ddoc == "" {
 		msg += "\n\t- has any ddoc"
 	} else {
@@ -285,7 +293,7 @@ func (e *ExpectedCreateIndex) method(v bool) string {
 	} else {
 		index = fmt.Sprintf("%v", e.index)
 	}
-	return fmt.Sprintf("DB.CreateIndex(ctx, %s, %s, %s)", ddoc, name, index)
+	return fmt.Sprintf("DB(%s).CreateIndex(ctx, %s, %s, %s)", e.db.name, ddoc, name, index)
 }
 
 func (e *ExpectedCreateIndex) met(ex expectation) bool {
@@ -332,11 +340,12 @@ func (e *ExpectedCreateIndex) WillDelay(delay time.Duration) *ExpectedCreateInde
 // ExpectedGetIndexes represents an expectation to call GetIndexes().
 type ExpectedGetIndexes struct {
 	commonExpectation
+	db      *MockDB
 	indexes []kivik.Index
 }
 
 func (e *ExpectedGetIndexes) String() string {
-	msg := "call to DB.GetIndexes()"
+	msg := fmt.Sprintf("call to DB(%s).GetIndexes()", e.db.name)
 	var extra string
 	if e.indexes != nil {
 		extra += fmt.Sprintf("\n\t- should return indexes: %v", e.indexes)
@@ -352,7 +361,7 @@ func (e *ExpectedGetIndexes) method(v bool) string {
 	if !v {
 		return "DB.GetIndexes()"
 	}
-	return "DB.GetIndexes(ctx)"
+	return fmt.Sprintf("DB(%s).GetIndexes(ctx)", e.db.name)
 }
 
 func (e *ExpectedGetIndexes) met(_ expectation) bool { return true }
@@ -373,6 +382,79 @@ func (e *ExpectedGetIndexes) WillReturnError(err error) *ExpectedGetIndexes {
 
 // WillDelay causes the call to DB.GetIndexes() to delay.
 func (e *ExpectedGetIndexes) WillDelay(delay time.Duration) *ExpectedGetIndexes {
+	e.delay = delay
+	return e
+}
+
+// ExpectedDeleteIndex represents an expectation to call DeleteIndex().
+type ExpectedDeleteIndex struct {
+	commonExpectation
+	db         *MockDB
+	ddoc, name string
+}
+
+func (e *ExpectedDeleteIndex) String() string {
+	msg := fmt.Sprintf("call to DB(%s).DeleteIndex() which:", e.db.name)
+	if e.ddoc == "" {
+		msg += "\n\t- has any ddoc"
+	} else {
+		msg += "\n\t- has ddoc: " + e.ddoc
+	}
+	msg += nameString(e.name)
+	msg += errorString(e.err)
+	return msg
+}
+
+func (e *ExpectedDeleteIndex) method(v bool) string {
+	if !v {
+		return "DB.DeleteIndex()"
+	}
+	var ddoc, name string
+	if e.ddoc == "" {
+		ddoc = "?"
+	} else {
+		ddoc = fmt.Sprintf("%q", e.ddoc)
+	}
+	if e.name == "" {
+		name = "?"
+	} else {
+		name = fmt.Sprintf("%q", e.name)
+	}
+	return fmt.Sprintf("DB(%s).DeleteIndex(ctx, %s, %s)", e.db.name, ddoc, name)
+}
+
+func (e *ExpectedDeleteIndex) met(ex expectation) bool {
+	exp := ex.(*ExpectedDeleteIndex)
+	if exp.ddoc != "" && exp.ddoc != e.ddoc {
+		return false
+	}
+	if exp.name != "" && exp.name != e.name {
+		return false
+	}
+	return true
+}
+
+// WithDDoc sets the expected ddoc to be passed to the DB.DeleteIndex() call.
+func (e *ExpectedDeleteIndex) WithDDoc(ddoc string) *ExpectedDeleteIndex {
+	e.ddoc = ddoc
+	return e
+}
+
+// WithName sets the expected name to be passed to the DB.DeleteIndex() call.
+func (e *ExpectedDeleteIndex) WithName(name string) *ExpectedDeleteIndex {
+	e.name = name
+	return e
+}
+
+// WillReturnError sets the error that will be returned by the call to
+// DB.DeleteIndex().
+func (e *ExpectedDeleteIndex) WillReturnError(err error) *ExpectedDeleteIndex {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to DB.DeleteIndex() to delay.
+func (e *ExpectedDeleteIndex) WillDelay(delay time.Duration) *ExpectedDeleteIndex {
 	e.delay = delay
 	return e
 }

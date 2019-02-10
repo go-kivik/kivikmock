@@ -16,7 +16,9 @@ var _ driver.BulkGetter = &driverDB{}
 var _ driver.Finder = &driverDB{}
 
 func (db *driverDB) Close(ctx context.Context) error {
-	expected := &ExpectedDBClose{}
+	expected := &ExpectedDBClose{
+		db: db.MockDB,
+	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
 	}
@@ -88,7 +90,14 @@ func (db *driverDB) GetIndexes(ctx context.Context) ([]driver.Index, error) {
 }
 
 func (db *driverDB) DeleteIndex(ctx context.Context, ddoc, name string) error {
-	return errors.New("unimplemented")
+	expected := &ExpectedDeleteIndex{
+		ddoc: ddoc,
+		name: name,
+	}
+	if err := db.client.nextExpectation(expected); err != nil {
+		return err
+	}
+	return expected.wait(ctx)
 }
 
 func (db *driverDB) Explain(ctx context.Context, query interface{}) (*driver.QueryPlan, error) {
