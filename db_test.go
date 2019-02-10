@@ -462,7 +462,7 @@ func TestCreateIndex(t *testing.T) {
 			testy.Error(t, "", err)
 		},
 	})
-	tests.Add("delya", mockTest{
+	tests.Add("delay", mockTest{
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
@@ -470,6 +470,63 @@ func TestCreateIndex(t *testing.T) {
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			err := c.DB(context.TODO(), "foo").CreateIndex(newCanceledContext(), "foo", "bar", "moo")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
+
+func TestGetIndexes(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetIndexes().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").GetIndexes(context.TODO())
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("indexes", func() interface{} {
+		expected := []kivik.Index{
+			{Name: "foo"},
+			{Name: "bar"},
+		}
+		return mockTest{
+			setup: func(m *MockClient) {
+				db := m.NewDB()
+				m.ExpectDB().WillReturn(db)
+				db.ExpectGetIndexes().WillReturn(expected)
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				indexes, err := c.DB(context.TODO(), "foo").GetIndexes(context.TODO())
+				testy.Error(t, "", err)
+				if d := diff.Interface(expected, indexes); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+	tests.Add("unexpected", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").GetIndexes(context.TODO())
+			testy.Error(t, "call to DB.GetIndexes() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetIndexes().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").GetIndexes(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
 	})

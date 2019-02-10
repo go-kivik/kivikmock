@@ -51,6 +51,14 @@ func (db *MockDB) ExpectCreateIndex() *ExpectedCreateIndex {
 	return e
 }
 
+// ExpectGetIndexes queues an expectation that DB.GetIndexes will be called.
+func (db *MockDB) ExpectGetIndexes() *ExpectedGetIndexes {
+	e := &ExpectedGetIndexes{}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
 // NewRows returns a new, empty set of rows, which can be returned by any of
 // the row-returning expectations.
 func (db *MockDB) NewRows() *Rows {

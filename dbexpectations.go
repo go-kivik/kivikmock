@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/flimzy/diff"
+	"github.com/go-kivik/kivik"
 	"github.com/go-kivik/kivik/driver"
 )
 
@@ -324,6 +325,54 @@ func (e *ExpectedCreateIndex) WillReturnError(err error) *ExpectedCreateIndex {
 
 // WillDelay causes the DB.CreateIndex() call to delay.
 func (e *ExpectedCreateIndex) WillDelay(delay time.Duration) *ExpectedCreateIndex {
+	e.delay = delay
+	return e
+}
+
+// ExpectedGetIndexes represents an expectation to call GetIndexes().
+type ExpectedGetIndexes struct {
+	commonExpectation
+	indexes []kivik.Index
+}
+
+func (e *ExpectedGetIndexes) String() string {
+	msg := "call to DB.GetIndexes()"
+	var extra string
+	if e.indexes != nil {
+		extra += fmt.Sprintf("\n\t- should return indexes: %v", e.indexes)
+	}
+	extra += errorString(e.err)
+	if extra != "" {
+		msg += " which:" + extra
+	}
+	return msg
+}
+
+func (e *ExpectedGetIndexes) method(v bool) string {
+	if !v {
+		return "DB.GetIndexes()"
+	}
+	return "DB.GetIndexes(ctx)"
+}
+
+func (e *ExpectedGetIndexes) met(_ expectation) bool { return true }
+
+// WillReturn sets the indexes that will be returned by the call to
+// DB.GetIndexes().
+func (e *ExpectedGetIndexes) WillReturn(indexes []kivik.Index) *ExpectedGetIndexes {
+	e.indexes = indexes
+	return e
+}
+
+// WillReturnError sets the error that will be returned by the call to
+// DB.GetIndexes().
+func (e *ExpectedGetIndexes) WillReturnError(err error) *ExpectedGetIndexes {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to DB.GetIndexes() to delay.
+func (e *ExpectedGetIndexes) WillDelay(delay time.Duration) *ExpectedGetIndexes {
 	e.delay = delay
 	return e
 }

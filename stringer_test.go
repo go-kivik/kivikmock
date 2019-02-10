@@ -477,3 +477,22 @@ func TestCreateIndexString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestExpectedGetIndexesString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input:    &ExpectedGetIndexes{},
+		expected: `call to DB.GetIndexes()`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedGetIndexes{commonExpectation: commonExpectation{err: errors.New("foo err")}},
+		expected: `call to DB.GetIndexes() which:
+	- should return error: foo err`,
+	})
+	tests.Add("indexes", stringerTest{
+		input: &ExpectedGetIndexes{indexes: []kivik.Index{{Name: "foo"}}},
+		expected: `call to DB.GetIndexes() which:
+	- should return indexes: [{ foo  <nil>}]`,
+	})
+	tests.Run(t, testStringer)
+}

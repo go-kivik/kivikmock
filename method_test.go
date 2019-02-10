@@ -313,3 +313,13 @@ func TestCreateIndexMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestGetIndexesMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedGetIndexes{},
+		standard: "DB.GetIndexes()",
+		verbose:  "DB.GetIndexes(ctx)",
+	})
+	tests.Run(t, testMethod)
+}
