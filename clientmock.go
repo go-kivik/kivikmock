@@ -9,11 +9,12 @@ import (
 
 // MockClient allows configuring the mock kivik client.
 type MockClient struct {
-	ordered  bool
-	dsn      string
-	opened   int
-	drv      *mockDriver
-	expected []expectation
+	ordered    bool
+	dsn        string
+	opened     int
+	drv        *mockDriver
+	expected   []expectation
+	newdbcount int
 }
 
 // nextExpectation accepts the expected value `e`, checks that this is a valid
@@ -180,7 +181,7 @@ func (c *MockClient) ExpectVersion() *ExpectedVersion {
 
 // ExpectCreateDB queues an expectation for a CreateDB() call.
 func (c *MockClient) ExpectCreateDB() *ExpectedCreateDB {
-	e2 := &ExpectedDB{}
+	e2 := &ExpectedDB{db: c.NewDB()}
 	e := &ExpectedCreateDB{
 		expectedDB: e2,
 	}
@@ -190,7 +191,7 @@ func (c *MockClient) ExpectCreateDB() *ExpectedCreateDB {
 
 // ExpectDB queues an expectation for a DB() call.
 func (c *MockClient) ExpectDB() *ExpectedDB {
-	e := &ExpectedDB{}
+	e := &ExpectedDB{db: &MockDB{}}
 	c.expected = append(c.expected, e)
 	return e
 }
@@ -198,7 +199,9 @@ func (c *MockClient) ExpectDB() *ExpectedDB {
 // NewDB creates a new mock DB object, which can be used along with ExpectDB()
 // or ExpectCreateDB() calls to mock database actions.
 func (c *MockClient) NewDB() *MockDB {
+	c.newdbcount++
 	return &MockDB{
 		client: c,
+		id:     c.newdbcount,
 	}
 }

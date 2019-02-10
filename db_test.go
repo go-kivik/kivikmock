@@ -47,6 +47,23 @@ func TestCloseDB(t *testing.T) {
 			testy.Error(t, "context canceled", err)
 		},
 	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectClose()
+			foo.ExpectClose()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			err := foo.Close(context.TODO())
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
 
 	tests.Run(t, testMock)
 }
@@ -462,7 +479,7 @@ func TestCreateIndex(t *testing.T) {
 			testy.Error(t, "", err)
 		},
 	})
-	tests.Add("delya", mockTest{
+	tests.Add("delay", mockTest{
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
@@ -470,6 +487,112 @@ func TestCreateIndex(t *testing.T) {
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			err := c.DB(context.TODO(), "foo").CreateIndex(newCanceledContext(), "foo", "bar", "moo")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
+
+func TestGetIndexes(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetIndexes().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").GetIndexes(context.TODO())
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("indexes", func() interface{} {
+		expected := []kivik.Index{
+			{Name: "foo"},
+			{Name: "bar"},
+		}
+		return mockTest{
+			setup: func(m *MockClient) {
+				db := m.NewDB()
+				m.ExpectDB().WillReturn(db)
+				db.ExpectGetIndexes().WillReturn(expected)
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				indexes, err := c.DB(context.TODO(), "foo").GetIndexes(context.TODO())
+				testy.Error(t, "", err)
+				if d := diff.Interface(expected, indexes); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+	tests.Add("unexpected", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").GetIndexes(context.TODO())
+			testy.Error(t, "call to DB.GetIndexes() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetIndexes().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").GetIndexes(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
+
+func TestDeleteIndex(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectDeleteIndex().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").DeleteIndex(context.TODO(), "foo", "bar")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("ddoc", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectDeleteIndex().WithDDoc("oink")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").DeleteIndex(context.TODO(), "foo", "bar")
+			testy.ErrorRE(t, "has ddoc: oink", err)
+		},
+	})
+	tests.Add("name", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectDeleteIndex().WithName("oink")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").DeleteIndex(context.TODO(), "foo", "bar")
+			testy.ErrorRE(t, "has name: oink", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectDeleteIndex().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").DeleteIndex(newCanceledContext(), "foo", "bar")
 			testy.Error(t, "context canceled", err)
 		},
 	})

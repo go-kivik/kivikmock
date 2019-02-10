@@ -242,14 +242,14 @@ func TestDBCloseMethod(t *testing.T) {
 func TestAllDocsMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedAllDocs{},
+		input:    &ExpectedAllDocs{db: &MockDB{name: "foo"}},
 		standard: "DB.AllDocs()",
-		verbose:  "DB.AllDocs(ctx)",
+		verbose:  "DB(foo).AllDocs(ctx)",
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedAllDocs{options: map[string]interface{}{"foo": 123}},
+		input:    &ExpectedAllDocs{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": 123}},
 		standard: "DB.AllDocs()",
-		verbose:  "DB.AllDocs(ctx, map[foo:123])",
+		verbose:  "DB(foo).AllDocs(ctx, map[foo:123])",
 	})
 	tests.Run(t, testMethod)
 }
@@ -257,19 +257,19 @@ func TestAllDocsMethod(t *testing.T) {
 func TestBulkGetMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedBulkGet{},
+		input:    &ExpectedBulkGet{db: &MockDB{name: "foo"}},
 		standard: "DB.BulkGet()",
-		verbose:  "DB.BulkGet(ctx, ?)",
+		verbose:  "DB(foo).BulkGet(ctx, ?)",
 	})
 	tests.Add("docs", methodTest{
-		input:    &ExpectedBulkGet{docs: []driver.BulkGetReference{{ID: "foo"}}},
+		input:    &ExpectedBulkGet{db: &MockDB{name: "foo"}, docs: []driver.BulkGetReference{{ID: "foo"}}},
 		standard: "DB.BulkGet()",
-		verbose:  "DB.BulkGet(ctx, [{foo  }])",
+		verbose:  "DB(foo).BulkGet(ctx, [{foo  }])",
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedBulkGet{options: map[string]interface{}{"foo": 123}},
+		input:    &ExpectedBulkGet{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": 123}},
 		standard: "DB.BulkGet()",
-		verbose:  "DB.BulkGet(ctx, ?, map[foo:123])",
+		verbose:  "DB(foo).BulkGet(ctx, ?, map[foo:123])",
 	})
 	tests.Run(t, testMethod)
 }
@@ -277,14 +277,14 @@ func TestBulkGetMethod(t *testing.T) {
 func TestFindMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedFind{},
+		input:    &ExpectedFind{db: &MockDB{name: "foo"}},
 		standard: "DB.Find()",
-		verbose:  "DB.Find(ctx, ?)",
+		verbose:  "DB(foo).Find(ctx, ?)",
 	})
 	tests.Add("query", methodTest{
-		input:    &ExpectedFind{query: map[string]string{"foo": "bar"}},
+		input:    &ExpectedFind{db: &MockDB{name: "foo"}, query: map[string]string{"foo": "bar"}},
 		standard: "DB.Find()",
-		verbose:  "DB.Find(ctx, map[foo:bar])",
+		verbose:  "DB(foo).Find(ctx, map[foo:bar])",
 	})
 	tests.Run(t, testMethod)
 }
@@ -292,24 +292,54 @@ func TestFindMethod(t *testing.T) {
 func TestCreateIndexMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedCreateIndex{},
+		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}},
 		standard: "DB.CreateIndex()",
-		verbose:  "DB.CreateIndex(ctx, ?, ?, ?)",
+		verbose:  "DB(foo).CreateIndex(ctx, ?, ?, ?)",
 	})
 	tests.Add("name", methodTest{
-		input:    &ExpectedCreateIndex{name: "foo"},
+		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}, name: "foo"},
 		standard: "DB.CreateIndex()",
-		verbose:  `DB.CreateIndex(ctx, ?, "foo", ?)`,
+		verbose:  `DB(foo).CreateIndex(ctx, ?, "foo", ?)`,
 	})
 	tests.Add("ddoc", methodTest{
-		input:    &ExpectedCreateIndex{ddoc: "foo"},
+		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}, ddoc: "foo"},
 		standard: "DB.CreateIndex()",
-		verbose:  `DB.CreateIndex(ctx, "foo", ?, ?)`,
+		verbose:  `DB(foo).CreateIndex(ctx, "foo", ?, ?)`,
 	})
 	tests.Add("index", methodTest{
-		input:    &ExpectedCreateIndex{index: map[string]string{"foo": "bar"}},
+		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}, index: map[string]string{"foo": "bar"}},
 		standard: "DB.CreateIndex()",
-		verbose:  `DB.CreateIndex(ctx, ?, ?, map[foo:bar])`,
+		verbose:  `DB(foo).CreateIndex(ctx, ?, ?, map[foo:bar])`,
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestGetIndexesMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedGetIndexes{db: &MockDB{name: "foo"}},
+		standard: "DB.GetIndexes()",
+		verbose:  "DB(foo).GetIndexes(ctx)",
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestDeleteIndexMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedDeleteIndex{db: &MockDB{name: "foo"}},
+		standard: "DB.DeleteIndex()",
+		verbose:  "DB(foo).DeleteIndex(ctx, ?, ?)",
+	})
+	tests.Add("ddoc", methodTest{
+		input:    &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, ddoc: "foo"},
+		standard: "DB.DeleteIndex()",
+		verbose:  `DB(foo).DeleteIndex(ctx, "foo", ?)`,
+	})
+	tests.Add("name", methodTest{
+		input:    &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, name: "foo"},
+		standard: "DB.DeleteIndex()",
+		verbose:  `DB(foo).DeleteIndex(ctx, ?, "foo")`,
 	})
 	tests.Run(t, testMethod)
 }
