@@ -477,20 +477,66 @@ func (e *ExpectedDeleteIndex) WillDelay(delay time.Duration) *ExpectedDeleteInde
 	return e
 }
 
-//
-// type ExpectedExplain struct {
-// 	commonExpectation
-// 	db    *MockDB
-// 	query interface{}
-// 	plan  *driver.QueryPlan
-// }
-//
-// func (e *ExpectedExplain) String() string       { return "" }
-// func (e *ExpectedExplain) method(v bool) string { return "" }
-// func (e *ExpectedExplain) met(ex expectation) bool {
-// 	exp := ex.(*ExpectedExplain)
-// 	if e.db.name != exp.db.name {
-// 		return false
-// 	}
-// 	return false
-// }
+// ExpectedExplain represents an expectation for a DB.Explain() call.
+type ExpectedExplain struct {
+	commonExpectation
+	db    *MockDB
+	query interface{}
+	plan  *kivik.QueryPlan
+}
+
+func (e *ExpectedExplain) String() string {
+	msg := fmt.Sprintf("call to DB(%s#%d).Explain() which:", e.db.name, e.db.id)
+	if e.query == nil {
+		msg += "\n\t- has any query"
+	} else {
+		msg += fmt.Sprintf("\n\t- has query: %v", e.query)
+	}
+	if e.plan != nil {
+		msg += fmt.Sprintf("\n\t- should return query plan: %v", e.plan)
+	}
+	msg += errorString(e.err)
+	return msg
+}
+
+func (e *ExpectedExplain) method(v bool) string {
+	if !v {
+		return "DB.Explain()"
+	}
+	if e.query != nil {
+		return fmt.Sprintf("DB(%s).Explain(ctx, %v)", e.db.name, e.query)
+	}
+	return fmt.Sprintf("DB(%s).Explain(ctx, ?)", e.db.name)
+}
+
+func (e *ExpectedExplain) met(ex expectation) bool {
+	exp := ex.(*ExpectedExplain)
+	if e.db.name != exp.db.name {
+		return false
+	}
+	return e.plan == nil || diff.AsJSON(e.plan, exp.plan) == nil
+}
+
+// WithQuery sets the expected query for the Explain() call.
+func (e *ExpectedExplain) WithQuery(query interface{}) *ExpectedExplain {
+	e.query = query
+	return e
+}
+
+// WillReturn sets the query plan to be returned by the Explain() call.
+func (e *ExpectedExplain) WillReturn(plan *kivik.QueryPlan) *ExpectedExplain {
+	e.plan = plan
+	return e
+}
+
+// WillReturnError sets the error to be returned by the Explain() call.
+func (e *ExpectedExplain) WillReturnError(err error) *ExpectedExplain {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the Explain() call to delay.
+func (e *ExpectedExplain) WillDelay(delay time.Duration) *ExpectedExplain {
+	e.delay = delay
+	return e
+}

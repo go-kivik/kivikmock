@@ -11,7 +11,6 @@
 - db.Delete https://godoc.org/github.com/go-kivik/kivik#DB.Delete
 - db.DeleteAttachment https://godoc.org/github.com/go-kivik/kivik#DB.DeleteAttachment
 - db.DesignDocs https://godoc.org/github.com/go-kivik/kivik#DB.DesignDocs
-- db.Explain https://godoc.org/github.com/go-kivik/kivik#DB.Explain
 - db.Flush https://godoc.org/github.com/go-kivik/kivik#DB.Flush
 - db.Get https://godoc.org/github.com/go-kivik/kivik#DB.Get
 - db.GetAttachment https://godoc.org/github.com/go-kivik/kivik#DB.GetAttachment

@@ -343,3 +343,18 @@ func TestDeleteIndexMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestExplainMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedExplain{db: &MockDB{name: "foo"}},
+		standard: "DB.Explain()",
+		verbose:  "DB(foo).Explain(ctx, ?)",
+	})
+	tests.Add("query", methodTest{
+		input:    &ExpectedExplain{db: &MockDB{name: "foo"}, query: map[string]string{"foo": "bar"}},
+		standard: "DB.Explain()",
+		verbose:  "DB(foo).Explain(ctx, map[foo:bar])",
+	})
+	tests.Run(t, testMethod)
+}

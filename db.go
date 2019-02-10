@@ -108,15 +108,18 @@ func (db *driverDB) DeleteIndex(ctx context.Context, ddoc, name string) error {
 }
 
 func (db *driverDB) Explain(ctx context.Context, query interface{}) (*driver.QueryPlan, error) {
-	// expected := &ExpectedExplain{
-	// 	db:    db.MockDB,
-	// 	query: query,
-	// }
-	// if err := db.client.nextExpectation(expected); err != nil {
-	// 	return nil, err
-	// }
-	// return expected.plan, expected.wait(ctx)
-	return nil, errors.New("unimplemented")
+	expected := &ExpectedExplain{
+		db:    db.MockDB,
+		query: query,
+	}
+	if err := db.client.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	plan := &driver.QueryPlan{}
+	if expected.plan != nil {
+		*plan = driver.QueryPlan(*expected.plan)
+	}
+	return plan, expected.wait(ctx)
 }
 
 func (db *driverDB) Changes(ctx context.Context, options map[string]interface{}) (driver.Changes, error) {
