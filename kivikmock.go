@@ -33,6 +33,9 @@ type Mock interface {
 	// triggered.
 	ExpectClusterStatus() *ExpectedClusterStatus
 
+	// ExpectCreateDB queues an expectation for CreateDB() to be called.
+	ExpectCreateDB() *ExpectedCreateDB
+
 	// ExpectDB queues an expectation for DB() to be called.
 	ExpectDB() *ExpectedDB
 
@@ -170,6 +173,15 @@ func (c *kivikmock) ExpectSession() *ExpectedSession {
 func (c *kivikmock) ExpectVersion() *ExpectedVersion {
 	e := &ExpectedVersion{}
 	c.expected = append(c.expected, e)
+	return e
+}
+
+func (c *kivikmock) ExpectCreateDB() *ExpectedCreateDB {
+	e2 := &ExpectedDB{}
+	e := &ExpectedCreateDB{
+		expectedDB: e2,
+	}
+	c.expected = append(c.expected, e, e2)
 	return e
 }
 

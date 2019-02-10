@@ -149,3 +149,14 @@ func (c *kivikmock) DB(ctx context.Context, name string, options map[string]inte
 	}
 	return expected.db, expected.wait(ctx)
 }
+
+func (c *kivikmock) CreateDB(ctx context.Context, name string, options map[string]interface{}) error {
+	expected := &ExpectedCreateDB{
+		name:    name,
+		options: options,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return err
+	}
+	return expected.wait(ctx)
+}

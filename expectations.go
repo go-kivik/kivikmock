@@ -687,8 +687,96 @@ func (e *ExpectedDB) WillReturn(db MockDB) *ExpectedDB {
 	return e
 }
 
+// WillReturnError sets the return value for the backend DB() call. Note that
+// kivik defers these errors until the next db call, or the Err() method.
+func (e *ExpectedDB) WillReturnError(err error) *ExpectedDB {
+	e.err = err
+	return e
+}
+
 // WillDelay will cause execution of DB() to delay by duration d.
 func (e *ExpectedDB) WillDelay(delay time.Duration) *ExpectedDB {
+	e.delay = delay
+	return e
+}
+
+// ExpectedCreateDB represents an expectation to call the CreateDB() method.
+//
+// Implementation note: Because kivik always calls DB() after a
+// successful CreateDB() is executed, ExpectCreateDB() creates two
+// expectations under the covers, one for the backend CreateDB() call,
+// and one for the DB() call. If WillReturnError() is called, the DB() call
+// expectation is removed.
+type ExpectedCreateDB struct {
+	commonExpectation
+	name       string
+	options    map[string]interface{}
+	db         MockDB
+	expectedDB *ExpectedDB
+}
+
+func (e *ExpectedCreateDB) String() string {
+	msg := "call to CreateDB() which:" +
+		nameString(e.name) +
+		optionsString(e.options)
+	if e.db != nil {
+		msg += fmt.Sprintf("\n\t- should return database with %d expectations", e.db.expectations())
+	}
+	msg += delayString(e.delay)
+	return msg
+}
+
+func (e *ExpectedCreateDB) method(v bool) string {
+	if !v {
+		return "CreateDB()"
+	}
+	var name, options string
+	if e.name == "" {
+		name = "?"
+	} else {
+		name = fmt.Sprintf("%q", e.name)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("CreateDB(ctx, %s%s)", name, options)
+}
+
+func (e *ExpectedCreateDB) met(ex expectation) bool {
+	exp := ex.(*ExpectedCreateDB)
+	nameOK := exp.name == "" || exp.name == e.name
+	optionsOK := exp.options == nil || reflect.DeepEqual(exp.options, e.options)
+	return nameOK && optionsOK
+}
+
+// WithName sets the expectation that DB() will be called with this name.
+func (e *ExpectedCreateDB) WithName(name string) *ExpectedCreateDB {
+	e.expectedDB.name = name
+	e.name = name
+	return e
+}
+
+// WithOptions set the expectation that DB() will be called with these options.
+func (e *ExpectedCreateDB) WithOptions(options map[string]interface{}) *ExpectedCreateDB {
+	e.options = options
+	return e
+}
+
+// WillReturn sets the return value for the DB() call.
+func (e *ExpectedCreateDB) WillReturn(db MockDB) *ExpectedCreateDB {
+	e.expectedDB.db = db
+	return e
+}
+
+// WillReturnError sets the return value for the backend CreateDB() call. Note
+// that kivik defers these errors until the next db call, or the Err() method.
+func (e *ExpectedCreateDB) WillReturnError(err error) *ExpectedCreateDB {
+	e.expectedDB.err = err
+	return e
+}
+
+// WillDelay will cause execution of DB() to delay by duration d.
+func (e *ExpectedCreateDB) WillDelay(delay time.Duration) *ExpectedCreateDB {
 	e.delay = delay
 	return e
 }

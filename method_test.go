@@ -188,6 +188,26 @@ func TestVersionMethod(t *testing.T) {
 	tests.Run(t, testMethod)
 }
 
+func TestCreateDBMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedCreateDB{},
+		standard: "CreateDB()",
+		verbose:  "CreateDB(ctx, ?)",
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedCreateDB{options: map[string]interface{}{"foo": 123}},
+		standard: "CreateDB()",
+		verbose:  "CreateDB(ctx, ?, map[foo:123])",
+	})
+	tests.Add("name", methodTest{
+		input:    &ExpectedCreateDB{name: "foo", options: map[string]interface{}{"foo": 123}},
+		standard: "CreateDB()",
+		verbose:  `CreateDB(ctx, "foo", map[foo:123])`,
+	})
+	tests.Run(t, testMethod)
+}
+
 func TestDBMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
