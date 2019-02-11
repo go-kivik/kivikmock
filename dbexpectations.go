@@ -254,30 +254,22 @@ func (e *ExpectedFind) WillDelay(delay time.Duration) *ExpectedFind {
 	return e
 }
 
-// ExpectedCreateIndex represents an expectation to call DB.CreateIndex().
-type ExpectedCreateIndex struct {
-	commonExpectation
-	db         *MockDB
-	ddoc, name string
-	index      interface{}
-}
-
 func (e *ExpectedCreateIndex) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).CreateIndex() which:", e.db.name, e.db.id)
-	if e.ddoc == "" {
+	if e.arg0 == "" {
 		msg += "\n\t- has any ddoc"
 	} else {
-		msg += "\n\t- has ddoc: " + e.ddoc
+		msg += "\n\t- has ddoc: " + e.arg0
 	}
-	if e.name == "" {
+	if e.arg1 == "" {
 		msg += "\n\t- has any name"
 	} else {
-		msg += "\n\t- has name: " + e.name
+		msg += "\n\t- has name: " + e.arg1
 	}
-	if e.index == nil {
+	if e.arg2 == nil {
 		msg += "\n\t- has any index"
 	} else {
-		msg += fmt.Sprintf("\n\t- has index: %v", e.index)
+		msg += fmt.Sprintf("\n\t- has index: %v", e.arg2)
 	}
 	msg += delayString(e.delay)
 	msg += errorString(e.err)
@@ -289,20 +281,20 @@ func (e *ExpectedCreateIndex) method(v bool) string {
 		return "DB.CreateIndex()"
 	}
 	var ddoc, name, index string
-	if e.ddoc == "" {
+	if e.arg0 == "" {
 		ddoc = "?"
 	} else {
-		ddoc = fmt.Sprintf("%q", e.ddoc)
+		ddoc = fmt.Sprintf("%q", e.arg0)
 	}
-	if e.name == "" {
+	if e.arg1 == "" {
 		name = "?"
 	} else {
-		name = fmt.Sprintf("%q", e.name)
+		name = fmt.Sprintf("%q", e.arg1)
 	}
-	if e.index == nil {
+	if e.arg2 == nil {
 		index = "?"
 	} else {
-		index = fmt.Sprintf("%v", e.index)
+		index = fmt.Sprintf("%v", e.arg2)
 	}
 	return fmt.Sprintf("DB(%s).CreateIndex(ctx, %s, %s, %s)", e.db.name, ddoc, name, index)
 }
@@ -312,42 +304,30 @@ func (e *ExpectedCreateIndex) met(ex expectation) bool {
 	if e.db.name != exp.db.name {
 		return false
 	}
-	if exp.ddoc != "" && exp.ddoc != e.ddoc {
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
 		return false
 	}
-	if exp.name != "" && exp.name != e.name {
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
 		return false
 	}
-	return exp.index == nil || diff.AsJSON(exp.index, e.index) == nil
+	return exp.arg2 == nil || diff.AsJSON(exp.arg2, e.arg2) == nil
 }
 
 // WithDDoc sets the expected ddoc value for the DB.CreateIndex() call.
 func (e *ExpectedCreateIndex) WithDDoc(ddoc string) *ExpectedCreateIndex {
-	e.ddoc = ddoc
+	e.arg0 = ddoc
 	return e
 }
 
 // WithName sets the expected name value for the DB.CreateIndex() call.
 func (e *ExpectedCreateIndex) WithName(name string) *ExpectedCreateIndex {
-	e.name = name
+	e.arg1 = name
 	return e
 }
 
 // WithIndex sets the expected index value for the DB.CreateIndex() call.
 func (e *ExpectedCreateIndex) WithIndex(index interface{}) *ExpectedCreateIndex {
-	e.index = index
-	return e
-}
-
-// WillReturnError sets the error to be returned by the DB.CreateIndex() call.
-func (e *ExpectedCreateIndex) WillReturnError(err error) *ExpectedCreateIndex {
-	e.err = err
-	return e
-}
-
-// WillDelay causes the DB.CreateIndex() call to delay.
-func (e *ExpectedCreateIndex) WillDelay(delay time.Duration) *ExpectedCreateIndex {
-	e.delay = delay
+	e.arg2 = index
 	return e
 }
 
@@ -404,21 +384,14 @@ func (e *ExpectedGetIndexes) WillDelay(delay time.Duration) *ExpectedGetIndexes 
 	return e
 }
 
-// ExpectedDeleteIndex represents an expectation to call DeleteIndex().
-type ExpectedDeleteIndex struct {
-	commonExpectation
-	db         *MockDB
-	ddoc, name string
-}
-
 func (e *ExpectedDeleteIndex) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).DeleteIndex() which:", e.db.name, e.db.id)
-	if e.ddoc == "" {
+	if e.arg0 == "" {
 		msg += "\n\t- has any ddoc"
 	} else {
-		msg += "\n\t- has ddoc: " + e.ddoc
+		msg += "\n\t- has ddoc: " + e.arg0
 	}
-	msg += nameString(e.name)
+	msg += nameString(e.arg1)
 	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
@@ -429,15 +402,15 @@ func (e *ExpectedDeleteIndex) method(v bool) string {
 		return "DB.DeleteIndex()"
 	}
 	var ddoc, name string
-	if e.ddoc == "" {
+	if e.arg0 == "" {
 		ddoc = "?"
 	} else {
-		ddoc = fmt.Sprintf("%q", e.ddoc)
+		ddoc = fmt.Sprintf("%q", e.arg0)
 	}
-	if e.name == "" {
+	if e.arg1 == "" {
 		name = "?"
 	} else {
-		name = fmt.Sprintf("%q", e.name)
+		name = fmt.Sprintf("%q", e.arg1)
 	}
 	return fmt.Sprintf("DB(%s).DeleteIndex(ctx, %s, %s)", e.db.name, ddoc, name)
 }
@@ -447,10 +420,10 @@ func (e *ExpectedDeleteIndex) met(ex expectation) bool {
 	if e.db.name != exp.db.name {
 		return false
 	}
-	if exp.ddoc != "" && exp.ddoc != e.ddoc {
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
 		return false
 	}
-	if exp.name != "" && exp.name != e.name {
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
 		return false
 	}
 	return true
@@ -458,26 +431,13 @@ func (e *ExpectedDeleteIndex) met(ex expectation) bool {
 
 // WithDDoc sets the expected ddoc to be passed to the DB.DeleteIndex() call.
 func (e *ExpectedDeleteIndex) WithDDoc(ddoc string) *ExpectedDeleteIndex {
-	e.ddoc = ddoc
+	e.arg0 = ddoc
 	return e
 }
 
 // WithName sets the expected name to be passed to the DB.DeleteIndex() call.
 func (e *ExpectedDeleteIndex) WithName(name string) *ExpectedDeleteIndex {
-	e.name = name
-	return e
-}
-
-// WillReturnError sets the error that will be returned by the call to
-// DB.DeleteIndex().
-func (e *ExpectedDeleteIndex) WillReturnError(err error) *ExpectedDeleteIndex {
-	e.err = err
-	return e
-}
-
-// WillDelay causes the call to DB.DeleteIndex() to delay.
-func (e *ExpectedDeleteIndex) WillDelay(delay time.Duration) *ExpectedDeleteIndex {
-	e.delay = delay
+	e.arg1 = name
 	return e
 }
 
@@ -546,28 +506,19 @@ func (e *ExpectedExplain) WillDelay(delay time.Duration) *ExpectedExplain {
 	return e
 }
 
-// ExpectedCreateDoc represents an expectation for a call to CreateDoc().
-type ExpectedCreateDoc struct {
-	commonExpectation
-	db         *MockDB
-	doc        interface{}
-	options    map[string]interface{}
-	docID, rev string
-}
-
 func (e *ExpectedCreateDoc) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).CreateDoc() which:", e.db.name, e.db.id)
-	if e.doc == nil {
+	if e.arg0 == nil {
 		msg += "\n\t- has any doc"
 	} else {
-		msg += fmt.Sprintf("\n\t- has doc: %v", e.doc)
+		msg += fmt.Sprintf("\n\t- has doc: %v", e.arg0)
 	}
 	msg += optionsString(e.options)
-	if e.docID != "" {
-		msg += "\n\t- should return docID: " + e.docID
+	if e.ret0 != "" {
+		msg += "\n\t- should return docID: " + e.ret0
 	}
-	if e.rev != "" {
-		msg += "\n\t- should return rev: " + e.rev
+	if e.ret1 != "" {
+		msg += "\n\t- should return rev: " + e.ret1
 	}
 	msg += delayString(e.delay)
 	msg += errorString(e.err)
@@ -579,10 +530,10 @@ func (e *ExpectedCreateDoc) method(v bool) string {
 		return "DB.CreateDoc()"
 	}
 	var doc, options string
-	if e.doc == nil {
+	if e.arg0 == nil {
 		doc = "?"
 	} else {
-		doc = fmt.Sprintf("%v", e.doc)
+		doc = fmt.Sprintf("%v", e.arg0)
 	}
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
@@ -595,7 +546,7 @@ func (e *ExpectedCreateDoc) met(ex expectation) bool {
 	if e.db.name != exp.db.name {
 		return false
 	}
-	if exp.doc != nil && diff.AsJSON(e.doc, exp.doc) != nil {
+	if exp.arg0 != nil && diff.AsJSON(e.arg0, exp.arg0) != nil {
 		return false
 	}
 	return exp.options == nil || reflect.DeepEqual(e.options, exp.options)
@@ -603,31 +554,6 @@ func (e *ExpectedCreateDoc) met(ex expectation) bool {
 
 // WithDoc sets the expected doc for the call to CreateDoc().
 func (e *ExpectedCreateDoc) WithDoc(doc interface{}) *ExpectedCreateDoc {
-	e.doc = doc
-	return e
-}
-
-// WithOptions sets the expected options for the call to CreateDoc().
-func (e *ExpectedCreateDoc) WithOptions(options map[string]interface{}) *ExpectedCreateDoc {
-	e.options = options
-	return e
-}
-
-// WillReturn sets the values that will be returned by the call to CreateDoc().
-func (e *ExpectedCreateDoc) WillReturn(docID, rev string) *ExpectedCreateDoc {
-	e.docID = docID
-	e.rev = rev
-	return e
-}
-
-// WillReturnError sets the error value that will be returned by the call to CreateDoc().
-func (e *ExpectedCreateDoc) WillReturnError(err error) *ExpectedCreateDoc {
-	e.err = err
-	return e
-}
-
-// WillDelay causes the call to CreateDoc() to delay.
-func (e *ExpectedCreateDoc) WillDelay(delay time.Duration) *ExpectedCreateDoc {
-	e.delay = delay
+	e.arg0 = doc
 	return e
 }

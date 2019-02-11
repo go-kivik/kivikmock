@@ -70,10 +70,10 @@ func (db *driverDB) Find(ctx context.Context, query interface{}) (driver.Rows, e
 
 func (db *driverDB) CreateIndex(ctx context.Context, ddoc, name string, index interface{}) error {
 	expected := &ExpectedCreateIndex{
-		db:    db.MockDB,
-		ddoc:  ddoc,
-		name:  name,
-		index: index,
+		db:   db.MockDB,
+		arg0: ddoc,
+		arg1: name,
+		arg2: index,
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
@@ -98,8 +98,8 @@ func (db *driverDB) GetIndexes(ctx context.Context) ([]driver.Index, error) {
 func (db *driverDB) DeleteIndex(ctx context.Context, ddoc, name string) error {
 	expected := &ExpectedDeleteIndex{
 		db:   db.MockDB,
-		ddoc: ddoc,
-		name: name,
+		arg0: ddoc,
+		arg1: name,
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
@@ -125,13 +125,13 @@ func (db *driverDB) Explain(ctx context.Context, query interface{}) (*driver.Que
 func (db *driverDB) CreateDoc(ctx context.Context, doc interface{}, options map[string]interface{}) (string, string, error) {
 	expected := &ExpectedCreateDoc{
 		db:      db.MockDB,
-		doc:     doc,
+		arg0:    doc,
 		options: options,
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return "", "", err
 	}
-	return expected.docID, expected.rev, expected.wait(ctx)
+	return expected.ret0, expected.ret1, expected.wait(ctx)
 }
 
 func (db *driverDB) Changes(ctx context.Context, options map[string]interface{}) (driver.Changes, error) {

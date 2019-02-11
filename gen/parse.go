@@ -59,6 +59,7 @@ func parseMethods(input interface{}, isClient bool) ([]*Method, error) {
 		dm := &Method{
 			Name: m.Name,
 		}
+		result = append(result, dm)
 		accepts := make([]reflect.Type, m.Type.NumIn())
 		for j := 0; j < m.Type.NumIn(); j++ {
 			accepts[j] = m.Type.In(j)
@@ -78,7 +79,6 @@ func parseMethods(input interface{}, isClient bool) ([]*Method, error) {
 			dm.AcceptsOptions = true
 			accepts = accepts[:len(accepts)-1]
 		}
-		result = append(result, dm)
 		if len(accepts) > 0 {
 			dm.Accepts = accepts
 		}

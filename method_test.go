@@ -296,18 +296,18 @@ func TestCreateIndexMethod(t *testing.T) {
 		standard: "DB.CreateIndex()",
 		verbose:  "DB(foo).CreateIndex(ctx, ?, ?, ?)",
 	})
-	tests.Add("name", methodTest{
-		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}, name: "foo"},
-		standard: "DB.CreateIndex()",
-		verbose:  `DB(foo).CreateIndex(ctx, ?, "foo", ?)`,
-	})
 	tests.Add("ddoc", methodTest{
-		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}, ddoc: "foo"},
+		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}, arg0: "foo"},
 		standard: "DB.CreateIndex()",
 		verbose:  `DB(foo).CreateIndex(ctx, "foo", ?, ?)`,
 	})
+	tests.Add("name", methodTest{
+		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}, arg1: "foo"},
+		standard: "DB.CreateIndex()",
+		verbose:  `DB(foo).CreateIndex(ctx, ?, "foo", ?)`,
+	})
 	tests.Add("index", methodTest{
-		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}, index: map[string]string{"foo": "bar"}},
+		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}, arg2: map[string]string{"foo": "bar"}},
 		standard: "DB.CreateIndex()",
 		verbose:  `DB(foo).CreateIndex(ctx, ?, ?, map[foo:bar])`,
 	})
@@ -332,12 +332,12 @@ func TestDeleteIndexMethod(t *testing.T) {
 		verbose:  "DB(foo).DeleteIndex(ctx, ?, ?)",
 	})
 	tests.Add("ddoc", methodTest{
-		input:    &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, ddoc: "foo"},
+		input:    &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, arg0: "foo"},
 		standard: "DB.DeleteIndex()",
 		verbose:  `DB(foo).DeleteIndex(ctx, "foo", ?)`,
 	})
 	tests.Add("name", methodTest{
-		input:    &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, name: "foo"},
+		input:    &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, arg1: "foo"},
 		standard: "DB.DeleteIndex()",
 		verbose:  `DB(foo).DeleteIndex(ctx, ?, "foo")`,
 	})
@@ -367,7 +367,7 @@ func TestCreateDocMethod(t *testing.T) {
 		verbose:  "DB(foo).CreateDoc(ctx, ?)",
 	})
 	tests.Add("docs", methodTest{
-		input:    &ExpectedCreateDoc{db: &MockDB{name: "foo"}, doc: map[string]string{"foo": "bar"}},
+		input:    &ExpectedCreateDoc{db: &MockDB{name: "foo"}, arg0: map[string]string{"foo": "bar"}},
 		standard: "DB.CreateDoc()",
 		verbose:  "DB(foo).CreateDoc(ctx, map[foo:bar])",
 	})

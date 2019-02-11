@@ -8,38 +8,38 @@ import (
 	"github.com/go-kivik/kivik/driver"
 )
 
-var clientSkips = map[string]struct{}{"CreateDB": struct{}{}}
+var clientSkips = map[string]struct{}{
+	"CreateDB":     struct{}{},
+	"Authenticate": struct{}{},
+}
+var dbSkips = map[string]struct{}{
+	"Close": struct{}{},
+}
 
 func main() {
 	initTemplates(os.Args[1])
 	if err := client(); err != nil {
 		panic(err)
 	}
+	if err := db(); err != nil {
+		panic(err)
+	}
 }
 
-func driverClient() ([]*Method, error) {
-	types := []interface{}{
-		struct{ X driver.Client }{},
-		struct{ X driver.DBsStatser }{},
-		struct{ X driver.Pinger }{},
-		struct{ X driver.Sessioner }{},
-		struct{ X driver.Cluster }{},
-		struct{ X driver.ClientCloser }{},
-	}
-
-	methods := make([]*Method, 0)
-	for _, t := range types {
-		m, err := parseMethods(t, false)
-		if err != nil {
-			return nil, err
-		}
-		methods = append(methods, m...)
-	}
-	return methods, nil
+type fullClient interface {
+	driver.Client
+	driver.DBsStatser
+	driver.Pinger
+	driver.Sessioner
+	driver.Cluster
+	driver.ClientCloser
+	driver.Authenticator
+	driver.ClientReplicator
+	driver.DBUpdater
 }
 
 func client() error {
-	dMethods, err := driverClient()
+	dMethods, err := parseMethods(struct{ X fullClient }{}, false)
 	if err != nil {
 		return err
 	}
@@ -56,6 +56,48 @@ func client() error {
 	same, _, _ := compareMethods(client, dMethods)
 
 	if err := RenderMockGo("clientexpectations_gen.go", same); err != nil {
+		return err
+	}
+	return nil
+}
+
+type fullDB interface {
+	driver.DB
+	driver.AttachmentMetaGetter
+	driver.BulkDocer
+	driver.BulkGetter
+	driver.Copier
+	driver.DBCloser
+	driver.DesignDocer
+	driver.Finder
+	driver.Flusher
+	driver.LocalDocer
+	driver.MetaGetter
+	driver.Purger
+}
+
+func db() error {
+	dMethods, err := parseMethods(struct{ X fullDB }{}, false)
+	if err != nil {
+		return err
+	}
+
+	client, err := parseMethods(struct{ X *kivik.DB }{}, true)
+	if err != nil {
+		return err
+	}
+	for i, method := range client {
+		if _, ok := dbSkips[method.Name]; ok {
+			client[i].Name += "_skipped"
+		}
+	}
+	same, _, _ := compareMethods(client, dMethods)
+
+	for _, method := range same {
+		method.DBMethod = true
+	}
+
+	if err := RenderMockGo("dbexpectations_gen.go", same); err != nil {
 		return err
 	}
 	return nil
