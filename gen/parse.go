@@ -4,9 +4,12 @@ import (
 	"context"
 	"errors"
 	"reflect"
+
+	"github.com/go-kivik/kivik"
 )
 
-type DriverMethod struct {
+// Method contains the relevant information for a driver method.
+type Method struct {
 	// The method name
 	Name string
 	// Accepted values, except for context and options
@@ -19,13 +22,15 @@ type DriverMethod struct {
 }
 
 var (
-	typeContext = reflect.TypeOf((*context.Context)(nil)).Elem()
-	typeOptions = reflect.TypeOf(map[string]interface{}{})
-	typeError   = reflect.TypeOf((*error)(nil)).Elem()
-	typeString  = reflect.TypeOf("")
+	typeContext       = reflect.TypeOf((*context.Context)(nil)).Elem()
+	typeDriverOptions = reflect.TypeOf(map[string]interface{}{})
+	typeClientOptions = reflect.TypeOf([]kivik.Options{})
+	typeError         = reflect.TypeOf((*error)(nil)).Elem()
+	typeString        = reflect.TypeOf("")
 )
 
-func parseDriverMethods(input interface{}) ([]*DriverMethod, error) {
+func parseDriverMethods(input interface{}, isClient bool) ([]*Method, error) {
+	var hasReceiver bool
 	t := reflect.TypeOf(input)
 	if t.Kind() != reflect.Struct {
 		return nil, errors.New("input must be struct")
@@ -33,25 +38,42 @@ func parseDriverMethods(input interface{}) ([]*DriverMethod, error) {
 	if t.NumField() != 1 || t.Field(0).Name != "X" {
 		return nil, errors.New("wrapper struct must have a single field: X")
 	}
-	f := t.Field(0)
-	if f.Type.Kind() != reflect.Interface {
-		return nil, errors.New("field X must be of type interface")
+	fType := t.Field(0).Type
+	if isClient {
+		if fType.Kind() != reflect.Ptr {
+			return nil, errors.New("field X must be of type pointer to struct")
+		}
+		if fType.Elem().Kind() != reflect.Struct {
+			return nil, errors.New("field X must be of type pointer to struct")
+		}
+		hasReceiver = true
+	} else {
+		if fType.Kind() != reflect.Interface {
+			return nil, errors.New("field X must be of type interface")
+		}
 	}
-	result := make([]*DriverMethod, 0, f.Type.NumMethod())
-	for i := 0; i < f.Type.NumMethod(); i++ {
-		m := f.Type.Method(i)
-		dm := &DriverMethod{
+	result := make([]*Method, 0, fType.NumMethod())
+	for i := 0; i < fType.NumMethod(); i++ {
+		m := fType.Method(i)
+		dm := &Method{
 			Name: m.Name,
 		}
 		accepts := make([]reflect.Type, m.Type.NumIn())
 		for j := 0; j < m.Type.NumIn(); j++ {
 			accepts[j] = m.Type.In(j)
 		}
+		if hasReceiver {
+			accepts = accepts[1:]
+		}
 		if accepts[0].Kind() == reflect.Interface && accepts[0].Implements(typeContext) {
 			dm.AcceptsContext = true
 			accepts = accepts[1:]
 		}
-		if accepts[len(accepts)-1] == typeOptions {
+		if !isClient && len(accepts) > 0 && accepts[len(accepts)-1] == typeDriverOptions {
+			dm.AcceptsOptions = true
+			accepts = accepts[:len(accepts)-1]
+		}
+		if isClient && m.Type.IsVariadic() && len(accepts) > 0 && accepts[len(accepts)-1] == typeClientOptions {
 			dm.AcceptsOptions = true
 			accepts = accepts[:len(accepts)-1]
 		}
