@@ -35,6 +35,73 @@ func (e *ExpectedAllDBs) WillDelay(delay time.Duration) *ExpectedAllDBs {
 	return e
 }
 
+// ExpectedClose represents an expectation for a call to Close().
+type ExpectedClose struct {
+	commonExpectation
+
+}
+
+// WillReturnError sets the error value that will be returned by the call to Close().
+func (e *ExpectedClose) WillReturnError(err error) *ExpectedClose {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to Close() to delay.
+func (e *ExpectedClose) WillDelay(delay time.Duration) *ExpectedClose {
+	e.delay = delay
+	return e
+}
+
+// ExpectedClusterSetup represents an expectation for a call to ClusterSetup().
+type ExpectedClusterSetup struct {
+	commonExpectation
+	arg0 interface {}
+}
+
+// WillReturnError sets the error value that will be returned by the call to ClusterSetup().
+func (e *ExpectedClusterSetup) WillReturnError(err error) *ExpectedClusterSetup {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to ClusterSetup() to delay.
+func (e *ExpectedClusterSetup) WillDelay(delay time.Duration) *ExpectedClusterSetup {
+	e.delay = delay
+	return e
+}
+
+// ExpectedClusterStatus represents an expectation for a call to ClusterStatus().
+type ExpectedClusterStatus struct {
+	commonExpectation
+	options map[string]interface{}
+	ret0    string
+}
+
+// WithOptions sets the expected options for the call to ClusterStatus().
+func (e *ExpectedClusterStatus) WithOptions(options map[string]interface{}) *ExpectedClusterStatus {
+	e.options = options
+	return e
+}
+
+// WillReturn sets the values that will be returned by the call to ClusterStatus().
+func (e *ExpectedClusterStatus) WillReturn(ret0 string) *ExpectedClusterStatus {
+	e.ret0 = ret0
+	return e
+}
+
+// WillReturnError sets the error value that will be returned by the call to ClusterStatus().
+func (e *ExpectedClusterStatus) WillReturnError(err error) *ExpectedClusterStatus {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to ClusterStatus() to delay.
+func (e *ExpectedClusterStatus) WillDelay(delay time.Duration) *ExpectedClusterStatus {
+	e.delay = delay
+	return e
+}
+
 // ExpectedDBExists represents an expectation for a call to DBExists().
 type ExpectedDBExists struct {
 	commonExpectation
@@ -88,6 +155,30 @@ func (e *ExpectedDestroyDB) WillReturnError(err error) *ExpectedDestroyDB {
 
 // WillDelay causes the call to DestroyDB() to delay.
 func (e *ExpectedDestroyDB) WillDelay(delay time.Duration) *ExpectedDestroyDB {
+	e.delay = delay
+	return e
+}
+
+// ExpectedPing represents an expectation for a call to Ping().
+type ExpectedPing struct {
+	commonExpectation
+	ret0 bool
+}
+
+// WillReturn sets the values that will be returned by the call to Ping().
+func (e *ExpectedPing) WillReturn(ret0 bool) *ExpectedPing {
+	e.ret0 = ret0
+	return e
+}
+
+// WillReturnError sets the error value that will be returned by the call to Ping().
+func (e *ExpectedPing) WillReturnError(err error) *ExpectedPing {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to Ping() to delay.
+func (e *ExpectedPing) WillDelay(delay time.Duration) *ExpectedPing {
 	e.delay = delay
 	return e
 }

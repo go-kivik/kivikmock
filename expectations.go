@@ -9,12 +9,6 @@ import (
 	"github.com/go-kivik/kivik"
 )
 
-// ExpectedClose is used to manage *kivik.Client.Close expectation returned
-// by Mock.ExpectClose.
-type ExpectedClose struct {
-	commonExpectation
-}
-
 func (e *ExpectedClose) method(v bool) string {
 	if v {
 		return "Close(ctx)"
@@ -24,12 +18,6 @@ func (e *ExpectedClose) method(v bool) string {
 
 func (e *ExpectedClose) met(_ expectation) bool { return true }
 
-// WillReturnError allows setting an error for *kivik.Client.Close action.
-func (e *ExpectedClose) WillReturnError(err error) *ExpectedClose {
-	e.err = err
-	return e
-}
-
 func (e *ExpectedClose) String() string {
 	extra := delayString(e.delay) + errorString(e.err)
 	msg := "call to Close()"
@@ -37,12 +25,6 @@ func (e *ExpectedClose) String() string {
 		msg += " which:" + extra
 	}
 	return msg
-}
-
-// WillDelay will cause execution of Close() to delay by duration d.
-func (e *ExpectedClose) WillDelay(d time.Duration) *ExpectedClose {
-	e.delay = d
-	return e
 }
 
 // // ExpectedAllDBs is used to manage *kivik.Client.AllDBs expectation returned
@@ -137,69 +119,34 @@ func (e *ExpectedAuthenticate) WillDelay(d time.Duration) *ExpectedAuthenticate 
 	return e
 }
 
-// ExpectedClusterSetup is used to manage *kivik.Client.ClusterSetup
-// expectation returned by Mock.ExpectClusterSetup.
-type ExpectedClusterSetup struct {
-	commonExpectation
-	action interface{}
-}
-
 func (e *ExpectedClusterSetup) method(v bool) string {
 	if v {
-		if e.action == nil {
+		if e.arg0 == nil {
 			return "ClusterSetup(ctx, <T>)"
 		}
-		return fmt.Sprintf("ClusterSetup(ctx, %v)", e.action)
+		return fmt.Sprintf("ClusterSetup(ctx, %v)", e.arg0)
 	}
 	return "ClusterSetup()"
 }
 
 func (e *ExpectedClusterSetup) met(ex expectation) bool {
 	exp := ex.(*ExpectedClusterSetup)
-	if exp.action == nil {
+	if exp.arg0 == nil {
 		return true
 	}
-	return diff.AsJSON(e.action, exp.action) == nil
+	return diff.AsJSON(e.arg0, exp.arg0) == nil
 }
 
 func (e *ExpectedClusterSetup) String() string {
 	msg := "call to ClusterSetup() which:"
-	if e.action == nil {
+	if e.arg0 == nil {
 		msg += "\n\t- has any action"
 	} else {
-		msg += fmt.Sprintf("\n\t- has the action: %v", e.action)
+		msg += fmt.Sprintf("\n\t- has the action: %v", e.arg0)
 	}
 	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
-}
-
-// WillReturnError causes ClusterSetup to mock this return error.
-func (e *ExpectedClusterSetup) WillReturnError(err error) *ExpectedClusterSetup {
-	e.err = err
-	return e
-}
-
-// WithAction specifies the action to be matched. Note that this expectation
-// is compared with the actual action's marshaled JSON output, so it is not
-// essential that the data types match exactly, in a Go sense.
-func (e *ExpectedClusterSetup) WithAction(action interface{}) *ExpectedClusterSetup {
-	e.action = action
-	return e
-}
-
-// WillDelay will cause execution of ClusterSetups() to delay by duration d.
-func (e *ExpectedClusterSetup) WillDelay(d time.Duration) *ExpectedClusterSetup {
-	e.delay = d
-	return e
-}
-
-// ExpectedClusterStatus is used to manage *kivik.Client.ClusterStatus
-// expectation returned by Mock.ExpectClusterStatus.
-type ExpectedClusterStatus struct {
-	commonExpectation
-	options map[string]interface{}
-	status  string
 }
 
 func (e *ExpectedClusterStatus) met(ex expectation) bool {
@@ -226,42 +173,15 @@ func (e *ExpectedClusterStatus) String() string {
 		optionsString(e.options) +
 		delayString(e.delay) +
 		errorString(e.err)
-
 }
 
-// WithOptions sets the expectation that ClusterStatus will be called with the
-// provided options.
-func (e *ExpectedClusterStatus) WithOptions(options map[string]interface{}) *ExpectedClusterStatus {
-	e.options = options
+// WithAction specifies the action to be matched. Note that this expectation
+// is compared with the actual action's marshaled JSON output, so it is not
+// essential that the data types match exactly, in a Go sense.
+func (e *ExpectedClusterSetup) WithAction(action interface{}) *ExpectedClusterSetup {
+	e.arg0 = action
 	return e
 }
-
-// WillReturn causes ClusterStatus to mock this return value.
-func (e *ExpectedClusterStatus) WillReturn(status string) *ExpectedClusterStatus {
-	e.status = status
-	return e
-}
-
-// WillReturnError causes ClusterStatus to mock this return error.
-func (e *ExpectedClusterStatus) WillReturnError(err error) *ExpectedClusterStatus {
-	e.err = err
-	return e
-}
-
-// WillDelay will cause execution of ClusterStatus() to delay by duration d.
-func (e *ExpectedClusterStatus) WillDelay(d time.Duration) *ExpectedClusterStatus {
-	e.delay = d
-	return e
-}
-
-// // ExpectedDBExists is used to manage *kivik.Client.DBExists expectation
-// // returned by Mock.ExpectDBExists.
-// type ExpectedDBExists struct {
-// 	commonExpectation
-// 	name    string
-// 	options map[string]interface{}
-// 	exists  bool
-// }
 
 func (e *ExpectedDBExists) String() string {
 	msg := "call to DBExists() which:" +
@@ -418,13 +338,6 @@ func (e *ExpectedDBsStats) WillDelay(delay time.Duration) *ExpectedDBsStats {
 	return e
 }
 
-// ExpectedPing is used to manage *kivik.Client.Ping expectation returned by
-// Mock.ExpectPing.
-type ExpectedPing struct {
-	commonExpectation
-	responded bool
-}
-
 func (e *ExpectedPing) String() string {
 	msg := "call to Ping()"
 	extra := delayString(e.delay) + errorString(e.err)
@@ -442,24 +355,6 @@ func (e *ExpectedPing) method(v bool) string {
 }
 
 func (e *ExpectedPing) met(_ expectation) bool { return true }
-
-// WillReturn sets the value to be returned by the call to Ping.
-func (e *ExpectedPing) WillReturn(responded bool) *ExpectedPing {
-	e.responded = responded
-	return e
-}
-
-// WillReturnError sets the error to be returned by the call to Ping.
-func (e *ExpectedPing) WillReturnError(err error) *ExpectedPing {
-	e.err = err
-	return e
-}
-
-// WillDelay will cause execution of Ping to delay by duration d.
-func (e *ExpectedPing) WillDelay(delay time.Duration) *ExpectedPing {
-	e.delay = delay
-	return e
-}
 
 // ExpectedSession is used to manage *kivik.Client.Session expectation returned
 // by Mock.ExpectSession.

@@ -52,7 +52,7 @@ func (c *driverClient) Authenticate(ctx context.Context, authenticator interface
 
 func (c *driverClient) ClusterSetup(ctx context.Context, action interface{}) error {
 	expected := &ExpectedClusterSetup{
-		action: action,
+		arg0: action,
 	}
 	if err := c.nextExpectation(expected); err != nil {
 		return err
@@ -67,7 +67,7 @@ func (c *driverClient) ClusterStatus(ctx context.Context, options map[string]int
 	if err := c.nextExpectation(expected); err != nil {
 		return "", err
 	}
-	return expected.status, expected.wait(ctx)
+	return expected.ret0, expected.wait(ctx)
 }
 
 func (c *driverClient) DBExists(ctx context.Context, name string, options map[string]interface{}) (bool, error) {
@@ -110,7 +110,7 @@ func (c *driverClient) Ping(ctx context.Context) (bool, error) {
 	if err := c.nextExpectation(expected); err != nil {
 		return false, err
 	}
-	return expected.responded, expected.wait(ctx)
+	return expected.ret0, expected.wait(ctx)
 }
 
 func (c *driverClient) Session(ctx context.Context) (*driver.Session, error) {

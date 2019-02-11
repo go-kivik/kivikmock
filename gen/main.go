@@ -4,8 +4,8 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/flimzy/kivik"
-	"github.com/flimzy/kivik/driver"
+	"github.com/go-kivik/kivik"
+	"github.com/go-kivik/kivik/driver"
 )
 
 var clientSkips = map[string]struct{}{"CreateDB": struct{}{}}
@@ -17,11 +17,33 @@ func main() {
 	}
 }
 
+func driverClient() ([]*Method, error) {
+	types := []interface{}{
+		struct{ X driver.Client }{},
+		struct{ X driver.DBsStatser }{},
+		struct{ X driver.Pinger }{},
+		struct{ X driver.Sessioner }{},
+		struct{ X driver.Cluster }{},
+		struct{ X driver.ClientCloser }{},
+	}
+
+	methods := make([]*Method, 0)
+	for _, t := range types {
+		m, err := parseMethods(t, false)
+		if err != nil {
+			return nil, err
+		}
+		methods = append(methods, m...)
+	}
+	return methods, nil
+}
+
 func client() error {
-	driver, err := parseMethods(struct{ X driver.Client }{}, false)
+	dMethods, err := driverClient()
 	if err != nil {
 		return err
 	}
+
 	client, err := parseMethods(struct{ X *kivik.Client }{}, true)
 	if err != nil {
 		return err
@@ -31,7 +53,7 @@ func client() error {
 			client[i].Name += "_skipped"
 		}
 	}
-	same, _, _ := compareMethods(client, driver)
+	same, _, _ := compareMethods(client, dMethods)
 
 	if err := RenderMockGo("clientexpectations_gen.go", same); err != nil {
 		return err

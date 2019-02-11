@@ -104,7 +104,7 @@ func TestClusterSetupString(t *testing.T) {
 	- has any action`,
 	})
 	tests.Add("action", stringerTest{
-		input: &ExpectedClusterSetup{action: map[string]string{"foo": "bar"}},
+		input: &ExpectedClusterSetup{arg0: map[string]string{"foo": "bar"}},
 		expected: `call to ClusterSetup() which:
 	- has the action: map[foo:bar]`,
 	})

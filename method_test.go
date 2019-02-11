@@ -72,7 +72,7 @@ func TestClusterSetupMethod(t *testing.T) {
 		verbose:  "ClusterSetup(ctx, <T>)",
 	})
 	tests.Add("action", methodTest{
-		input:    &ExpectedClusterSetup{action: map[string]string{"foo": "bar"}},
+		input:    &ExpectedClusterSetup{arg0: map[string]string{"foo": "bar"}},
 		standard: "ClusterSetup()",
 		verbose:  "ClusterSetup(ctx, map[foo:bar])",
 	})
