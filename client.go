@@ -19,26 +19,6 @@ var _ driver.DBsStatser = &driverClient{}
 var _ driver.Pinger = &driverClient{}
 var _ driver.Sessioner = &driverClient{}
 
-func (c *driverClient) Close(ctx context.Context) error {
-	expected := &ExpectedClose{}
-	if err := c.nextExpectation(expected); err != nil {
-		return err
-	}
-
-	return expected.wait(ctx)
-}
-
-func (c *driverClient) AllDBs(ctx context.Context, opts map[string]interface{}) ([]string, error) {
-	expected := &ExpectedAllDBs{
-		options: opts,
-	}
-	if err := c.nextExpectation(expected); err != nil {
-		return nil, err
-	}
-
-	return expected.ret0, expected.wait(ctx)
-}
-
 func (c *driverClient) Authenticate(ctx context.Context, authenticator interface{}) error {
 	expected := &ExpectedAuthenticate{
 		authType: reflect.TypeOf(authenticator).Name(),
@@ -47,47 +27,6 @@ func (c *driverClient) Authenticate(ctx context.Context, authenticator interface
 		return err
 	}
 
-	return expected.wait(ctx)
-}
-
-func (c *driverClient) ClusterSetup(ctx context.Context, action interface{}) error {
-	expected := &ExpectedClusterSetup{
-		arg0: action,
-	}
-	if err := c.nextExpectation(expected); err != nil {
-		return err
-	}
-	return expected.wait(ctx)
-}
-
-func (c *driverClient) ClusterStatus(ctx context.Context, options map[string]interface{}) (string, error) {
-	expected := &ExpectedClusterStatus{
-		options: options,
-	}
-	if err := c.nextExpectation(expected); err != nil {
-		return "", err
-	}
-	return expected.ret0, expected.wait(ctx)
-}
-
-func (c *driverClient) DBExists(ctx context.Context, name string, options map[string]interface{}) (bool, error) {
-	expected := &ExpectedDBExists{
-		arg0:    name,
-		options: options,
-	}
-	if err := c.nextExpectation(expected); err != nil {
-		return false, err
-	}
-	return expected.ret0, expected.wait(ctx)
-}
-
-func (c *driverClient) DestroyDB(ctx context.Context, name string, options map[string]interface{}) error {
-	expected := &ExpectedDestroyDB{
-		arg0: name,
-	}
-	if err := c.nextExpectation(expected); err != nil {
-		return err
-	}
 	return expected.wait(ctx)
 }
 
@@ -103,14 +42,6 @@ func (c *driverClient) DBsStats(ctx context.Context, names []string) ([]*driver.
 		stats[i] = kivikStats2driverStats(s)
 	}
 	return stats, expected.wait(ctx)
-}
-
-func (c *driverClient) Ping(ctx context.Context) (bool, error) {
-	expected := &ExpectedPing{}
-	if err := c.nextExpectation(expected); err != nil {
-		return false, err
-	}
-	return expected.ret0, expected.wait(ctx)
 }
 
 func (c *driverClient) Session(ctx context.Context) (*driver.Session, error) {

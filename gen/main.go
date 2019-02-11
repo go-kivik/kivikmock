@@ -59,7 +59,7 @@ func client() error {
 	if err := RenderExpectationsGo("clientexpectations_gen.go", same); err != nil {
 		return err
 	}
-	if err := RenderMockGo("clientmock_gen.go", same); err != nil {
+	if err := RenderMockGo("client_gen.go", same); err != nil {
 		return err
 	}
 	return nil
