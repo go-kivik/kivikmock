@@ -36,7 +36,7 @@ func (c *driverClient) AllDBs(ctx context.Context, opts map[string]interface{}) 
 		return nil, err
 	}
 
-	return expected.results, expected.wait(ctx)
+	return expected.ret0, expected.wait(ctx)
 }
 
 func (c *driverClient) Authenticate(ctx context.Context, authenticator interface{}) error {
@@ -72,18 +72,18 @@ func (c *driverClient) ClusterStatus(ctx context.Context, options map[string]int
 
 func (c *driverClient) DBExists(ctx context.Context, name string, options map[string]interface{}) (bool, error) {
 	expected := &ExpectedDBExists{
-		name:    name,
+		arg0:    name,
 		options: options,
 	}
 	if err := c.nextExpectation(expected); err != nil {
 		return false, err
 	}
-	return expected.exists, expected.wait(ctx)
+	return expected.ret0, expected.wait(ctx)
 }
 
 func (c *driverClient) DestroyDB(ctx context.Context, name string, options map[string]interface{}) error {
 	expected := &ExpectedDestroyDB{
-		name: name,
+		arg0: name,
 	}
 	if err := c.nextExpectation(expected); err != nil {
 		return err
@@ -141,7 +141,7 @@ func (c *driverClient) Version(ctx context.Context) (*driver.Version, error) {
 
 func (c *driverClient) DB(ctx context.Context, name string, options map[string]interface{}) (driver.DB, error) {
 	expected := &ExpectedDB{
-		name:    name,
+		arg0:    name,
 		options: options,
 	}
 	if err := c.nextExpectation(expected); err != nil {
@@ -153,7 +153,7 @@ func (c *driverClient) DB(ctx context.Context, name string, options map[string]i
 
 func (c *driverClient) CreateDB(ctx context.Context, name string, options map[string]interface{}) error {
 	expected := &ExpectedCreateDB{
-		name:    name,
+		arg0:    name,
 		options: options,
 	}
 	if err := c.nextExpectation(expected); err != nil {

@@ -107,7 +107,7 @@ func TestDBExistsMethod(t *testing.T) {
 		verbose:  "DBExists(ctx, ?, ?)",
 	})
 	tests.Add("name", methodTest{
-		input:    &ExpectedDBExists{name: "foo"},
+		input:    &ExpectedDBExists{arg0: "foo"},
 		standard: "DBExists()",
 		verbose:  `DBExists(ctx, "foo", ?)`,
 	})
@@ -117,7 +117,7 @@ func TestDBExistsMethod(t *testing.T) {
 		verbose:  `DBExists(ctx, ?, map[foo:321])`,
 	})
 	tests.Add("full", methodTest{
-		input:    &ExpectedDBExists{name: "foo", options: map[string]interface{}{"foo": 321}},
+		input:    &ExpectedDBExists{arg0: "foo", options: map[string]interface{}{"foo": 321}},
 		standard: "DBExists()",
 		verbose:  `DBExists(ctx, "foo", map[foo:321])`,
 	})
@@ -132,7 +132,7 @@ func TestDestroyDBMethod(t *testing.T) {
 		verbose:  "DestroyDB(ctx, ?, ?)",
 	})
 	tests.Add("name", methodTest{
-		input:    &ExpectedDestroyDB{name: "foo"},
+		input:    &ExpectedDestroyDB{arg0: "foo"},
 		standard: "DestroyDB()",
 		verbose:  `DestroyDB(ctx, "foo", ?)`,
 	})
@@ -202,7 +202,7 @@ func TestCreateDBMethod(t *testing.T) {
 		verbose:  "CreateDB(ctx, ?, map[foo:123])",
 	})
 	tests.Add("name", methodTest{
-		input:    &ExpectedCreateDB{name: "foo", options: map[string]interface{}{"foo": 123}},
+		input:    &ExpectedCreateDB{arg0: "foo", options: map[string]interface{}{"foo": 123}},
 		standard: "CreateDB()",
 		verbose:  `CreateDB(ctx, "foo", map[foo:123])`,
 	})
@@ -222,7 +222,7 @@ func TestDBMethod(t *testing.T) {
 		verbose:  "DB(ctx, ?, map[foo:123])",
 	})
 	tests.Add("name", methodTest{
-		input:    &ExpectedDB{name: "foo", options: map[string]interface{}{"foo": 123}},
+		input:    &ExpectedDB{arg0: "foo", options: map[string]interface{}{"foo": 123}},
 		standard: "DB()",
 		verbose:  `DB(ctx, "foo", map[foo:123])`,
 	})

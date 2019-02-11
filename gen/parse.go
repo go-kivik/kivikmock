@@ -66,7 +66,7 @@ func parseMethods(input interface{}, isClient bool) ([]*Method, error) {
 		if hasReceiver {
 			accepts = accepts[1:]
 		}
-		if accepts[0].Kind() == reflect.Interface && accepts[0].Implements(typeContext) {
+		if len(accepts) > 0 && accepts[0].Kind() == reflect.Interface && accepts[0].Implements(typeContext) {
 			dm.AcceptsContext = true
 			accepts = accepts[1:]
 		}
@@ -74,7 +74,7 @@ func parseMethods(input interface{}, isClient bool) ([]*Method, error) {
 			dm.AcceptsOptions = true
 			accepts = accepts[:len(accepts)-1]
 		}
-		if isClient && m.Type.IsVariadic() && len(accepts) > 0 && accepts[len(accepts)-1] == typeClientOptions {
+		if isClient && m.Type.IsVariadic() && len(accepts) > 0 && accepts[len(accepts)-1].String() == typeClientOptions.String() {
 			dm.AcceptsOptions = true
 			accepts = accepts[:len(accepts)-1]
 		}

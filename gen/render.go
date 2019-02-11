@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"reflect"
 	"strings"
 	"text/template"
@@ -10,12 +11,23 @@ import (
 
 var tmpl *template.Template
 
-func init() {
+func initTemplates(root string) {
 	var err error
-	tmpl, err = template.ParseGlob("templates/*")
+	tmpl, err = template.ParseGlob(root + "/*")
 	if err != nil {
 		panic(err)
 	}
+}
+
+func RenderMockGo(filename string, same []*Method) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	for _, m := range same {
+		fmt.Printf("%s", m.Name)
+	}
+	return tmpl.ExecuteTemplate(file, "mockgo.tmpl", same)
 }
 
 func RenderDriverMethod(m *Method) (string, error) {
@@ -145,7 +157,7 @@ func (m *Method) ExpectedReturns() string {
 func (m *Method) ReturnTypes() string {
 	args := make([]string, len(m.Returns))
 	for i, ret := range m.Returns {
-		args[i] = fmt.Sprintf("ret%d %s", i, ret.Name())
+		args[i] = fmt.Sprintf("ret%d %s", i, ret.String())
 	}
 	return strings.Join(args, ", ")
 }

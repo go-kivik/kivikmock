@@ -45,13 +45,13 @@ func (e *ExpectedClose) WillDelay(d time.Duration) *ExpectedClose {
 	return e
 }
 
-// ExpectedAllDBs is used to manage *kivik.Client.AllDBs expectation returned
-// by Mock.ExpectAllDBs.
-type ExpectedAllDBs struct {
-	commonExpectation
-	options map[string]interface{}
-	results []string
-}
+// // ExpectedAllDBs is used to manage *kivik.Client.AllDBs expectation returned
+// // by Mock.ExpectAllDBs.
+// type ExpectedAllDBs struct {
+// 	commonExpectation
+// 	options map[string]interface{}
+// 	results []string
+// }
 
 func (e *ExpectedAllDBs) method(v bool) string {
 	if v {
@@ -77,31 +77,6 @@ func (e *ExpectedAllDBs) String() string {
 		optionsString(e.options) +
 		delayString(e.delay) +
 		errorString(e.err)
-}
-
-// WillReturnError allows setting an error for *kivik.Client.Close action.
-func (e *ExpectedAllDBs) WillReturnError(err error) *ExpectedAllDBs {
-	e.err = err
-	return e
-}
-
-// WithOptions will match the provided options against actual options passed
-// during execution.
-func (e *ExpectedAllDBs) WithOptions(options kivik.Options) *ExpectedAllDBs {
-	e.options = options
-	return e
-}
-
-// WillReturn sets the expected results.
-func (e *ExpectedAllDBs) WillReturn(results []string) *ExpectedAllDBs {
-	e.results = results
-	return e
-}
-
-// WillDelay will cause execution of AllDBs() to delay by duration d.
-func (e *ExpectedAllDBs) WillDelay(d time.Duration) *ExpectedAllDBs {
-	e.delay = d
-	return e
 }
 
 // ExpectedAuthenticate is used to manage *kivik.Client.Authenticate
@@ -279,22 +254,22 @@ func (e *ExpectedClusterStatus) WillDelay(d time.Duration) *ExpectedClusterStatu
 	return e
 }
 
-// ExpectedDBExists is used to manage *kivik.Client.DBExists expectation
-// returned by Mock.ExpectDBExists.
-type ExpectedDBExists struct {
-	commonExpectation
-	name    string
-	options map[string]interface{}
-	exists  bool
-}
+// // ExpectedDBExists is used to manage *kivik.Client.DBExists expectation
+// // returned by Mock.ExpectDBExists.
+// type ExpectedDBExists struct {
+// 	commonExpectation
+// 	name    string
+// 	options map[string]interface{}
+// 	exists  bool
+// }
 
 func (e *ExpectedDBExists) String() string {
 	msg := "call to DBExists() which:" +
-		nameString(e.name) +
+		nameString(e.arg0) +
 		optionsString(e.options) +
 		delayString(e.delay)
 	if e.err == nil {
-		msg += fmt.Sprintf("\n\t- should return: %t", e.exists)
+		msg += fmt.Sprintf("\n\t- should return: %t", e.ret0)
 	} else {
 		msg += fmt.Sprintf("\n\t- should return error: %s", e.err)
 	}
@@ -306,10 +281,10 @@ func (e *ExpectedDBExists) method(v bool) string {
 		return "DBExists()"
 	}
 	var name, options string
-	if e.name == "" {
+	if e.arg0 == "" {
 		name = "?"
 	} else {
-		name = fmt.Sprintf("%q", e.name)
+		name = fmt.Sprintf("%q", e.arg0)
 	}
 	if e.options == nil {
 		options = "?"
@@ -321,10 +296,10 @@ func (e *ExpectedDBExists) method(v bool) string {
 
 func (e *ExpectedDBExists) met(ex expectation) bool {
 	exp := ex.(*ExpectedDBExists)
-	if exp.options == nil && exp.name == "" {
+	if exp.options == nil && exp.arg0 == "" {
 		return true
 	}
-	nameOK := exp.name == "" || exp.name == e.name
+	nameOK := exp.arg0 == "" || exp.arg0 == e.arg0
 	optionsOK := exp.options == nil || reflect.DeepEqual(exp.options, e.options)
 	return nameOK && optionsOK
 }
@@ -332,46 +307,21 @@ func (e *ExpectedDBExists) met(ex expectation) bool {
 // WithName sets the expectation that DBExists will be called with the provided
 // name.
 func (e *ExpectedDBExists) WithName(name string) *ExpectedDBExists {
-	e.name = name
+	e.arg0 = name
 	return e
 }
 
-// WithOptions sets the expectation that DBExists will be called with the
-// provided options.
-func (e *ExpectedDBExists) WithOptions(options map[string]interface{}) *ExpectedDBExists {
-	e.options = options
-	return e
-}
-
-// WillReturn sets the value to be returned by the DBExists call.
-func (e *ExpectedDBExists) WillReturn(exists bool) *ExpectedDBExists {
-	e.exists = exists
-	return e
-}
-
-// WillReturnError sets the error to be returned by the DBExists call.
-func (e *ExpectedDBExists) WillReturnError(err error) *ExpectedDBExists {
-	e.err = err
-	return e
-}
-
-// WillDelay causes DBExists to delay before returning.
-func (e *ExpectedDBExists) WillDelay(delay time.Duration) *ExpectedDBExists {
-	e.delay = delay
-	return e
-}
-
-// ExpectedDestroyDB is used to manage *kivik.Client.DestroyDB expectation
-// returned by Mock.DestroyDB.
-type ExpectedDestroyDB struct {
-	commonExpectation
-	name    string
-	options map[string]interface{}
-}
+// // ExpectedDestroyDB is used to manage *kivik.Client.DestroyDB expectation
+// // returned by Mock.DestroyDB.
+// type ExpectedDestroyDB struct {
+// 	commonExpectation
+// 	name    string
+// 	options map[string]interface{}
+// }
 
 func (e *ExpectedDestroyDB) String() string {
 	return "call to DestroyDB() which:" +
-		nameString(e.name) +
+		nameString(e.arg0) +
 		optionsString(e.options) +
 		delayString(e.delay) +
 		errorString(e.err)
@@ -382,10 +332,10 @@ func (e *ExpectedDestroyDB) method(v bool) string {
 		return "DestroyDB()"
 	}
 	var name, options string
-	if e.name == "" {
+	if e.arg0 == "" {
 		name = "?"
 	} else {
-		name = fmt.Sprintf("%q", e.name)
+		name = fmt.Sprintf("%q", e.arg0)
 	}
 	if e.options == nil {
 		options = "?"
@@ -397,36 +347,14 @@ func (e *ExpectedDestroyDB) method(v bool) string {
 
 func (e *ExpectedDestroyDB) met(ex expectation) bool {
 	exp := ex.(*ExpectedDestroyDB)
-	if exp.name == "" && exp.options == nil {
-		return true
-	}
-	nameOK := exp.name == "" || exp.name == e.name
+	nameOK := exp.arg0 == "" || exp.arg0 == e.arg0
 	optionsOK := exp.options == nil || reflect.DeepEqual(exp.options, e.options)
 	return nameOK && optionsOK
 }
 
 // WithName sets the expectation that DestroyDB will be called with this name.
 func (e *ExpectedDestroyDB) WithName(name string) *ExpectedDestroyDB {
-	e.name = name
-	return e
-}
-
-// WithOptions sets the expectation that DestroyDB will be called with these
-// options.
-func (e *ExpectedDestroyDB) WithOptions(options map[string]interface{}) *ExpectedDestroyDB {
-	e.options = options
-	return e
-}
-
-// WillReturnError causes DestroyDB to return this error.
-func (e *ExpectedDestroyDB) WillReturnError(err error) *ExpectedDestroyDB {
-	e.err = err
-	return e
-}
-
-// WillDelay will cause execution of DestroyDB to delay by duration d.
-func (e *ExpectedDestroyDB) WillDelay(delay time.Duration) *ExpectedDestroyDB {
-	e.delay = delay
+	e.arg0 = name
 	return e
 }
 
@@ -630,14 +558,14 @@ func (e *ExpectedVersion) WillDelay(delay time.Duration) *ExpectedVersion {
 // ExpectedDB represents an expectation to call the DB() method.
 type ExpectedDB struct {
 	commonExpectation
-	name    string
+	arg0    string
 	options map[string]interface{}
 	db      *MockDB
 }
 
 func (e *ExpectedDB) String() string {
 	msg := "call to DB() which:" +
-		nameString(e.name) +
+		nameString(e.arg0) +
 		optionsString(e.options)
 	if e.db != nil {
 		msg += fmt.Sprintf("\n\t- should return database with %d expectations", e.db.expectations())
@@ -651,10 +579,10 @@ func (e *ExpectedDB) method(v bool) string {
 		return "DB()"
 	}
 	var name, options string
-	if e.name == "" {
+	if e.arg0 == "" {
 		name = "?"
 	} else {
-		name = fmt.Sprintf("%q", e.name)
+		name = fmt.Sprintf("%q", e.arg0)
 	}
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
@@ -664,14 +592,14 @@ func (e *ExpectedDB) method(v bool) string {
 
 func (e *ExpectedDB) met(ex expectation) bool {
 	exp := ex.(*ExpectedDB)
-	nameOK := exp.name == "" || exp.name == e.name
+	nameOK := exp.arg0 == "" || exp.arg0 == e.arg0
 	optionsOK := exp.options == nil || reflect.DeepEqual(exp.options, e.options)
 	return nameOK && optionsOK
 }
 
 // WithName sets the expectation that DB() will be called with this name.
 func (e *ExpectedDB) WithName(name string) *ExpectedDB {
-	e.name = name
+	e.arg0 = name
 	return e
 }
 
@@ -709,7 +637,7 @@ func (e *ExpectedDB) WillDelay(delay time.Duration) *ExpectedDB {
 // expectation is removed.
 type ExpectedCreateDB struct {
 	commonExpectation
-	name       string
+	arg0       string
 	options    map[string]interface{}
 	db         *MockDB
 	expectedDB *ExpectedDB
@@ -717,7 +645,7 @@ type ExpectedCreateDB struct {
 
 func (e *ExpectedCreateDB) String() string {
 	msg := "call to CreateDB() which:" +
-		nameString(e.name) +
+		nameString(e.arg0) +
 		optionsString(e.options)
 	if e.db != nil {
 		msg += fmt.Sprintf("\n\t- should return database with %d expectations", e.db.expectations())
@@ -731,10 +659,10 @@ func (e *ExpectedCreateDB) method(v bool) string {
 		return "CreateDB()"
 	}
 	var name, options string
-	if e.name == "" {
+	if e.arg0 == "" {
 		name = "?"
 	} else {
-		name = fmt.Sprintf("%q", e.name)
+		name = fmt.Sprintf("%q", e.arg0)
 	}
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
@@ -744,21 +672,21 @@ func (e *ExpectedCreateDB) method(v bool) string {
 
 func (e *ExpectedCreateDB) met(ex expectation) bool {
 	exp := ex.(*ExpectedCreateDB)
-	nameOK := exp.name == "" || exp.name == e.name
+	nameOK := exp.arg0 == "" || exp.arg0 == e.arg0
 	optionsOK := exp.options == nil || reflect.DeepEqual(exp.options, e.options)
 	return nameOK && optionsOK
-}
-
-// WithName sets the expectation that DB() will be called with this name.
-func (e *ExpectedCreateDB) WithName(name string) *ExpectedCreateDB {
-	e.expectedDB.name = name
-	e.name = name
-	return e
 }
 
 // WithOptions set the expectation that DB() will be called with these options.
 func (e *ExpectedCreateDB) WithOptions(options map[string]interface{}) *ExpectedCreateDB {
 	e.options = options
+	return e
+}
+
+// WithName sets the expectation that DB() will be called with this name.
+func (e *ExpectedCreateDB) WithName(name string) *ExpectedCreateDB {
+	e.expectedDB.arg0 = name
+	e.arg0 = name
 	return e
 }
 
@@ -768,10 +696,9 @@ func (e *ExpectedCreateDB) WillReturn(db *MockDB) *ExpectedCreateDB {
 	return e
 }
 
-// WillReturnError sets the return value for the backend CreateDB() call. Note
-// that kivik defers these errors until the next db call, or the Err() method.
+// WillReturnError sets the return value for the DB() call.
 func (e *ExpectedCreateDB) WillReturnError(err error) *ExpectedCreateDB {
-	e.expectedDB.err = err
+	e.err = err
 	return e
 }
 

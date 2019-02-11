@@ -160,7 +160,7 @@ func TestDBExistsString(t *testing.T) {
 	- should return: false`,
 	})
 	tests.Add("full", stringerTest{
-		input: &ExpectedDBExists{name: "foo", exists: true, options: map[string]interface{}{"foo": 123}},
+		input: &ExpectedDBExists{arg0: "foo", ret0: true, options: map[string]interface{}{"foo": 123}},
 		expected: `call to DBExists() which:
 	- has name: foo
 	- has options: map[foo:123]
@@ -193,7 +193,7 @@ func TestDestroyDBString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("name", stringerTest{
-		input: &ExpectedDestroyDB{name: "foo"},
+		input: &ExpectedDestroyDB{arg0: "foo"},
 		expected: `call to DestroyDB() which:
 	- has name: foo
 	- has any options`,
@@ -291,7 +291,7 @@ func TestCreateDBString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("name", stringerTest{
-		input: &ExpectedCreateDB{name: "foo"},
+		input: &ExpectedCreateDB{arg0: "foo"},
 		expected: `call to CreateDB() which:
 	- has name: foo
 	- has any options`,
@@ -315,7 +315,7 @@ func TestDBString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("name", stringerTest{
-		input: &ExpectedDB{name: "foo"},
+		input: &ExpectedDB{arg0: "foo"},
 		expected: `call to DB() which:
 	- has name: foo
 	- has any options`,
