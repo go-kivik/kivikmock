@@ -5,5 +5,5 @@ package kivikmock
 import "time"
 
 {{ range $method := . -}}
-{{template "expectedtype.tmpl" $method}}
-{{- end }}
+{{ template "expectedtype.tmpl" $method -}}
+{{- end -}}

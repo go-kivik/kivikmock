@@ -4,7 +4,6 @@ package kivikmock
 
 import "time"
 
-
 // ExpectedAllDBs represents an expectation for a call to AllDBs().
 type ExpectedAllDBs struct {
 	commonExpectation
@@ -35,7 +34,6 @@ func (e *ExpectedAllDBs) WillDelay(delay time.Duration) *ExpectedAllDBs {
 	e.delay = delay
 	return e
 }
-
 
 // ExpectedDBExists represents an expectation for a call to DBExists().
 type ExpectedDBExists struct {
@@ -69,7 +67,6 @@ func (e *ExpectedDBExists) WillDelay(delay time.Duration) *ExpectedDBExists {
 	return e
 }
 
-
 // ExpectedDestroyDB represents an expectation for a call to DestroyDB().
 type ExpectedDestroyDB struct {
 	commonExpectation
@@ -83,8 +80,6 @@ func (e *ExpectedDestroyDB) WithOptions(options map[string]interface{}) *Expecte
 	return e
 }
 
-
-
 // WillReturnError sets the error value that will be returned by the call to DestroyDB().
 func (e *ExpectedDestroyDB) WillReturnError(err error) *ExpectedDestroyDB {
 	e.err = err
@@ -96,5 +91,4 @@ func (e *ExpectedDestroyDB) WillDelay(delay time.Duration) *ExpectedDestroyDB {
 	e.delay = delay
 	return e
 }
-
 

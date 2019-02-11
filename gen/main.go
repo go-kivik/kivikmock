@@ -33,7 +33,7 @@ func client() error {
 	}
 	same, _, _ := compareMethods(client, driver)
 
-	if err := RenderMockGo("expectations_gen.go", same); err != nil {
+	if err := RenderMockGo("clientexpectations_gen.go", same); err != nil {
 		return err
 	}
 	return nil

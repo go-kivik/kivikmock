@@ -3,16 +3,14 @@ type Expected{{ .Name }} struct {
 	commonExpectation
 {{ .VariableDefinitions 1 }}
 }
-
-{{ if .AcceptsOptions -}}
+{{ if .AcceptsOptions }}
 // WithOptions sets the expected options for the call to {{if .DBMethod}}DB.{{end}}{{.Name}}().
 func (e *Expected{{.Name}}) WithOptions(options map[string]interface{}) *Expected{{.Name}} {
 	e.options = options
 	return e
 }
-{{- end }}
-
-{{ if ne (len .Returns) 0 -}}
+{{ end }}
+{{- if ne (len .Returns) 0 }}
 // WillReturn sets the values that will be returned by the call to {{if .DBMethod}}DB.{{end}}{{.Name}}().
 func (e *Expected{{.Name}}) WillReturn({{.ReturnTypes}}) *Expected{{.Name}} {
 {{- range $i, $discard := .Returns }}
@@ -20,20 +18,18 @@ func (e *Expected{{.Name}}) WillReturn({{.ReturnTypes}}) *Expected{{.Name}} {
 {{- end }}
 	return e
 }
-{{- end }}
-
-{{ if .ReturnsError -}}
+{{ end }}
+{{- if .ReturnsError }}
 // WillReturnError sets the error value that will be returned by the call to {{if .DBMethod}}DB.{{end}}{{.Name}}().
 func (e *Expected{{.Name}}) WillReturnError(err error) *Expected{{.Name}} {
 	e.err = err
 	return e
 }
-{{- end }}
-
-{{ if .AcceptsContext -}}
+{{ end }}
+{{- if .AcceptsContext }}
 // WillDelay causes the call to {{if .DBMethod}}DB.{{end}}{{.Name}}() to delay.
 func (e *Expected{{.Name}}) WillDelay(delay time.Duration) *Expected{{.Name}} {
 	e.delay = delay
 	return e
 }
-{{ end -}}
+{{ end }}

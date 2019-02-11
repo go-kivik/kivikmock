@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"sort"
 	"strings"
 	"text/template"
 )
@@ -24,9 +25,9 @@ func RenderMockGo(filename string, same []*Method) error {
 	if err != nil {
 		return err
 	}
-	for _, m := range same {
-		fmt.Printf("%s", m.Name)
-	}
+	sort.Slice(same, func(i, j int) bool {
+		return same[i].Name < same[j].Name
+	})
 	return tmpl.ExecuteTemplate(file, "mockgo.tmpl", same)
 }
 
