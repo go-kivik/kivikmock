@@ -2,7 +2,7 @@
 type ExpectedCreateDoc struct {
 	commonExpectation
 	db      *MockDB
-	arg0    interface {}
+	arg0    interface{}
 	options map[string]interface{}
 	ret0    string
 	ret1    string
@@ -32,4 +32,3 @@ func (e *ExpectedCreateDoc) WillDelay(delay time.Duration) *ExpectedCreateDoc {
 	e.delay = delay
 	return e
 }
-

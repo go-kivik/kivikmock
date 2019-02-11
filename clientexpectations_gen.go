@@ -56,7 +56,7 @@ func (e *ExpectedClose) WillDelay(delay time.Duration) *ExpectedClose {
 // ExpectedClusterSetup represents an expectation for a call to ClusterSetup().
 type ExpectedClusterSetup struct {
 	commonExpectation
-	arg0 interface {}
+	arg0 interface{}
 }
 
 // WillReturnError sets the error value that will be returned by the call to ClusterSetup().

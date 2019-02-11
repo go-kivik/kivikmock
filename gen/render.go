@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-	"sort"
 	"strings"
 	"text/template"
 )
@@ -20,15 +19,20 @@ func initTemplates(root string) {
 	}
 }
 
-func RenderMockGo(filename string, same []*Method) error {
+func RenderExpectationsGo(filename string, methods []*Method) error {
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
-	sort.Slice(same, func(i, j int) bool {
-		return same[i].Name < same[j].Name
-	})
-	return tmpl.ExecuteTemplate(file, "mockgo.tmpl", same)
+	return tmpl.ExecuteTemplate(file, "expectations.go.tmpl", methods)
+}
+
+func RenderMockGo(filename string, methods []*Method) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	return tmpl.ExecuteTemplate(file, "mock.go.tmpl", methods)
 }
 
 func RenderDriverMethod(m *Method) (string, error) {
@@ -55,7 +59,7 @@ func (m *Method) DriverArgs() string {
 		args = append(args, "ctx context.Context")
 	}
 	for i, arg := range m.Accepts {
-		args = append(args, fmt.Sprintf("arg%d %s", i, arg.Name()))
+		args = append(args, fmt.Sprintf("arg%d %s", i, typeName(arg)))
 	}
 	if m.AcceptsOptions {
 		args = append(args, "options map[string]interface{}")
@@ -86,7 +90,7 @@ func (m *Method) VariableDefinitions(indent int) string {
 	}
 	for i, arg := range m.Accepts {
 		args = append(args, fmt.Sprintf("arg%d", i))
-		types = append(types, fmt.Sprintf("%s", arg))
+		types = append(types, typeName(arg))
 	}
 	if m.AcceptsOptions {
 		args = append(args, "options")
@@ -94,7 +98,7 @@ func (m *Method) VariableDefinitions(indent int) string {
 	}
 	for i, ret := range m.Returns {
 		args = append(args, fmt.Sprintf("ret%d", i))
-		types = append(types, fmt.Sprintf("%s", ret))
+		types = append(types, typeName(ret))
 	}
 	var maxLen int
 	for _, arg := range args {
@@ -161,4 +165,12 @@ func (m *Method) ReturnTypes() string {
 		args[i] = fmt.Sprintf("ret%d %s", i, ret.String())
 	}
 	return strings.Join(args, ", ")
+}
+
+func typeName(t reflect.Type) string {
+	name := t.String()
+	if name == "interface {}" {
+		name = "interface{}"
+	}
+	return name
 }

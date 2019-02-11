@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"reflect"
+	"sort"
 
 	"github.com/go-kivik/kivik"
 	"github.com/go-kivik/kivik/driver"
@@ -55,7 +56,10 @@ func client() error {
 	}
 	same, _, _ := compareMethods(client, dMethods)
 
-	if err := RenderMockGo("clientexpectations_gen.go", same); err != nil {
+	if err := RenderExpectationsGo("clientexpectations_gen.go", same); err != nil {
+		return err
+	}
+	if err := RenderMockGo("clientmock_gen.go", same); err != nil {
 		return err
 	}
 	return nil
@@ -97,7 +101,7 @@ func db() error {
 		method.DBMethod = true
 	}
 
-	if err := RenderMockGo("dbexpectations_gen.go", same); err != nil {
+	if err := RenderExpectationsGo("dbexpectations_gen.go", same); err != nil {
 		return err
 	}
 	return nil
@@ -124,6 +128,9 @@ func toSlice(methods map[string]*Method) []*Method {
 	for _, method := range methods {
 		result = append(result, method)
 	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Name < result[j].Name
+	})
 	return result
 }
 
