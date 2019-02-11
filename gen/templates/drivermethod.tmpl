@@ -1,0 +1,9 @@
+func ({{if .DBMethod}}db *driverDB{{else}}c *driverClient{{end}}) {{ .Name }}({{ .DriverArgs }}) {{ .ReturnArgs }} {
+	expected := &Expected{{ .Name }}{
+{{ .InputVariables 2 }}
+	}
+	if err := {{if .DBMethod}}db.client{{else}}c{{end}}.nextExpectation(expected); err != nil {
+		return {{ .ZeroReturns }}
+	}
+	return {{ .ExpectedReturns }}
+}

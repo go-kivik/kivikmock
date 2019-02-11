@@ -22,7 +22,7 @@
 
 [[constraint]]
   name = "github.com/flimzy/testy"
-  version = "0.0.13"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/go-kivik/kivik"
@@ -30,4 +30,8 @@
 
 [[constraint]]
   name = "github.com/go-kivik/couchdb"
+  branch = "master"
+
+[[constraint]]
+  name = "github.com/flimzy/diff"
   branch = "master"

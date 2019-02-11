@@ -8,15 +8,12 @@ function join_list {
 
 case "$1" in
     "standard")
-        ./travis/test_version.sh
         go test -race ./...
     ;;
     "gopherjs")
         gopherjs test ./...
     ;;
     "linter")
-        go install # to make gotype (run by gometalinter) happy
-        go test -i
         gometalinter.v2 --config=.linter.json
     ;;
     "coverage")

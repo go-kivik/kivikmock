@@ -104,7 +104,7 @@ func TestClusterSetupString(t *testing.T) {
 	- has any action`,
 	})
 	tests.Add("action", stringerTest{
-		input: &ExpectedClusterSetup{action: map[string]string{"foo": "bar"}},
+		input: &ExpectedClusterSetup{arg0: map[string]string{"foo": "bar"}},
 		expected: `call to ClusterSetup() which:
 	- has the action: map[foo:bar]`,
 	})
@@ -160,7 +160,7 @@ func TestDBExistsString(t *testing.T) {
 	- should return: false`,
 	})
 	tests.Add("full", stringerTest{
-		input: &ExpectedDBExists{name: "foo", exists: true, options: map[string]interface{}{"foo": 123}},
+		input: &ExpectedDBExists{arg0: "foo", ret0: true, options: map[string]interface{}{"foo": 123}},
 		expected: `call to DBExists() which:
 	- has name: foo
 	- has options: map[foo:123]
@@ -193,7 +193,7 @@ func TestDestroyDBString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("name", stringerTest{
-		input: &ExpectedDestroyDB{name: "foo"},
+		input: &ExpectedDestroyDB{arg0: "foo"},
 		expected: `call to DestroyDB() which:
 	- has name: foo
 	- has any options`,
@@ -291,7 +291,7 @@ func TestCreateDBString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("name", stringerTest{
-		input: &ExpectedCreateDB{name: "foo"},
+		input: &ExpectedCreateDB{arg0: "foo"},
 		expected: `call to CreateDB() which:
 	- has name: foo
 	- has any options`,
@@ -315,7 +315,7 @@ func TestDBString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("name", stringerTest{
-		input: &ExpectedDB{name: "foo"},
+		input: &ExpectedDB{arg0: "foo"},
 		expected: `call to DB() which:
 	- has name: foo
 	- has any options`,
@@ -458,21 +458,21 @@ func TestCreateIndexString(t *testing.T) {
 	- has any index`,
 	})
 	tests.Add("ddoc", stringerTest{
-		input: &ExpectedCreateIndex{db: &MockDB{name: "foo"}, ddoc: "foo"},
+		input: &ExpectedCreateIndex{db: &MockDB{name: "foo"}, arg0: "foo"},
 		expected: `call to DB(foo#0).CreateIndex() which:
 	- has ddoc: foo
 	- has any name
 	- has any index`,
 	})
 	tests.Add("name", stringerTest{
-		input: &ExpectedCreateIndex{db: &MockDB{name: "foo"}, name: "foo"},
+		input: &ExpectedCreateIndex{db: &MockDB{name: "foo"}, arg1: "foo"},
 		expected: `call to DB(foo#0).CreateIndex() which:
 	- has any ddoc
 	- has name: foo
 	- has any index`,
 	})
 	tests.Add("index", stringerTest{
-		input: &ExpectedCreateIndex{db: &MockDB{name: "foo"}, index: map[string]string{"foo": "bar"}},
+		input: &ExpectedCreateIndex{db: &MockDB{name: "foo"}, arg2: map[string]string{"foo": "bar"}},
 		expected: `call to DB(foo#0).CreateIndex() which:
 	- has any ddoc
 	- has any name
@@ -509,13 +509,13 @@ func TestDeleteIndexString(t *testing.T) {
 	- has any name`,
 	})
 	tests.Add("ddoc", stringerTest{
-		input: &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, ddoc: "foo"},
+		input: &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, arg0: "foo"},
 		expected: `call to DB(foo#0).DeleteIndex() which:
 	- has ddoc: foo
 	- has any name`,
 	})
 	tests.Add("name", stringerTest{
-		input: &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, name: "foo"},
+		input: &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, arg1: "foo"},
 		expected: `call to DB(foo#0).DeleteIndex() which:
 	- has any ddoc
 	- has name: foo`,
@@ -559,7 +559,7 @@ func TestCreateDocString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("doc", stringerTest{
-		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, doc: map[string]string{"foo": "bar"}},
+		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, arg0: map[string]string{"foo": "bar"}},
 		expected: `call to DB(foo#0).CreateDoc() which:
 	- has doc: map[foo:bar]
 	- has any options`,
@@ -585,14 +585,14 @@ func TestCreateDocString(t *testing.T) {
 	- should delay for: 1s`,
 	})
 	tests.Add("docID", stringerTest{
-		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, docID: "foo"},
+		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, ret0: "foo"},
 		expected: `call to DB(foo#0).CreateDoc() which:
 	- has any doc
 	- has any options
 	- should return docID: foo`,
 	})
 	tests.Add("rev", stringerTest{
-		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, rev: "1-foo"},
+		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, ret1: "1-foo"},
 		expected: `call to DB(foo#0).CreateDoc() which:
 	- has any doc
 	- has any options
