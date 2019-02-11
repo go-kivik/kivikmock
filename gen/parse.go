@@ -87,7 +87,7 @@ func parseMethods(input interface{}, isClient bool) ([]*Method, error) {
 		for j := 0; j < m.Type.NumOut(); j++ {
 			returns[j] = m.Type.Out(j)
 		}
-		if returns[len(returns)-1] == typeError {
+		if len(returns) > 0 && returns[len(returns)-1] == typeError {
 			dm.ReturnsError = true
 			returns = returns[:len(returns)-1]
 		}
