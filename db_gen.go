@@ -146,4 +146,3 @@ func (db *driverDB) ViewCleanup(ctx context.Context) error {
 	}
 	return expected.wait(ctx)
 }
-

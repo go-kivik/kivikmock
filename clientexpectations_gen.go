@@ -38,7 +38,6 @@ func (e *ExpectedAllDBs) WillDelay(delay time.Duration) *ExpectedAllDBs {
 // ExpectedClose represents an expectation for a call to Close().
 type ExpectedClose struct {
 	commonExpectation
-
 }
 
 // WillReturnError sets the error value that will be returned by the call to Close().
@@ -182,4 +181,3 @@ func (e *ExpectedPing) WillDelay(delay time.Duration) *ExpectedPing {
 	e.delay = delay
 	return e
 }
-

@@ -15,9 +15,7 @@ func (c *driverClient) AllDBs(ctx context.Context, options map[string]interface{
 }
 
 func (c *driverClient) Close(ctx context.Context) error {
-	expected := &ExpectedClose{
-
-	}
+	expected := &ExpectedClose{}
 	if err := c.nextExpectation(expected); err != nil {
 		return err
 	}
@@ -67,12 +65,9 @@ func (c *driverClient) DestroyDB(ctx context.Context, arg0 string, options map[s
 }
 
 func (c *driverClient) Ping(ctx context.Context) (bool, error) {
-	expected := &ExpectedPing{
-
-	}
+	expected := &ExpectedPing{}
 	if err := c.nextExpectation(expected); err != nil {
 		return false, err
 	}
 	return expected.ret0, expected.wait(ctx)
 }
-
