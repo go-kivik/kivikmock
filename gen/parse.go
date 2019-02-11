@@ -19,6 +19,7 @@ type Method struct {
 	AcceptsContext bool
 	AcceptsOptions bool
 	ReturnsError   bool
+	DBMethod       bool
 }
 
 var (
@@ -29,7 +30,7 @@ var (
 	typeString        = reflect.TypeOf("")
 )
 
-func parseDriverMethods(input interface{}, isClient bool) ([]*Method, error) {
+func parseMethods(input interface{}, isClient bool) ([]*Method, error) {
 	var hasReceiver bool
 	t := reflect.TypeOf(input)
 	if t.Kind() != reflect.Struct {

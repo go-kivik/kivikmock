@@ -1,0 +1,34 @@
+// ExpectedCreateDoc represents an expectation for a call to DB.CreateDoc().
+type ExpectedCreateDoc struct {
+	commonExpectation
+	db      *MockDB
+	arg0    interface {}
+	options map[string]interface{}
+	ret0    string
+	ret1    string
+}
+
+// WithOptions sets the expected options for the call to DB.CreateDoc().
+func (e *ExpectedCreateDoc) WithOptions(options map[string]interface{}) *ExpectedCreateDoc {
+	e.options = options
+	return e
+}
+
+// WillReturn sets the values that will be returned by the call to DB.CreateDoc().
+func (e *ExpectedCreateDoc) WillReturn(ret0 string, ret1 string) *ExpectedCreateDoc {
+	e.ret0 = ret0
+	e.ret1 = ret1
+	return e
+}
+
+// WillReturnError sets the error value that will be returned by the call to DB.CreateDoc().
+func (e *ExpectedCreateDoc) WillReturnError(err error) *ExpectedCreateDoc {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to DB.CreateDoc() to delay.
+func (e *ExpectedCreateDoc) WillDelay(delay time.Duration) *ExpectedCreateDoc {
+	e.delay = delay
+	return e
+}

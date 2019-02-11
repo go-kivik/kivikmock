@@ -24,7 +24,7 @@ func (c *testClient) WithCtx(_ context.Context) error          { return nil }
 func (c *testClient) NoCtx(_ string) error                     { return nil }
 func (c *testClient) WithOptions(_ string, _ ...kivik.Options) {}
 
-func TestDriverMethods(t *testing.T) {
+func TestMethods(t *testing.T) {
 	type tst struct {
 		input    interface{}
 		isClient bool
@@ -97,7 +97,7 @@ func TestDriverMethods(t *testing.T) {
 	})
 
 	tests.Run(t, func(t *testing.T, test tst) {
-		result, err := parseDriverMethods(test.input, test.isClient)
+		result, err := parseMethods(test.input, test.isClient)
 		testy.Error(t, test.err, err)
 		if d := diff.Interface(test.expected, result); d != nil {
 			t.Error(d)

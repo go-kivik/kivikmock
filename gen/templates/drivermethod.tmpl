@@ -1,0 +1,9 @@
+func (c *driverClient) {{ .Name }}({{ .DriverArgs }}) {{ .ReturnArgs }} {
+	expected := &Expected{{ .Name }}{
+{{ .Variables 2 }}
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return {{ .ZeroReturns }}
+	}
+	return {{ .ExpectedReturns }}
+}
