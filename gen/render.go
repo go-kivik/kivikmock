@@ -125,8 +125,12 @@ func (m *Method) inputVars() []string {
 }
 
 func (m *Method) InputVariables(indent int) string {
-	args := m.inputVars()
-	return alignVars(indent, args)
+	args := []string{}
+	if m.DBMethod {
+		args = append(args, "db")
+	}
+	args = append(args, m.inputVars()...)
+	return strings.Replace(alignVars(indent, args), "db,", "db.MockDB,", 1) // amazingly ugly hack
 }
 
 func (m *Method) Variables(indent int) string {

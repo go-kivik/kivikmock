@@ -557,3 +557,31 @@ func (e *ExpectedCreateDoc) WithDoc(doc interface{}) *ExpectedCreateDoc {
 	e.arg0 = doc
 	return e
 }
+
+func (e *ExpectedCompact) String() string                   { return "" }
+func (e *ExpectedCompact) method(v bool) string             { return "" }
+func (e *ExpectedCompact) met(ex expectation) bool          { return false }
+func (e *ExpectedViewCleanup) String() string               { return "" }
+func (e *ExpectedViewCleanup) method(v bool) string         { return "" }
+func (e *ExpectedViewCleanup) met(ex expectation) bool      { return false }
+func (e *ExpectedPut) String() string                       { return "" }
+func (e *ExpectedPut) method(v bool) string                 { return "" }
+func (e *ExpectedPut) met(ex expectation) bool              { return false }
+func (e *ExpectedGetMeta) String() string                   { return "" }
+func (e *ExpectedGetMeta) method(v bool) string             { return "" }
+func (e *ExpectedGetMeta) met(ex expectation) bool          { return false }
+func (e *ExpectedFlush) String() string                     { return "" }
+func (e *ExpectedFlush) method(v bool) string               { return "" }
+func (e *ExpectedFlush) met(ex expectation) bool            { return false }
+func (e *ExpectedDeleteAttachment) String() string          { return "" }
+func (e *ExpectedDeleteAttachment) method(v bool) string    { return "" }
+func (e *ExpectedDeleteAttachment) met(ex expectation) bool { return false }
+func (e *ExpectedDelete) String() string                    { return "" }
+func (e *ExpectedDelete) method(v bool) string              { return "" }
+func (e *ExpectedDelete) met(ex expectation) bool           { return false }
+func (e *ExpectedCopy) String() string                      { return "" }
+func (e *ExpectedCopy) method(v bool) string                { return "" }
+func (e *ExpectedCopy) met(ex expectation) bool             { return false }
+func (e *ExpectedCompactView) String() string               { return "" }
+func (e *ExpectedCompactView) method(v bool) string         { return "" }
+func (e *ExpectedCompactView) met(ex expectation) bool      { return false }

@@ -104,6 +104,9 @@ func db() error {
 	if err := RenderExpectationsGo("dbexpectations_gen.go", same); err != nil {
 		return err
 	}
+	if err := RenderMockGo("db_gen.go", same); err != nil {
+		return err
+	}
 	return nil
 }
 

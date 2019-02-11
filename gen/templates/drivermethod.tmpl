@@ -1,8 +1,8 @@
-func (c *driverClient) {{ .Name }}({{ .DriverArgs }}) {{ .ReturnArgs }} {
+func ({{if .DBMethod}}db *driverDB{{else}}c *driverClient{{end}}) {{ .Name }}({{ .DriverArgs }}) {{ .ReturnArgs }} {
 	expected := &Expected{{ .Name }}{
 {{ .InputVariables 2 }}
 	}
-	if err := c.nextExpectation(expected); err != nil {
+	if err := {{if .DBMethod}}db.client{{else}}c{{end}}.nextExpectation(expected); err != nil {
 		return {{ .ZeroReturns }}
 	}
 	return {{ .ExpectedReturns }}
