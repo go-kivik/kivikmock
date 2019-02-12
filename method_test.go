@@ -499,3 +499,28 @@ func TestDeleteAttachmentMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestDeleteMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedDelete{db: &MockDB{name: "foo"}},
+		standard: "DB.Delete()",
+		verbose:  "DB(foo).Delete(ctx, ?, ?)",
+	})
+	tests.Add("docID", methodTest{
+		input:    &ExpectedDelete{db: &MockDB{name: "foo"}, arg0: "foo"},
+		standard: "DB.Delete()",
+		verbose:  `DB(foo).Delete(ctx, "foo", ?)`,
+	})
+	tests.Add("rev", methodTest{
+		input:    &ExpectedDelete{db: &MockDB{name: "foo"}, arg1: "1-foo"},
+		standard: "DB.Delete()",
+		verbose:  `DB(foo).Delete(ctx, ?, "1-foo")`,
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedDelete{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
+		standard: "DB.Delete()",
+		verbose:  "DB(foo).Delete(ctx, ?, ?, map[foo:bar])",
+	})
+	tests.Run(t, testMethod)
+}
