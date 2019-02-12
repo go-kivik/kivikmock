@@ -1435,3 +1435,94 @@ func TestDelete(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestCopy(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCopy().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").Copy(context.TODO(), "foo", "bar")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCopy().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").Copy(newCanceledContext(), "foo", "bar")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectCopy()
+			foo.ExpectCopy()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			_, err := foo.Copy(context.TODO(), "foo", "1-foo")
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
+	tests.Add("wrong targetID", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCopy().WithTargetID("bar")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").Copy(context.TODO(), "foo", "bar")
+			testy.ErrorRE(t, "has targetID: bar", err)
+		},
+	})
+	tests.Add("wrong sourceID", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCopy().WithSourceID("baz")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").Copy(context.TODO(), "foo", "bar")
+			testy.ErrorRE(t, "has sourceID: baz", err)
+		},
+	})
+	tests.Add("wrong options", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCopy().WithOptions(map[string]interface{}{"foo": "baz"})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").Copy(context.TODO(), "foo", "bar")
+			testy.ErrorRE(t, `has options: map\[foo:baz]`, err)
+		},
+	})
+	tests.Add("success", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectCopy().WillReturn("2-bar")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			rev, err := c.DB(context.TODO(), "foo").Copy(context.TODO(), "foo", "bar")
+			testy.Error(t, "", err)
+			if rev != "2-bar" {
+				t.Errorf("Unexpected rev: %s", rev)
+			}
+		},
+	})
+	tests.Run(t, testMock)
+}

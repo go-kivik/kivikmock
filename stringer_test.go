@@ -850,3 +850,37 @@ func TestDeleteString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestCopyString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedCopy{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).Copy() which:
+	- has any targetID
+	- has any sourceID
+	- has any options`,
+	})
+	tests.Add("targetID", stringerTest{
+		input: &ExpectedCopy{db: &MockDB{name: "foo"}, arg0: "foo"},
+		expected: `call to DB(foo#0).Copy() which:
+	- has targetID: foo
+	- has any sourceID
+	- has any options`,
+	})
+	tests.Add("sourceID", stringerTest{
+		input: &ExpectedCopy{db: &MockDB{name: "foo"}, arg1: "foo"},
+		expected: `call to DB(foo#0).Copy() which:
+	- has any targetID
+	- has sourceID: foo
+	- has any options`,
+	})
+	tests.Add("return value", stringerTest{
+		input: &ExpectedCopy{db: &MockDB{name: "foo"}, ret0: "1-foo"},
+		expected: `call to DB(foo#0).Copy() which:
+	- has any targetID
+	- has any sourceID
+	- has any options
+	- should return rev: 1-foo`,
+	})
+	tests.Run(t, testStringer)
+}

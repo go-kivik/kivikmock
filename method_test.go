@@ -524,3 +524,28 @@ func TestDeleteMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestCopyMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedCopy{db: &MockDB{name: "foo"}},
+		standard: "DB.Copy()",
+		verbose:  "DB(foo).Copy(ctx, ?, ?)",
+	})
+	tests.Add("targetID", methodTest{
+		input:    &ExpectedCopy{db: &MockDB{name: "foo"}, arg0: "foo"},
+		standard: "DB.Copy()",
+		verbose:  `DB(foo).Copy(ctx, "foo", ?)`,
+	})
+	tests.Add("sourceID", methodTest{
+		input:    &ExpectedCopy{db: &MockDB{name: "foo"}, arg1: "bar"},
+		standard: "DB.Copy()",
+		verbose:  `DB(foo).Copy(ctx, ?, "bar")`,
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedCopy{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
+		standard: "DB.Copy()",
+		verbose:  "DB(foo).Copy(ctx, ?, ?, map[foo:bar])",
+	})
+	tests.Run(t, testMethod)
+}
