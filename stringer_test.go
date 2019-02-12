@@ -754,3 +754,58 @@ func TestCompactViewString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestFlushString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input:    &ExpectedFlush{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).Flush()`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestDeleteAttachmentString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).DeleteAttachment() which:
+	- has any docID
+	- has any rev
+	- has any filename
+	- has any options`,
+	})
+	tests.Add("docID", stringerTest{
+		input: &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}, arg0: "foo"},
+		expected: `call to DB(foo#0).DeleteAttachment() which:
+	- has docID: foo
+	- has any rev
+	- has any filename
+	- has any options`,
+	})
+	tests.Add("rev", stringerTest{
+		input: &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}, arg1: "1-foo"},
+		expected: `call to DB(foo#0).DeleteAttachment() which:
+	- has any docID
+	- has rev: 1-foo
+	- has any filename
+	- has any options`,
+	})
+	tests.Add("filename", stringerTest{
+		input: &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}, arg2: "foo.txt"},
+		expected: `call to DB(foo#0).DeleteAttachment() which:
+	- has any docID
+	- has any rev
+	- has filename: foo.txt
+	- has any options`,
+	})
+	tests.Add("return", stringerTest{
+		input: &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}, ret0: "2-bar"},
+		expected: `call to DB(foo#0).DeleteAttachment() which:
+	- has any docID
+	- has any rev
+	- has any filename
+	- has any options
+	- should return rev: 2-bar`,
+	})
+	tests.Run(t, testStringer)
+}

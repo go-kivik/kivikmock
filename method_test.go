@@ -459,3 +459,43 @@ func TestCompactViewMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestFlushMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedFlush{db: &MockDB{name: "foo"}},
+		standard: "DB.Flush()",
+		verbose:  "DB(foo).Flush(ctx)",
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestDeleteAttachmentMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}},
+		standard: "DB.DeleteAttachment()",
+		verbose:  "DB(foo).DeleteAttachment(ctx, ?, ?, ?)",
+	})
+	tests.Add("docID", methodTest{
+		input:    &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}, arg0: "foo"},
+		standard: "DB.DeleteAttachment()",
+		verbose:  `DB(foo).DeleteAttachment(ctx, "foo", ?, ?)`,
+	})
+	tests.Add("rev", methodTest{
+		input:    &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}, arg1: "1-foo"},
+		standard: "DB.DeleteAttachment()",
+		verbose:  `DB(foo).DeleteAttachment(ctx, ?, "1-foo", ?)`,
+	})
+	tests.Add("filename", methodTest{
+		input:    &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}, arg2: "foo.txt"},
+		standard: "DB.DeleteAttachment()",
+		verbose:  `DB(foo).DeleteAttachment(ctx, ?, ?, "foo.txt")`,
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
+		standard: "DB.DeleteAttachment()",
+		verbose:  `DB(foo).DeleteAttachment(ctx, ?, ?, ?, map[foo:bar])`,
+	})
+	tests.Run(t, testMethod)
+}

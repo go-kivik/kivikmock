@@ -651,16 +651,28 @@ func (e *ExpectedPut) met(ex expectation) bool {
 	if e.db.name != exp.db.name || e.db.id != exp.db.id {
 		return false
 	}
-	if e.arg0 != "" && e.arg0 != exp.arg0 {
+	if exp.arg0 != "" && e.arg0 != exp.arg0 {
 		return false
 	}
-	if e.arg1 != nil && diff.AsJSON(e.arg1, exp.arg1) != nil {
+	if exp.arg1 != nil && diff.AsJSON(e.arg1, exp.arg1) != nil {
 		return false
 	}
-	if e.options != nil && !reflect.DeepEqual(e.options, exp.options) {
+	if exp.options != nil && !reflect.DeepEqual(e.options, exp.options) {
 		return false
 	}
 	return true
+}
+
+// WithDocID sets the expectation for the docID passed to the DB.Put() call.
+func (e *ExpectedPut) WithDocID(docID string) *ExpectedPut {
+	e.arg0 = docID
+	return e
+}
+
+// WithDoc sets the expectation for the doc passed to the DB.Put() call.
+func (e *ExpectedPut) WithDoc(doc interface{}) *ExpectedPut {
+	e.arg1 = doc
+	return e
 }
 
 func (e *ExpectedGetMeta) String() string {
@@ -694,19 +706,126 @@ func (e *ExpectedGetMeta) method(v bool) string {
 	return fmt.Sprintf("DB(%s).GetMeta(ctx, %s%s)", e.db.name, docID, options)
 }
 
-func (e *ExpectedGetMeta) met(ex expectation) bool          { return false }
-func (e *ExpectedFlush) String() string                     { return "" }
-func (e *ExpectedFlush) method(v bool) string               { return "" }
-func (e *ExpectedFlush) met(ex expectation) bool            { return false }
-func (e *ExpectedDeleteAttachment) String() string          { return "" }
-func (e *ExpectedDeleteAttachment) method(v bool) string    { return "" }
-func (e *ExpectedDeleteAttachment) met(ex expectation) bool { return false }
-func (e *ExpectedDelete) String() string                    { return "" }
-func (e *ExpectedDelete) method(v bool) string              { return "" }
-func (e *ExpectedDelete) met(ex expectation) bool           { return false }
-func (e *ExpectedCopy) String() string                      { return "" }
-func (e *ExpectedCopy) method(v bool) string                { return "" }
-func (e *ExpectedCopy) met(ex expectation) bool             { return false }
+func (e *ExpectedGetMeta) met(ex expectation) bool {
+	exp := ex.(*ExpectedGetMeta)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	if exp.arg0 != "" && e.arg0 != exp.arg0 {
+		return false
+	}
+	if exp.options != nil && !reflect.DeepEqual(e.options, exp.options) {
+		return false
+	}
+	return true
+}
+
+// WithDocID sets the expectation for the docID passed to the DB.GetMeta() call.
+func (e *ExpectedGetMeta) WithDocID(docID string) *ExpectedGetMeta {
+	e.arg0 = docID
+	return e
+}
+
+func (e *ExpectedFlush) String() string {
+	return dbStringer("Flush", e.db, &e.commonExpectation, 0, nil, nil)
+}
+
+func (e *ExpectedFlush) method(v bool) string {
+	if !v {
+		return "DB.Flush()"
+	}
+	return fmt.Sprintf("DB(%s).Flush(ctx)", e.db.name)
+}
+
+func (e *ExpectedFlush) met(ex expectation) bool {
+	exp := ex.(*ExpectedFlush)
+	return e.db.name == exp.db.name && e.db.id == exp.db.id
+}
+
+func (e *ExpectedDeleteAttachment) String() string {
+	var opts, rets []string
+	if e.arg0 == "" {
+		opts = append(opts, "has any docID")
+	} else {
+		opts = append(opts, "has docID: "+e.arg0)
+	}
+	if e.arg1 == "" {
+		opts = append(opts, "has any rev")
+	} else {
+		opts = append(opts, "has rev: "+e.arg1)
+	}
+	if e.arg2 == "" {
+		opts = append(opts, "has any filename")
+	} else {
+		opts = append(opts, "has filename: "+e.arg2)
+	}
+	if e.ret0 != "" {
+		rets = append(rets, "should return rev: "+e.ret0)
+	}
+	return dbStringer("DeleteAttachment", e.db, &e.commonExpectation, withOptions, opts, rets)
+}
+
+func (e *ExpectedDeleteAttachment) method(v bool) string {
+	if !v {
+		return "DB.DeleteAttachment()"
+	}
+	id, rev, filename, options := "?", "?", "?", ""
+	if e.arg0 != "" {
+		id = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.arg1 != "" {
+		rev = fmt.Sprintf("%q", e.arg1)
+	}
+	if e.arg2 != "" {
+		filename = fmt.Sprintf("%q", e.arg2)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(%s).DeleteAttachment(ctx, %s, %s, %s%s)", e.db.name, id, rev, filename, options)
+}
+
+func (e *ExpectedDeleteAttachment) met(ex expectation) bool {
+	exp := ex.(*ExpectedDeleteAttachment)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	if exp.arg2 != "" && exp.arg2 != e.arg2 {
+		return false
+	}
+	return exp.options == nil || reflect.DeepEqual(exp.options, e.options)
+}
+
+// WithDocID sets the expectation for the docID passed to the DB.DeleteAttachment() call.
+func (e *ExpectedDeleteAttachment) WithDocID(docID string) *ExpectedDeleteAttachment {
+	e.arg0 = docID
+	return e
+}
+
+// WithRev sets the expectation for the rev passed to the DB.DeleteAttachment() call.
+func (e *ExpectedDeleteAttachment) WithRev(rev string) *ExpectedDeleteAttachment {
+	e.arg1 = rev
+	return e
+}
+
+// WithFilename sets the expectation for the filename passed to the DB.DeleteAttachment() call.
+func (e *ExpectedDeleteAttachment) WithFilename(filename string) *ExpectedDeleteAttachment {
+	e.arg2 = filename
+	return e
+}
+
+func (e *ExpectedDelete) String() string          { return "" }
+func (e *ExpectedDelete) method(v bool) string    { return "" }
+func (e *ExpectedDelete) met(ex expectation) bool { return false }
+func (e *ExpectedCopy) String() string            { return "" }
+func (e *ExpectedCopy) method(v bool) string      { return "" }
+func (e *ExpectedCopy) met(ex expectation) bool   { return false }
 
 func (e *ExpectedCompactView) String() string {
 	var opts []string
