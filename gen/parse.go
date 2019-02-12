@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql/driver"
 	"errors"
 	"reflect"
 
@@ -28,9 +29,10 @@ var (
 	typeClientOptions = reflect.TypeOf([]kivik.Options{})
 	typeError         = reflect.TypeOf((*error)(nil)).Elem()
 	typeString        = reflect.TypeOf("")
+	typeDriverRows    = reflect.TypeOf((*driver.Rows)(nil)).Elem()
 )
 
-func parseMethods(input interface{}, isClient bool) ([]*Method, error) {
+func parseMethods(input interface{}, isClient bool, skip map[string]struct{}) ([]*Method, error) {
 	var hasReceiver bool
 	t := reflect.TypeOf(input)
 	if t.Kind() != reflect.Struct {
@@ -56,6 +58,9 @@ func parseMethods(input interface{}, isClient bool) ([]*Method, error) {
 	result := make([]*Method, 0, fType.NumMethod())
 	for i := 0; i < fType.NumMethod(); i++ {
 		m := fType.Method(i)
+		if _, ok := skip[m.Name]; ok {
+			continue
+		}
 		dm := &Method{
 			Name: m.Name,
 		}

@@ -360,7 +360,7 @@ func TestAllDocsString(t *testing.T) {
 	tests.Add("results", stringerTest{
 		input: &ExpectedAllDocs{
 			db: &MockDB{name: "foo"},
-			rows: &Rows{results: []*delayedRow{
+			ret0: &Rows{results: []*delayedRow{
 				{Row: &driver.Row{}},
 				{Row: &driver.Row{}},
 				{delay: 15},
@@ -386,7 +386,7 @@ func TestBulkGetString(t *testing.T) {
 	- should return: 0 results`,
 	})
 	tests.Add("docs", stringerTest{
-		input: &ExpectedBulkGet{db: &MockDB{name: "foo"}, docs: []driver.BulkGetReference{
+		input: &ExpectedBulkGet{db: &MockDB{name: "foo"}, arg0: []driver.BulkGetReference{
 			{ID: "foo"},
 			{ID: "bar"},
 		}},
@@ -398,7 +398,7 @@ func TestBulkGetString(t *testing.T) {
 	tests.Add("results", stringerTest{
 		input: &ExpectedBulkGet{
 			db: &MockDB{name: "foo"},
-			rows: &Rows{results: []*delayedRow{
+			ret0: &Rows{results: []*delayedRow{
 				{Row: &driver.Row{}},
 				{Row: &driver.Row{}},
 				{delay: 15},
@@ -424,7 +424,7 @@ func TestFindString(t *testing.T) {
 	- should return: 0 results`,
 	})
 	tests.Add("query", stringerTest{
-		input: &ExpectedFind{db: &MockDB{name: "foo"}, query: map[string]string{"foo": "bar"}},
+		input: &ExpectedFind{db: &MockDB{name: "foo"}, arg0: map[string]string{"foo": "bar"}},
 		expected: `call to DB(foo#0).Find() which:
 	- has query: map[foo:bar]
 	- should return: 0 results`,
@@ -432,7 +432,7 @@ func TestFindString(t *testing.T) {
 	tests.Add("results", stringerTest{
 		input: &ExpectedFind{
 			db: &MockDB{name: "foo"},
-			rows: &Rows{results: []*delayedRow{
+			ret0: &Rows{results: []*delayedRow{
 				{Row: &driver.Row{}},
 				{Row: &driver.Row{}},
 				{delay: 15},
@@ -493,7 +493,7 @@ func TestExpectedGetIndexesString(t *testing.T) {
 	- should return error: foo err`,
 	})
 	tests.Add("indexes", stringerTest{
-		input: &ExpectedGetIndexes{db: &MockDB{name: "foo"}, indexes: []kivik.Index{{Name: "foo"}}},
+		input: &ExpectedGetIndexes{db: &MockDB{name: "foo"}, ret0: []driver.Index{{Name: "foo"}}},
 		expected: `call to DB(foo#0).GetIndexes() which:
 	- should return indexes: [{ foo  <nil>}]`,
 	})
@@ -531,12 +531,12 @@ func TestExplainString(t *testing.T) {
 	- has any query`,
 	})
 	tests.Add("query", stringerTest{
-		input: &ExpectedExplain{db: &MockDB{name: "foo"}, query: map[string]string{"foo": "bar"}},
+		input: &ExpectedExplain{db: &MockDB{name: "foo"}, arg0: map[string]string{"foo": "bar"}},
 		expected: `call to DB(foo#0).Explain() which:
 	- has query: map[foo:bar]`,
 	})
 	tests.Add("plan", stringerTest{
-		input: &ExpectedExplain{db: &MockDB{name: "foo"}, plan: &kivik.QueryPlan{DBName: "foo"}},
+		input: &ExpectedExplain{db: &MockDB{name: "foo"}, ret0: &driver.QueryPlan{DBName: "foo"}},
 		expected: `call to DB(foo#0).Explain() which:
 	- has any query
 	- should return query plan: &{foo map[] map[] map[] 0 0 [] map[]}`,

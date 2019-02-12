@@ -14,11 +14,17 @@ var clientSkips = map[string]struct{}{
 	"Authenticate": struct{}{},
 }
 var dbSkips = map[string]struct{}{
-	"Close": struct{}{},
+	"Close":  struct{}{},
+	"Client": struct{}{},
+	"Err":    struct{}{},
+	"Name":   struct{}{},
 }
 
 func main() {
 	initTemplates(os.Args[1])
+	if err := os.Mkdir("./other", 0777); err != nil && !os.IsExist(err) {
+		panic(err)
+	}
 	if err := client(); err != nil {
 		panic(err)
 	}
@@ -40,19 +46,14 @@ type fullClient interface {
 }
 
 func client() error {
-	dMethods, err := parseMethods(struct{ X fullClient }{}, false)
+	dMethods, err := parseMethods(struct{ X fullClient }{}, false, clientSkips)
 	if err != nil {
 		return err
 	}
 
-	client, err := parseMethods(struct{ X *kivik.Client }{}, true)
+	client, err := parseMethods(struct{ X *kivik.Client }{}, true, clientSkips)
 	if err != nil {
 		return err
-	}
-	for i, method := range client {
-		if _, ok := clientSkips[method.Name]; ok {
-			client[i].Name += "_skipped"
-		}
 	}
 	same, _, _ := compareMethods(client, dMethods)
 
@@ -84,33 +85,34 @@ type fullDB interface {
 }
 
 func db() error {
-	dMethods, err := parseMethods(struct{ X fullDB }{}, false)
+	dMethods, err := parseMethods(struct{ X fullDB }{}, false, dbSkips)
 	if err != nil {
 		return err
 	}
 
-	client, err := parseMethods(struct{ X *kivik.DB }{}, true)
+	client, err := parseMethods(struct{ X *kivik.DB }{}, true, dbSkips)
 	if err != nil {
 		return err
 	}
-	for i, method := range client {
-		if _, ok := dbSkips[method.Name]; ok {
-			client[i].Name += "_skipped"
-		}
-	}
-	same, _, _ := compareMethods(client, dMethods)
+	same, cm, dm := compareMethods(client, dMethods)
 
 	for _, method := range same {
 		method.DBMethod = true
 	}
+	for _, method := range dm {
+		method.DBMethod = true
+	}
+	for _, method := range cm {
+		method.DBMethod = true
+	}
 
-	if err := RenderExpectationsGo("dbexpectations_gen.go", same); err != nil {
+	if err := RenderExpectationsGo("dbexpectations_gen.go", append(same, dm...)); err != nil {
 		return err
 	}
-	if err := RenderClientGo("db_gen.go", same); err != nil {
+	if err := RenderClientGo("db_gen.go", append(same, dm...)); err != nil {
 		return err
 	}
-	if err := RenderMockGo("dbmock_gen.go", same); err != nil {
+	if err := RenderMockGo("dbmock_gen.go", append(same, cm...)); err != nil {
 		return err
 	}
 	return nil
@@ -127,6 +129,9 @@ func compareMethods(client, driver []*Method) (same []*Method, differentClient [
 				delete(dMethods, name)
 				delete(cMethods, name)
 			}
+		} else {
+			delete(dMethods, name)
+			delete(cMethods, name)
 		}
 	}
 	return toSlice(sameMethods), toSlice(cMethods), toSlice(dMethods)

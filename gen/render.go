@@ -162,20 +162,32 @@ func alignVars(indent int, args []string) string {
 func (m *Method) ZeroReturns() string {
 	args := make([]string, 0, len(m.Returns))
 	for _, arg := range m.Returns {
-		args = append(args, fmt.Sprintf("%#v", reflect.Zero(arg).Interface()))
+		args = append(args, zeroValue(arg))
 	}
 	args = append(args, "err")
 	return strings.Join(args, ", ")
 }
 
-// func quotedZero(t reflect.Type) string {
-// 	return fmt.Sprintf("%#v", reflect.Zero(t).Interface())
-// }
+func zeroValue(t reflect.Type) string {
+	z := fmt.Sprintf("%#v", reflect.Zero(t).Interface())
+	if strings.HasSuffix(z, "(nil)") {
+		return "nil"
+	}
+	switch z {
+	case "<nil>":
+		return "nil"
+	}
+	return z
+}
 
 func (m *Method) ExpectedReturns() string {
 	args := make([]string, 0, len(m.Returns))
-	for i := range m.Returns {
-		args = append(args, fmt.Sprintf("expected.ret%d", i))
+	for i, arg := range m.Returns {
+		if arg.String() == "driver.Rows" {
+			args = append(args, fmt.Sprintf("&driverRows{Context: ctx, Rows: expected.ret%d}", i))
+		} else {
+			args = append(args, fmt.Sprintf("expected.ret%d", i))
+		}
 	}
 	if m.AcceptsContext {
 		args = append(args, "expected.wait(ctx)")
@@ -188,15 +200,38 @@ func (m *Method) ExpectedReturns() string {
 func (m *Method) ReturnTypes() string {
 	args := make([]string, len(m.Returns))
 	for i, ret := range m.Returns {
-		args[i] = fmt.Sprintf("ret%d %s", i, ret.String())
+		args[i] = fmt.Sprintf("ret%d %s", i, typeName(ret))
 	}
 	return strings.Join(args, ", ")
 }
 
 func typeName(t reflect.Type) string {
 	name := t.String()
-	if name == "interface {}" {
-		name = "interface{}"
+	switch name {
+	case "interface {}":
+		return "interface{}"
+	case "driver.Rows":
+		return "*Rows"
 	}
 	return name
+}
+
+func (m *Method) SetExpectations() string {
+	var args []string
+	if m.DBMethod {
+		args = append(args, "db: db,\n")
+	}
+	for i, ret := range m.Returns {
+		var zero string
+		switch ret.String() {
+		case "*kivik.Rows":
+			zero = "&Rows{}"
+		case "*kivik.QueryPlan":
+			zero = "&driver.QueryPlan{}"
+		}
+		if zero != "" {
+			args = append(args, fmt.Sprintf("ret%d: %s,\n", i, zero))
+		}
+	}
+	return strings.Join(args, "")
 }

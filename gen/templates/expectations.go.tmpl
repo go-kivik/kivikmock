@@ -2,7 +2,13 @@
 
 package kivikmock
 
-import "time"
+import (
+	"time"
+
+	"github.com/go-kivik/kivik/driver"
+)
+
+var _ = &driver.Attachment{}
 
 {{ range $method := . -}}
 {{ template "expectedtype.tmpl" $method -}}

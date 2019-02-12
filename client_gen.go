@@ -2,14 +2,20 @@
 
 package kivikmock
 
-import "context"
+import (
+	"context"
+
+	"github.com/go-kivik/kivik/driver"
+)
+
+var _ = &driver.Attachment{}
 
 func (c *driverClient) AllDBs(ctx context.Context, options map[string]interface{}) ([]string, error) {
 	expected := &ExpectedAllDBs{
 		commonExpectation: commonExpectation{options: options},
 	}
 	if err := c.nextExpectation(expected); err != nil {
-		return []string(nil), err
+		return nil, err
 	}
 	return expected.ret0, expected.wait(ctx)
 }

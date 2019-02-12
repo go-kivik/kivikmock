@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/flimzy/diff"
-	"github.com/go-kivik/kivik"
-	"github.com/go-kivik/kivik/driver"
 )
 
 // ExpectedDBClose is used to manage *kivik.Client.Close expectation returned
@@ -51,18 +49,10 @@ func (e *ExpectedDBClose) WillDelay(d time.Duration) *ExpectedDBClose {
 	return e
 }
 
-// ExpectedAllDocs represents an expectation to call DB.AllDocs().
-type ExpectedAllDocs struct {
-	commonExpectation
-	db      *MockDB
-	options map[string]interface{}
-	rows    *Rows
-}
-
 func (e *ExpectedAllDocs) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).AllDocs() which:", e.db.name, e.db.id)
 	msg += optionsString(e.options)
-	msg += fmt.Sprintf("\n\t- should return: %d results", e.rows.rowCount())
+	msg += fmt.Sprintf("\n\t- should return: %d results", e.ret0.rowCount())
 	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
@@ -86,50 +76,23 @@ func (e *ExpectedAllDocs) met(ex expectation) bool {
 	return reflect.DeepEqual(e.options, exp.options)
 }
 
-// WithOptions sets the expected options for the AllDocs() call.
-func (e *ExpectedAllDocs) WithOptions(options map[string]interface{}) *ExpectedAllDocs {
-	e.options = options
-	return e
-}
-
 // WillReturnRows sets rows to be returned by AllDocs().
 func (e *ExpectedAllDocs) WillReturnRows(rows *Rows) *ExpectedAllDocs {
-	e.rows = rows
+	e.ret0 = rows
 	return e
-}
-
-// WillReturnError sets the error that will be returned by AllDocs().
-func (e *ExpectedAllDocs) WillReturnError(err error) *ExpectedAllDocs {
-	e.err = err
-	return e
-}
-
-// WillDelay causes AllDocs() to delay execution by the specified duration.
-func (e *ExpectedAllDocs) WillDelay(delay time.Duration) *ExpectedAllDocs {
-	e.delay = delay
-	return e
-}
-
-// ExpectedBulkGet represents an expectation to call DB.BulkGet().
-type ExpectedBulkGet struct {
-	commonExpectation
-	db      *MockDB
-	docs    []driver.BulkGetReference
-	options map[string]interface{}
-	rows    *Rows
 }
 
 func (e *ExpectedBulkGet) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).BulkGet() which:", e.db.name, e.db.id)
-	if e.docs == nil {
+	if e.arg0 == nil {
 		msg += "\n\t- has any doc references"
 	} else {
-		msg += fmt.Sprintf("\n\t- has doc references: %v", e.docs)
+		msg += fmt.Sprintf("\n\t- has doc references: %v", e.arg0)
 	}
 	msg += optionsString(e.options)
 	var count int
-	if e.rows != nil {
-		for _, r := range e.rows.results {
+	if e.ret0 != nil {
+		for _, r := range e.ret0.results {
 			if r != nil && r.Row != nil {
 				count++
 			}
@@ -146,10 +109,10 @@ func (e *ExpectedBulkGet) method(v bool) string {
 		return "DB.BulkGet()"
 	}
 	var docs, options string
-	if e.docs == nil {
+	if e.arg0 == nil {
 		docs = "?"
 	} else {
-		docs = fmt.Sprintf("%v", e.docs)
+		docs = fmt.Sprintf("%v", e.arg0)
 	}
 	if e.options == nil {
 		options = ""
@@ -167,46 +130,20 @@ func (e *ExpectedBulkGet) met(ex expectation) bool {
 	return reflect.DeepEqual(e.options, exp.options)
 }
 
-// WithOptions sets the expected options for the BulkGet() call.
-func (e *ExpectedBulkGet) WithOptions(options map[string]interface{}) *ExpectedBulkGet {
-	e.options = options
-	return e
-}
-
 // WillReturnRows sets rows to be returned by BulkGet().
 func (e *ExpectedBulkGet) WillReturnRows(rows *Rows) *ExpectedBulkGet {
-	e.rows = rows
+	e.ret0 = rows
 	return e
-}
-
-// WillReturnError sets the error that will be returned by BulkGet().
-func (e *ExpectedBulkGet) WillReturnError(err error) *ExpectedBulkGet {
-	e.err = err
-	return e
-}
-
-// WillDelay causes BulkGet() to delay execution by the specified duration.
-func (e *ExpectedBulkGet) WillDelay(delay time.Duration) *ExpectedBulkGet {
-	e.delay = delay
-	return e
-}
-
-// ExpectedFind represents an expectation to call DB.Find().
-type ExpectedFind struct {
-	commonExpectation
-	db    *MockDB
-	query interface{}
-	rows  *Rows
 }
 
 func (e *ExpectedFind) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).Find() which:", e.db.name, e.db.id)
-	if e.query == nil {
+	if e.arg0 == nil {
 		msg += "\n\t- has any query"
 	} else {
-		msg += fmt.Sprintf("\n\t- has query: %v", e.query)
+		msg += fmt.Sprintf("\n\t- has query: %v", e.arg0)
 	}
-	msg += fmt.Sprintf("\n\t- should return: %d results", e.rows.rowCount())
+	msg += fmt.Sprintf("\n\t- should return: %d results", e.ret0.rowCount())
 	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
@@ -216,41 +153,29 @@ func (e *ExpectedFind) method(v bool) string {
 	if !v {
 		return "DB.Find()"
 	}
-	if e.query == nil {
+	if e.arg0 == nil {
 		return fmt.Sprintf("DB(%s).Find(ctx, ?)", e.db.name)
 	}
-	return fmt.Sprintf("DB(%s).Find(ctx, %v)", e.db.name, e.query)
+	return fmt.Sprintf("DB(%s).Find(ctx, %v)", e.db.name, e.arg0)
 }
 
 func (e *ExpectedFind) met(ex expectation) bool {
 	exp := ex.(*ExpectedFind)
-	if e.db.name != exp.db.name {
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
 		return false
 	}
-	return exp.query == nil || diff.AsJSON(e.query, exp.query) == nil
+	return exp.arg0 == nil || diff.AsJSON(e.arg0, exp.arg0) == nil
 }
 
 // WithQuery sets the expected query for the Find() call.
 func (e *ExpectedFind) WithQuery(query interface{}) *ExpectedFind {
-	e.query = query
+	e.arg0 = query
 	return e
 }
 
 // WillReturnRows sets rows to be returned by Find().
 func (e *ExpectedFind) WillReturnRows(rows *Rows) *ExpectedFind {
-	e.rows = rows
-	return e
-}
-
-// WillReturnError sets the error that will be returned by Find().
-func (e *ExpectedFind) WillReturnError(err error) *ExpectedFind {
-	e.err = err
-	return e
-}
-
-// WillDelay causes Find() to delay execution by the specified duration.
-func (e *ExpectedFind) WillDelay(delay time.Duration) *ExpectedFind {
-	e.delay = delay
+	e.ret0 = rows
 	return e
 }
 
@@ -331,18 +256,11 @@ func (e *ExpectedCreateIndex) WithIndex(index interface{}) *ExpectedCreateIndex 
 	return e
 }
 
-// ExpectedGetIndexes represents an expectation to call GetIndexes().
-type ExpectedGetIndexes struct {
-	commonExpectation
-	db      *MockDB
-	indexes []kivik.Index
-}
-
 func (e *ExpectedGetIndexes) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).GetIndexes()", e.db.name, e.db.id)
 	var extra string
-	if e.indexes != nil {
-		extra += fmt.Sprintf("\n\t- should return indexes: %v", e.indexes)
+	if e.ret0 != nil {
+		extra += fmt.Sprintf("\n\t- should return indexes: %v", e.ret0)
 	}
 	extra += delayString(e.delay)
 	extra += errorString(e.err)
@@ -362,26 +280,6 @@ func (e *ExpectedGetIndexes) method(v bool) string {
 func (e *ExpectedGetIndexes) met(ex expectation) bool {
 	exp := ex.(*ExpectedGetIndexes)
 	return e.db.name == exp.db.name
-}
-
-// WillReturn sets the indexes that will be returned by the call to
-// DB.GetIndexes().
-func (e *ExpectedGetIndexes) WillReturn(indexes []kivik.Index) *ExpectedGetIndexes {
-	e.indexes = indexes
-	return e
-}
-
-// WillReturnError sets the error that will be returned by the call to
-// DB.GetIndexes().
-func (e *ExpectedGetIndexes) WillReturnError(err error) *ExpectedGetIndexes {
-	e.err = err
-	return e
-}
-
-// WillDelay causes the call to DB.GetIndexes() to delay.
-func (e *ExpectedGetIndexes) WillDelay(delay time.Duration) *ExpectedGetIndexes {
-	e.delay = delay
-	return e
 }
 
 func (e *ExpectedDeleteIndex) String() string {
@@ -441,23 +339,15 @@ func (e *ExpectedDeleteIndex) WithName(name string) *ExpectedDeleteIndex {
 	return e
 }
 
-// ExpectedExplain represents an expectation for a DB.Explain() call.
-type ExpectedExplain struct {
-	commonExpectation
-	db    *MockDB
-	query interface{}
-	plan  *kivik.QueryPlan
-}
-
 func (e *ExpectedExplain) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).Explain() which:", e.db.name, e.db.id)
-	if e.query == nil {
+	if e.arg0 == nil {
 		msg += "\n\t- has any query"
 	} else {
-		msg += fmt.Sprintf("\n\t- has query: %v", e.query)
+		msg += fmt.Sprintf("\n\t- has query: %v", e.arg0)
 	}
-	if e.plan != nil {
-		msg += fmt.Sprintf("\n\t- should return query plan: %v", e.plan)
+	if e.ret0 != nil {
+		msg += fmt.Sprintf("\n\t- should return query plan: %v", e.ret0)
 	}
 	msg += delayString(e.delay)
 	msg += errorString(e.err)
@@ -468,41 +358,23 @@ func (e *ExpectedExplain) method(v bool) string {
 	if !v {
 		return "DB.Explain()"
 	}
-	if e.query != nil {
-		return fmt.Sprintf("DB(%s).Explain(ctx, %v)", e.db.name, e.query)
+	if e.arg0 != nil {
+		return fmt.Sprintf("DB(%s).Explain(ctx, %v)", e.db.name, e.arg0)
 	}
 	return fmt.Sprintf("DB(%s).Explain(ctx, ?)", e.db.name)
 }
 
 func (e *ExpectedExplain) met(ex expectation) bool {
 	exp := ex.(*ExpectedExplain)
-	if e.db.name != exp.db.name {
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
 		return false
 	}
-	return e.plan == nil || diff.AsJSON(e.plan, exp.plan) == nil
+	return e.ret0 == nil || diff.AsJSON(e.ret0, exp.ret0) == nil
 }
 
 // WithQuery sets the expected query for the Explain() call.
 func (e *ExpectedExplain) WithQuery(query interface{}) *ExpectedExplain {
-	e.query = query
-	return e
-}
-
-// WillReturn sets the query plan to be returned by the Explain() call.
-func (e *ExpectedExplain) WillReturn(plan *kivik.QueryPlan) *ExpectedExplain {
-	e.plan = plan
-	return e
-}
-
-// WillReturnError sets the error to be returned by the Explain() call.
-func (e *ExpectedExplain) WillReturnError(err error) *ExpectedExplain {
-	e.err = err
-	return e
-}
-
-// WillDelay causes the Explain() call to delay.
-func (e *ExpectedExplain) WillDelay(delay time.Duration) *ExpectedExplain {
-	e.delay = delay
+	e.arg0 = query
 	return e
 }
 
@@ -979,3 +851,43 @@ func (e *ExpectedCompactView) WithDDoc(ddocID string) *ExpectedCompactView {
 	e.arg0 = ddocID
 	return e
 }
+
+func (e *ExpectedGet) String() string                        { panic("x") }
+func (e *ExpectedGet) method(v bool) string                  { panic("x") }
+func (e *ExpectedGet) met(ex expectation) bool               { panic("x") }
+func (e *ExpectedGetAttachmentMeta) String() string          { panic("x") }
+func (e *ExpectedGetAttachmentMeta) method(v bool) string    { panic("x") }
+func (e *ExpectedGetAttachmentMeta) met(ex expectation) bool { panic("x") }
+func (e *ExpectedLocalDocs) String() string                  { panic("x") }
+func (e *ExpectedLocalDocs) method(v bool) string            { panic("x") }
+func (e *ExpectedLocalDocs) met(ex expectation) bool         { panic("x") }
+func (e *ExpectedPurge) String() string                      { panic("x") }
+func (e *ExpectedPurge) method(v bool) string                { panic("x") }
+func (e *ExpectedPurge) met(ex expectation) bool             { panic("x") }
+func (e *ExpectedPutAttachment) String() string              { panic("x") }
+func (e *ExpectedPutAttachment) method(v bool) string        { panic("x") }
+func (e *ExpectedPutAttachment) met(ex expectation) bool     { panic("x") }
+func (e *ExpectedQuery) String() string                      { panic("x") }
+func (e *ExpectedQuery) method(v bool) string                { panic("x") }
+func (e *ExpectedQuery) met(ex expectation) bool             { panic("x") }
+func (e *ExpectedSecurity) String() string                   { panic("x") }
+func (e *ExpectedSecurity) method(v bool) string             { panic("x") }
+func (e *ExpectedSecurity) met(ex expectation) bool          { panic("x") }
+func (e *ExpectedSetSecurity) String() string                { panic("x") }
+func (e *ExpectedSetSecurity) method(v bool) string          { panic("x") }
+func (e *ExpectedSetSecurity) met(ex expectation) bool       { panic("x") }
+func (e *ExpectedStats) String() string                      { panic("x") }
+func (e *ExpectedStats) method(v bool) string                { panic("x") }
+func (e *ExpectedStats) met(ex expectation) bool             { panic("x") }
+func (e *ExpectedBulkDocs) String() string                   { panic("x") }
+func (e *ExpectedBulkDocs) method(v bool) string             { panic("x") }
+func (e *ExpectedBulkDocs) met(ex expectation) bool          { panic("x") }
+func (e *ExpectedGetAttachment) String() string              { panic("x") }
+func (e *ExpectedGetAttachment) method(v bool) string        { panic("x") }
+func (e *ExpectedGetAttachment) met(ex expectation) bool     { panic("x") }
+func (e *ExpectedDesignDocs) String() string                 { panic("x") }
+func (e *ExpectedDesignDocs) method(v bool) string           { panic("x") }
+func (e *ExpectedDesignDocs) met(ex expectation) bool        { panic("x") }
+func (e *ExpectedChanges) String() string                    { panic("x") }
+func (e *ExpectedChanges) method(v bool) string              { panic("x") }
+func (e *ExpectedChanges) met(ex expectation) bool           { panic("x") }

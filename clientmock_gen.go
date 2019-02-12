@@ -2,9 +2,13 @@
 
 package kivikmock
 
-import "github.com/go-kivik/kivik"
+import (
+	"github.com/go-kivik/kivik"
+	"github.com/go-kivik/kivik/driver"
+)
 
 var _ = kivik.EndKeySuffix // To ensure a reference to kivik package
+var _ = &driver.Attachment{}
 
 // ExpectAllDBs queues an expectation that AllDBs will be called.
 func (c *MockClient) ExpectAllDBs() *ExpectedAllDBs {

@@ -248,7 +248,7 @@ func TestAllDocsMethod(t *testing.T) {
 		verbose:  "DB(foo).AllDocs(ctx)",
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedAllDocs{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": 123}},
+		input:    &ExpectedAllDocs{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
 		standard: "DB.AllDocs()",
 		verbose:  "DB(foo).AllDocs(ctx, map[foo:123])",
 	})
@@ -263,12 +263,12 @@ func TestBulkGetMethod(t *testing.T) {
 		verbose:  "DB(foo).BulkGet(ctx, ?)",
 	})
 	tests.Add("docs", methodTest{
-		input:    &ExpectedBulkGet{db: &MockDB{name: "foo"}, docs: []driver.BulkGetReference{{ID: "foo"}}},
+		input:    &ExpectedBulkGet{db: &MockDB{name: "foo"}, arg0: []driver.BulkGetReference{{ID: "foo"}}},
 		standard: "DB.BulkGet()",
 		verbose:  "DB(foo).BulkGet(ctx, [{foo  }])",
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedBulkGet{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": 123}},
+		input:    &ExpectedBulkGet{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
 		standard: "DB.BulkGet()",
 		verbose:  "DB(foo).BulkGet(ctx, ?, map[foo:123])",
 	})
@@ -283,7 +283,7 @@ func TestFindMethod(t *testing.T) {
 		verbose:  "DB(foo).Find(ctx, ?)",
 	})
 	tests.Add("query", methodTest{
-		input:    &ExpectedFind{db: &MockDB{name: "foo"}, query: map[string]string{"foo": "bar"}},
+		input:    &ExpectedFind{db: &MockDB{name: "foo"}, arg0: map[string]string{"foo": "bar"}},
 		standard: "DB.Find()",
 		verbose:  "DB(foo).Find(ctx, map[foo:bar])",
 	})
@@ -353,7 +353,7 @@ func TestExplainMethod(t *testing.T) {
 		verbose:  "DB(foo).Explain(ctx, ?)",
 	})
 	tests.Add("query", methodTest{
-		input:    &ExpectedExplain{db: &MockDB{name: "foo"}, query: map[string]string{"foo": "bar"}},
+		input:    &ExpectedExplain{db: &MockDB{name: "foo"}, arg0: map[string]string{"foo": "bar"}},
 		standard: "DB.Explain()",
 		verbose:  "DB(foo).Explain(ctx, map[foo:bar])",
 	})
