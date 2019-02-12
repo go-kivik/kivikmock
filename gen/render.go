@@ -27,6 +27,14 @@ func RenderExpectationsGo(filename string, methods []*Method) error {
 	return tmpl.ExecuteTemplate(file, "expectations.go.tmpl", methods)
 }
 
+func RenderClientGo(filename string, methods []*Method) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	return tmpl.ExecuteTemplate(file, "client.go.tmpl", methods)
+}
+
 func RenderMockGo(filename string, methods []*Method) error {
 	file, err := os.Create(filename)
 	if err != nil {
@@ -122,6 +130,15 @@ func (m *Method) inputVars() []string {
 		args = append(args, "options")
 	}
 	return args
+}
+
+func (m *Method) ExpectedVariables() string {
+	args := []string{}
+	if m.DBMethod {
+		args = append(args, "db")
+	}
+	args = append(args, m.inputVars()...)
+	return alignVars(0, args)
 }
 
 func (m *Method) InputVariables(indent int) string {

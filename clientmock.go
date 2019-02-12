@@ -102,20 +102,6 @@ func (c *MockClient) MatchExpectationsInOrder(b bool) {
 	c.ordered = b
 }
 
-// ExpectClose queues an expectation for a Close() call.
-func (c *MockClient) ExpectClose() *ExpectedClose {
-	e := &ExpectedClose{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
-// ExpectAllDBs queues an expectation for an AllDBs() call.
-func (c *MockClient) ExpectAllDBs() *ExpectedAllDBs {
-	e := &ExpectedAllDBs{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
 // ExpectAuthenticate queues an expectation for an Authenticate() call.
 func (c *MockClient) ExpectAuthenticate() *ExpectedAuthenticate {
 	e := &ExpectedAuthenticate{}
@@ -123,44 +109,9 @@ func (c *MockClient) ExpectAuthenticate() *ExpectedAuthenticate {
 	return e
 }
 
-// ExpectClusterSetup queues an expectation for a ClusterSetup() call.
-func (c *MockClient) ExpectClusterSetup() *ExpectedClusterSetup {
-	e := &ExpectedClusterSetup{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
-// ExpectClusterStatus queues an expectation for a ClusterStatus() call.
-func (c *MockClient) ExpectClusterStatus() *ExpectedClusterStatus {
-	e := &ExpectedClusterStatus{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
-// ExpectDBExists queues an expectation for a DBExists() call.
-func (c *MockClient) ExpectDBExists() *ExpectedDBExists {
-	e := &ExpectedDBExists{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
-// ExpectDestroyDB queues an expectation for a DestroyDB() call.
-func (c *MockClient) ExpectDestroyDB() *ExpectedDestroyDB {
-	e := &ExpectedDestroyDB{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
 // ExpectDBsStats queues an expectation for a DBsStats() call.
 func (c *MockClient) ExpectDBsStats() *ExpectedDBsStats {
 	e := &ExpectedDBsStats{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
-// ExpectPing queues an expectation for a Ping() call.
-func (c *MockClient) ExpectPing() *ExpectedPing {
-	e := &ExpectedPing{}
 	c.expected = append(c.expected, e)
 	return e
 }

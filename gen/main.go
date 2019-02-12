@@ -59,7 +59,10 @@ func client() error {
 	if err := RenderExpectationsGo("clientexpectations_gen.go", same); err != nil {
 		return err
 	}
-	if err := RenderMockGo("client_gen.go", same); err != nil {
+	if err := RenderClientGo("client_gen.go", same); err != nil {
+		return err
+	}
+	if err := RenderMockGo("clientmock_gen.go", same); err != nil {
 		return err
 	}
 	return nil
@@ -104,7 +107,10 @@ func db() error {
 	if err := RenderExpectationsGo("dbexpectations_gen.go", same); err != nil {
 		return err
 	}
-	if err := RenderMockGo("db_gen.go", same); err != nil {
+	if err := RenderClientGo("db_gen.go", same); err != nil {
+		return err
+	}
+	if err := RenderMockGo("dbmock_gen.go", same); err != nil {
 		return err
 	}
 	return nil
