@@ -1105,3 +1105,96 @@ func TestPut(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestGetMeta(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetMeta().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, _, err := c.DB(context.TODO(), "foo").GetMeta(context.TODO(), "foo")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetMeta().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, _, err := c.DB(context.TODO(), "foo").GetMeta(newCanceledContext(), "foo")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, _, err := c.DB(context.TODO(), "foo").GetMeta(context.TODO(), "foo")
+			testy.Error(t, "call to DB.GetMeta() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectGetMeta()
+			foo.ExpectGetMeta()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			_, _, err := foo.GetMeta(context.TODO(), "foo")
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
+	tests.Add("wrong id", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetMeta().WithDocID("foo")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, _, err := c.DB(context.TODO(), "foo").GetMeta(context.TODO(), "bar")
+			testy.ErrorRE(t, "has docID: foo", err)
+		},
+	})
+	tests.Add("wrong options", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetMeta().WithOptions(map[string]interface{}{"foo": "bar"})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, _, err := c.DB(context.TODO(), "foo").GetMeta(context.TODO(), "foo", map[string]interface{}{"foo": 123})
+			testy.ErrorRE(t, "has docID: foo", err)
+		},
+	})
+	tests.Add("success", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetMeta().WillReturn(123, "1-oink")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			size, rev, err := c.DB(context.TODO(), "foo").GetMeta(context.TODO(), "foo")
+			testy.ErrorRE(t, "", err)
+			if size != 123 {
+				t.Errorf("Unexpected size: %d", size)
+			}
+			if rev != "1-oink" {
+				t.Errorf("Unexpected rev: %s", rev)
+			}
+		},
+	})
+	tests.Run(t, testMock)
+}

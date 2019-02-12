@@ -706,7 +706,26 @@ func (e *ExpectedGetMeta) method(v bool) string {
 	return fmt.Sprintf("DB(%s).GetMeta(ctx, %s%s)", e.db.name, docID, options)
 }
 
-func (e *ExpectedGetMeta) met(ex expectation) bool          { return false }
+func (e *ExpectedGetMeta) met(ex expectation) bool {
+	exp := ex.(*ExpectedGetMeta)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	if exp.arg0 != "" && e.arg0 != exp.arg0 {
+		return false
+	}
+	if exp.options != nil && !reflect.DeepEqual(e.options, exp.options) {
+		return false
+	}
+	return true
+}
+
+// WithDocID sets the expectation for the docID passed to the DB.GetMeta() call.
+func (e *ExpectedGetMeta) WithDocID(docID string) *ExpectedGetMeta {
+	e.arg0 = docID
+	return e
+}
+
 func (e *ExpectedFlush) String() string                     { return "" }
 func (e *ExpectedFlush) method(v bool) string               { return "" }
 func (e *ExpectedFlush) met(ex expectation) bool            { return false }

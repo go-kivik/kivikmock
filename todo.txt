@@ -13,7 +13,6 @@
 - db.GetAttachment https://godoc.org/github.com/go-kivik/kivik#DB.GetAttachment
 - db.GetAttachmentMeta https://godoc.org/github.com/go-kivik/kivik#DB.GetAttachmentMeta
 - db.GetIndexes https://godoc.org/github.com/go-kivik/kivik#DB.GetIndexes
-- db.GetMeta https://godoc.org/github.com/go-kivik/kivik#DB.GetMeta
 - db.LocalDocs https://godoc.org/github.com/go-kivik/kivik#DB.LocalDocs
 - db.Purge https://godoc.org/github.com/go-kivik/kivik#DB.Purge
 - db.PutAttachment https://godoc.org/github.com/go-kivik/kivik#DB.PutAttachment
