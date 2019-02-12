@@ -22,4 +22,3 @@
 - db.Security https://godoc.org/github.com/go-kivik/kivik#DB.Security
 - db.SetSecurity https://godoc.org/github.com/go-kivik/kivik#DB.SetSecurity
 - db.Stats https://godoc.org/github.com/go-kivik/kivik#DB.Stats
-- db.ViewCleanup https://godoc.org/github.com/go-kivik/kivik#DB.ViewCleanup

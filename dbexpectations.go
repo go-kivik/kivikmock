@@ -610,7 +610,7 @@ func (e *ExpectedViewCleanup) method(v bool) string {
 }
 
 func (e *ExpectedViewCleanup) met(ex expectation) bool {
-	exp := ex.(*ExpectedCreateDoc)
+	exp := ex.(*ExpectedViewCleanup)
 	return e.db.name == exp.db.name && e.db.id == exp.db.id
 }
 
