@@ -594,8 +594,8 @@ func (e *ExpectedCompact) method(v bool) string {
 }
 
 func (e *ExpectedCompact) met(ex expectation) bool {
-	exp := ex.(*ExpectedCreateDoc)
-	return e.db.name != exp.db.name && e.db.id == exp.db.id
+	exp := ex.(*ExpectedCompact)
+	return e.db.name == exp.db.name && e.db.id == exp.db.id
 }
 
 func (e *ExpectedViewCleanup) String() string {
@@ -611,7 +611,7 @@ func (e *ExpectedViewCleanup) method(v bool) string {
 
 func (e *ExpectedViewCleanup) met(ex expectation) bool {
 	exp := ex.(*ExpectedCreateDoc)
-	return e.db.name != exp.db.name && e.db.id == exp.db.id
+	return e.db.name == exp.db.name && e.db.id == exp.db.id
 }
 
 func (e *ExpectedPut) String() string {
@@ -648,7 +648,7 @@ func (e *ExpectedPut) method(v bool) string {
 
 func (e *ExpectedPut) met(ex expectation) bool {
 	exp := ex.(*ExpectedPut)
-	if e.db.name != exp.db.name || e.db.id == exp.db.id {
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
 		return false
 	}
 	if e.arg0 != "" && e.arg0 != exp.arg0 {
@@ -707,6 +707,41 @@ func (e *ExpectedDelete) met(ex expectation) bool           { return false }
 func (e *ExpectedCopy) String() string                      { return "" }
 func (e *ExpectedCopy) method(v bool) string                { return "" }
 func (e *ExpectedCopy) met(ex expectation) bool             { return false }
-func (e *ExpectedCompactView) String() string               { return "" }
-func (e *ExpectedCompactView) method(v bool) string         { return "" }
-func (e *ExpectedCompactView) met(ex expectation) bool      { return false }
+
+func (e *ExpectedCompactView) String() string {
+	var opts []string
+	if e.arg0 == "" {
+		opts = []string{"has any ddocID"}
+	} else {
+		opts = []string{"has ddocID: " + e.arg0}
+	}
+	return dbStringer("CompactView", e.db, &e.commonExpectation, 0, opts, nil)
+}
+
+func (e *ExpectedCompactView) method(v bool) string {
+	if !v {
+		return "DB.CompactView()"
+	}
+	ddoc := "?"
+	if e.arg0 != "" {
+		ddoc = fmt.Sprintf("%q", e.arg0)
+	}
+	return fmt.Sprintf("DB(%s).CompactView(ctx, %s)", e.db.name, ddoc)
+}
+
+func (e *ExpectedCompactView) met(ex expectation) bool {
+	exp := ex.(*ExpectedCompactView)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	if exp.arg0 != "" && e.arg0 != exp.arg0 {
+		return false
+	}
+	return true
+}
+
+// WithDDoc sets the expected design doc name for the call to DB.CompactView().
+func (e *ExpectedCompactView) WithDDoc(ddocID string) *ExpectedCompactView {
+	e.arg0 = ddocID
+	return e
+}

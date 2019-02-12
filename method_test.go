@@ -444,3 +444,18 @@ func TestGetMetaMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestCompactViewMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedCompactView{db: &MockDB{name: "foo"}},
+		standard: "DB.CompactView()",
+		verbose:  "DB(foo).CompactView(ctx, ?)",
+	})
+	tests.Add("ddocID", methodTest{
+		input:    &ExpectedCompactView{db: &MockDB{name: "foo"}, arg0: "foo"},
+		standard: "DB.CompactView()",
+		verbose:  `DB(foo).CompactView(ctx, "foo")`,
+	})
+	tests.Run(t, testMethod)
+}
