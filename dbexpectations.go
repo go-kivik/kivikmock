@@ -651,16 +651,28 @@ func (e *ExpectedPut) met(ex expectation) bool {
 	if e.db.name != exp.db.name || e.db.id != exp.db.id {
 		return false
 	}
-	if e.arg0 != "" && e.arg0 != exp.arg0 {
+	if exp.arg0 != "" && e.arg0 != exp.arg0 {
 		return false
 	}
-	if e.arg1 != nil && diff.AsJSON(e.arg1, exp.arg1) != nil {
+	if exp.arg1 != nil && diff.AsJSON(e.arg1, exp.arg1) != nil {
 		return false
 	}
-	if e.options != nil && !reflect.DeepEqual(e.options, exp.options) {
+	if exp.options != nil && !reflect.DeepEqual(e.options, exp.options) {
 		return false
 	}
 	return true
+}
+
+// WithDocID sets the expectation for the docID passed to the DB.Put() call.
+func (e *ExpectedPut) WithDocID(docID string) *ExpectedPut {
+	e.arg0 = docID
+	return e
+}
+
+// WithDoc sets the expectation for the doc passed to the DB.Put() call.
+func (e *ExpectedPut) WithDoc(doc interface{}) *ExpectedPut {
+	e.arg1 = doc
+	return e
 }
 
 func (e *ExpectedGetMeta) String() string {
