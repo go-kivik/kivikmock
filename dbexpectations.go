@@ -70,16 +70,10 @@ func (e *ExpectedAllDocs) method(v bool) string {
 
 func (e *ExpectedAllDocs) met(ex expectation) bool {
 	exp := ex.(*ExpectedAllDocs)
-	if e.db.name != exp.db.name {
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
 		return false
 	}
 	return reflect.DeepEqual(e.options, exp.options)
-}
-
-// WillReturnRows sets rows to be returned by AllDocs().
-func (e *ExpectedAllDocs) WillReturnRows(rows *Rows) *ExpectedAllDocs {
-	e.ret0 = rows
-	return e
 }
 
 func (e *ExpectedBulkGet) String() string {
@@ -130,12 +124,6 @@ func (e *ExpectedBulkGet) met(ex expectation) bool {
 	return reflect.DeepEqual(e.options, exp.options)
 }
 
-// WillReturnRows sets rows to be returned by BulkGet().
-func (e *ExpectedBulkGet) WillReturnRows(rows *Rows) *ExpectedBulkGet {
-	e.ret0 = rows
-	return e
-}
-
 func (e *ExpectedFind) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).Find() which:", e.db.name, e.db.id)
 	if e.arg0 == nil {
@@ -170,12 +158,6 @@ func (e *ExpectedFind) met(ex expectation) bool {
 // WithQuery sets the expected query for the Find() call.
 func (e *ExpectedFind) WithQuery(query interface{}) *ExpectedFind {
 	e.arg0 = query
-	return e
-}
-
-// WillReturnRows sets rows to be returned by Find().
-func (e *ExpectedFind) WillReturnRows(rows *Rows) *ExpectedFind {
-	e.ret0 = rows
 	return e
 }
 
@@ -963,9 +945,30 @@ func (e *ExpectedGetAttachmentMeta) WithFilename(filename string) *ExpectedGetAt
 	return e
 }
 
-func (e *ExpectedLocalDocs) String() string              { panic("x") }
-func (e *ExpectedLocalDocs) method(v bool) string        { panic("x") }
-func (e *ExpectedLocalDocs) met(ex expectation) bool     { panic("x") }
+func (e *ExpectedLocalDocs) String() string {
+	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	return dbStringer("LocalDocs", e.db, &e.commonExpectation, withOptions, nil, rets)
+}
+
+func (e *ExpectedLocalDocs) method(v bool) string {
+	if !v {
+		return "DB.LocalDocs()"
+	}
+	var options string
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(%s).LocalDocs(ctx%s)", e.db.name, options)
+}
+
+func (e *ExpectedLocalDocs) met(ex expectation) bool {
+	exp := ex.(*ExpectedLocalDocs)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	return reflect.DeepEqual(e.options, exp.options)
+}
+
 func (e *ExpectedPurge) String() string                  { panic("x") }
 func (e *ExpectedPurge) method(v bool) string            { panic("x") }
 func (e *ExpectedPurge) met(ex expectation) bool         { panic("x") }
