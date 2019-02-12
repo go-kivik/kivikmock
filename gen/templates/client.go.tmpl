@@ -2,7 +2,13 @@
 
 package kivikmock
 
-import "context"
+import (
+	"context"
+
+	"github.com/go-kivik/kivik/driver"
+)
+
+var _ = &driver.Attachment{}
 
 {{ range $method := . -}}
 {{ template "drivermethod.tmpl" $method }}

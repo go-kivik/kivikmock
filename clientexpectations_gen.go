@@ -2,7 +2,13 @@
 
 package kivikmock
 
-import "time"
+import (
+	"time"
+
+	"github.com/go-kivik/kivik/driver"
+)
+
+var _ = &driver.Attachment{}
 
 // ExpectedAllDBs represents an expectation for a call to AllDBs().
 type ExpectedAllDBs struct {

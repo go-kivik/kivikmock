@@ -2,9 +2,13 @@
 
 package kivikmock
 
-import "github.com/go-kivik/kivik"
+import (
+	"github.com/go-kivik/kivik"
+	"github.com/go-kivik/kivik/driver"
+)
 
 var _ = kivik.EndKeySuffix // To ensure a reference to kivik package
+var _ = &driver.Attachment{}
 
 // ExpectCompact queues an expectation that DB.Compact will be called.
 func (db *MockDB) ExpectCompact() *ExpectedCompact {
@@ -119,6 +123,193 @@ func (db *MockDB) ExpectPut() *ExpectedPut {
 // ExpectViewCleanup queues an expectation that DB.ViewCleanup will be called.
 func (db *MockDB) ExpectViewCleanup() *ExpectedViewCleanup {
 	e := &ExpectedViewCleanup{
+		db: db,
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectAllDocs queues an expectation that DB.AllDocs will be called.
+func (db *MockDB) ExpectAllDocs() *ExpectedAllDocs {
+	e := &ExpectedAllDocs{
+		db:   db,
+		ret0: &Rows{},
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectBulkDocs queues an expectation that DB.BulkDocs will be called.
+func (db *MockDB) ExpectBulkDocs() *ExpectedBulkDocs {
+	e := &ExpectedBulkDocs{
+		db: db,
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectBulkGet queues an expectation that DB.BulkGet will be called.
+func (db *MockDB) ExpectBulkGet() *ExpectedBulkGet {
+	e := &ExpectedBulkGet{
+		db:   db,
+		ret0: &Rows{},
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectChanges queues an expectation that DB.Changes will be called.
+func (db *MockDB) ExpectChanges() *ExpectedChanges {
+	e := &ExpectedChanges{
+		db: db,
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectDesignDocs queues an expectation that DB.DesignDocs will be called.
+func (db *MockDB) ExpectDesignDocs() *ExpectedDesignDocs {
+	e := &ExpectedDesignDocs{
+		db:   db,
+		ret0: &Rows{},
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectExplain queues an expectation that DB.Explain will be called.
+func (db *MockDB) ExpectExplain() *ExpectedExplain {
+	e := &ExpectedExplain{
+		db:   db,
+		ret0: &driver.QueryPlan{},
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectFind queues an expectation that DB.Find will be called.
+func (db *MockDB) ExpectFind() *ExpectedFind {
+	e := &ExpectedFind{
+		db:   db,
+		ret0: &Rows{},
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectGet queues an expectation that DB.Get will be called.
+func (db *MockDB) ExpectGet() *ExpectedGet {
+	e := &ExpectedGet{
+		db: db,
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectGetAttachment queues an expectation that DB.GetAttachment will be called.
+func (db *MockDB) ExpectGetAttachment() *ExpectedGetAttachment {
+	e := &ExpectedGetAttachment{
+		db: db,
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectGetAttachmentMeta queues an expectation that DB.GetAttachmentMeta will be called.
+func (db *MockDB) ExpectGetAttachmentMeta() *ExpectedGetAttachmentMeta {
+	e := &ExpectedGetAttachmentMeta{
+		db: db,
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectGetIndexes queues an expectation that DB.GetIndexes will be called.
+func (db *MockDB) ExpectGetIndexes() *ExpectedGetIndexes {
+	e := &ExpectedGetIndexes{
+		db: db,
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectLocalDocs queues an expectation that DB.LocalDocs will be called.
+func (db *MockDB) ExpectLocalDocs() *ExpectedLocalDocs {
+	e := &ExpectedLocalDocs{
+		db:   db,
+		ret0: &Rows{},
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectPurge queues an expectation that DB.Purge will be called.
+func (db *MockDB) ExpectPurge() *ExpectedPurge {
+	e := &ExpectedPurge{
+		db: db,
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectPutAttachment queues an expectation that DB.PutAttachment will be called.
+func (db *MockDB) ExpectPutAttachment() *ExpectedPutAttachment {
+	e := &ExpectedPutAttachment{
+		db: db,
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectQuery queues an expectation that DB.Query will be called.
+func (db *MockDB) ExpectQuery() *ExpectedQuery {
+	e := &ExpectedQuery{
+		db:   db,
+		ret0: &Rows{},
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectSecurity queues an expectation that DB.Security will be called.
+func (db *MockDB) ExpectSecurity() *ExpectedSecurity {
+	e := &ExpectedSecurity{
+		db: db,
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectSetSecurity queues an expectation that DB.SetSecurity will be called.
+func (db *MockDB) ExpectSetSecurity() *ExpectedSetSecurity {
+	e := &ExpectedSetSecurity{
+		db: db,
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectStats queues an expectation that DB.Stats will be called.
+func (db *MockDB) ExpectStats() *ExpectedStats {
+	e := &ExpectedStats{
 		db: db,
 	}
 	db.count++

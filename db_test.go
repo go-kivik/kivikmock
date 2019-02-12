@@ -573,25 +573,26 @@ func TestGetIndexes(t *testing.T) {
 			testy.Error(t, "foo err", err)
 		},
 	})
-	tests.Add("indexes", func() interface{} {
-		expected := []kivik.Index{
-			{Name: "foo"},
-			{Name: "bar"},
-		}
-		return mockTest{
-			setup: func(m *MockClient) {
-				db := m.NewDB()
-				m.ExpectDB().WillReturn(db)
-				db.ExpectGetIndexes().WillReturn(expected)
-			},
-			test: func(t *testing.T, c *kivik.Client) {
-				indexes, err := c.DB(context.TODO(), "foo").GetIndexes(context.TODO())
-				testy.Error(t, "", err)
-				if d := diff.Interface(expected, indexes); d != nil {
-					t.Error(d)
-				}
-			},
-		}
+	tests.Add("indexes", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetIndexes().WillReturn([]driver.Index{
+				{Name: "foo"},
+				{Name: "bar"},
+			})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			indexes, err := c.DB(context.TODO(), "foo").GetIndexes(context.TODO())
+			testy.Error(t, "", err)
+			expected := []kivik.Index{
+				{Name: "foo"},
+				{Name: "bar"},
+			}
+			if d := diff.Interface(expected, indexes); d != nil {
+				t.Error(d)
+			}
+		},
 	})
 	tests.Add("unexpected", mockTest{
 		setup: func(m *MockClient) {
@@ -734,22 +735,20 @@ func TestExplain(t *testing.T) {
 			testy.Error(t, "", err)
 		},
 	})
-	tests.Add("plan", func() interface{} {
-		expected := &kivik.QueryPlan{DBName: "foo"}
-		return mockTest{
-			setup: func(m *MockClient) {
-				db := m.NewDB()
-				m.ExpectDB().WillReturn(db)
-				db.ExpectExplain().WillReturn(expected)
-			},
-			test: func(t *testing.T, c *kivik.Client) {
-				plan, err := c.DB(context.TODO(), "foo").Explain(context.TODO(), map[string]interface{}{"foo": "bar"})
-				testy.Error(t, "", err)
-				if d := diff.Interface(expected, plan); d != nil {
-					t.Error(d)
-				}
-			},
-		}
+	tests.Add("plan", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectExplain().WillReturn(&driver.QueryPlan{DBName: "foo"})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			plan, err := c.DB(context.TODO(), "foo").Explain(context.TODO(), map[string]interface{}{"foo": "bar"})
+			testy.Error(t, "", err)
+			expected := &kivik.QueryPlan{DBName: "foo"}
+			if d := diff.Interface(expected, plan); d != nil {
+				t.Error(d)
+			}
+		},
 	})
 	tests.Add("delay", mockTest{
 		setup: func(m *MockClient) {

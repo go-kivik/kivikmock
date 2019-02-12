@@ -23,56 +23,6 @@ func (db *MockDB) ExpectClose() *ExpectedDBClose {
 	return e
 }
 
-// ExpectAllDocs queues an expectation that DB.AllDocs() will be called.
-func (db *MockDB) ExpectAllDocs() *ExpectedAllDocs {
-	e := &ExpectedAllDocs{
-		db: db,
-	}
-	db.count++
-	db.client.expected = append(db.client.expected, e)
-	return e
-}
-
-// ExpectBulkGet queues an expectation that DB.BulkGet() will be called.
-func (db *MockDB) ExpectBulkGet() *ExpectedBulkGet {
-	e := &ExpectedBulkGet{
-		db: db,
-	}
-	db.count++
-	db.client.expected = append(db.client.expected, e)
-	return e
-}
-
-// ExpectFind queues an expectation that DB.Find() will be called.
-func (db *MockDB) ExpectFind() *ExpectedFind {
-	e := &ExpectedFind{
-		db: db,
-	}
-	db.count++
-	db.client.expected = append(db.client.expected, e)
-	return e
-}
-
-// ExpectGetIndexes queues an expectation that DB.GetIndexes will be called.
-func (db *MockDB) ExpectGetIndexes() *ExpectedGetIndexes {
-	e := &ExpectedGetIndexes{
-		db: db,
-	}
-	db.count++
-	db.client.expected = append(db.client.expected, e)
-	return e
-}
-
-// ExpectExplain queues an expectation to call the Explain() method.
-func (db *MockDB) ExpectExplain() *ExpectedExplain {
-	e := &ExpectedExplain{
-		db: db,
-	}
-	db.count++
-	db.client.expected = append(db.client.expected, e)
-	return e
-}
-
 // NewRows returns a new, empty set of rows, which can be returned by any of
 // the row-returning expectations.
 func (db *MockDB) NewRows() *Rows {
