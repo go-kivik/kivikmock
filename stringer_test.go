@@ -908,3 +908,37 @@ func TestGetString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestGetAttachmentMetaString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedGetAttachmentMeta{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).GetAttachmentMeta() which:
+	- has any docID
+	- has any filename
+	- has any options`,
+	})
+	tests.Add("docID", stringerTest{
+		input: &ExpectedGetAttachmentMeta{db: &MockDB{name: "foo"}, arg0: "foo"},
+		expected: `call to DB(foo#0).GetAttachmentMeta() which:
+	- has docID: foo
+	- has any filename
+	- has any options`,
+	})
+	tests.Add("filename", stringerTest{
+		input: &ExpectedGetAttachmentMeta{db: &MockDB{name: "foo"}, arg1: "foo.txt"},
+		expected: `call to DB(foo#0).GetAttachmentMeta() which:
+	- has any docID
+	- has filename: foo.txt
+	- has any options`,
+	})
+	tests.Add("return value", stringerTest{
+		input: &ExpectedGetAttachmentMeta{db: &MockDB{name: "foo"}, ret0: &driver.Attachment{Filename: "foo.txt"}},
+		expected: `call to DB(foo#0).GetAttachmentMeta() which:
+	- has any docID
+	- has any filename
+	- has any options
+	- should return attachment: foo.txt`,
+	})
+	tests.Run(t, testStringer)
+}

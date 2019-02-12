@@ -572,7 +572,6 @@ type ExpectedGetAttachment struct {
 	db   *MockDB
 	arg0 string
 	arg1 string
-	arg2 string
 	ret0 *driver.Attachment
 }
 
@@ -606,7 +605,6 @@ type ExpectedGetAttachmentMeta struct {
 	db   *MockDB
 	arg0 string
 	arg1 string
-	arg2 string
 	ret0 *driver.Attachment
 }
 
