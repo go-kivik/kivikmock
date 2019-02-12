@@ -1198,3 +1198,47 @@ func TestGetMeta(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestFlush(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectFlush().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").Flush(context.TODO())
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectFlush().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").Flush(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectFlush()
+			foo.ExpectFlush()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			err := foo.Flush(context.TODO())
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
+	tests.Run(t, testMock)
+}

@@ -726,9 +726,22 @@ func (e *ExpectedGetMeta) WithDocID(docID string) *ExpectedGetMeta {
 	return e
 }
 
-func (e *ExpectedFlush) String() string                     { return "" }
-func (e *ExpectedFlush) method(v bool) string               { return "" }
-func (e *ExpectedFlush) met(ex expectation) bool            { return false }
+func (e *ExpectedFlush) String() string {
+	return dbStringer("Flush", e.db, &e.commonExpectation, 0, nil, nil)
+}
+
+func (e *ExpectedFlush) method(v bool) string {
+	if !v {
+		return "DB.Flush()"
+	}
+	return fmt.Sprintf("DB(%s).Flush(ctx)", e.db.name)
+}
+
+func (e *ExpectedFlush) met(ex expectation) bool {
+	exp := ex.(*ExpectedFlush)
+	return e.db.name == exp.db.name && e.db.id == exp.db.id
+}
+
 func (e *ExpectedDeleteAttachment) String() string          { return "" }
 func (e *ExpectedDeleteAttachment) method(v bool) string    { return "" }
 func (e *ExpectedDeleteAttachment) met(ex expectation) bool { return false }

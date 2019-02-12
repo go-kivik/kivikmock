@@ -459,3 +459,13 @@ func TestCompactViewMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestFlushMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedFlush{db: &MockDB{name: "foo"}},
+		standard: "DB.Flush()",
+		verbose:  "DB(foo).Flush(ctx)",
+	})
+	tests.Run(t, testMethod)
+}

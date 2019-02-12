@@ -754,3 +754,13 @@ func TestCompactViewString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestFlushString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input:    &ExpectedFlush{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).Flush()`,
+	})
+
+	tests.Run(t, testStringer)
+}
