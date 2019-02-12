@@ -609,3 +609,18 @@ func TestLocalDocsMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestPurgeMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedPurge{db: &MockDB{name: "foo"}},
+		standard: "DB.Purge()",
+		verbose:  "DB(foo).Purge(ctx, ?)",
+	})
+	tests.Add("docRevMap", methodTest{
+		input:    &ExpectedPurge{db: &MockDB{name: "foo"}, arg0: map[string][]string{"foo": {"a", "b"}}},
+		standard: "DB.Purge()",
+		verbose:  "DB(foo).Purge(ctx, map[foo:[a b]])",
+	})
+	tests.Run(t, testMethod)
+}

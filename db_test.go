@@ -1766,3 +1766,76 @@ func TestLocalDocs(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestPurge(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPurge().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.Purge(context.TODO(), nil)
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("success", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPurge().WillReturn(&driver.PurgeResult{Seq: 123})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			result, err := db.Purge(context.TODO(), nil)
+			testy.Error(t, "", err)
+			if seq := result.Seq; seq != 123 {
+				t.Errorf("Unexpected seq: %v", seq)
+			}
+		},
+	})
+	tests.Add("wrong map", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPurge().WithDocRevMap(map[string][]string{"foo": {"a", "b"}})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.Purge(context.TODO(), nil)
+			testy.ErrorRE(t, "has docRevMap: map", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPurge().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.Purge(newCanceledContext(), nil)
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectPurge()
+			foo.ExpectPurge()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			_, err := foo.Purge(context.TODO(), nil)
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
+	tests.Run(t, testMock)
+}

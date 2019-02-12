@@ -259,7 +259,8 @@ func (db *MockDB) ExpectLocalDocs() *ExpectedLocalDocs {
 // ExpectPurge queues an expectation that DB.Purge will be called.
 func (db *MockDB) ExpectPurge() *ExpectedPurge {
 	e := &ExpectedPurge{
-		db: db,
+		db:   db,
+		ret0: &driver.PurgeResult{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
