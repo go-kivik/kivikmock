@@ -1839,3 +1839,105 @@ func TestPurge(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestPutAttachment(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPutAttachment().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPutAttachment().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").PutAttachment(newCanceledContext(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectPutAttachment()
+			foo.ExpectPutAttachment()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			_, err := foo.PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
+	tests.Add("wrong id", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPutAttachment().WithDocID("bar")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			testy.ErrorRE(t, "has docID: bar", err)
+		},
+	})
+	tests.Add("wrong rev", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPutAttachment().WithRev("2-bar")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			testy.ErrorRE(t, "has rev: 2-bar", err)
+		},
+	})
+	tests.Add("wrong attachment", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPutAttachment().WithAttachment(&driver.Attachment{Filename: "bar.jpg"})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			testy.ErrorRE(t, "has attachment: bar.jpg", err)
+		},
+	})
+	tests.Add("wrong options", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPutAttachment().WithOptions(map[string]interface{}{"foo": "bar"})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"}, map[string]interface{}{"foo": 123})
+			testy.ErrorRE(t, "has docID: foo", err)
+		},
+	})
+	tests.Add("success", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPutAttachment().WillReturn("2-boo")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			result, err := c.DB(context.TODO(), "foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			testy.ErrorRE(t, "", err)
+			if result != "2-boo" {
+				t.Errorf("Unexpected result: %s", result)
+			}
+		},
+	})
+	tests.Run(t, testMock)
+}
