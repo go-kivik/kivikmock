@@ -725,6 +725,32 @@ func TestGetMetaString(t *testing.T) {
 	- has any options
 	- should delay for: 1s`,
 	})
+	tests.Run(t, testStringer)
+}
 
+func TestCompactViewString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedCompactView{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).CompactView() which:
+	- has any ddocID`,
+	})
+	tests.Add("ddocID", stringerTest{
+		input: &ExpectedCompactView{db: &MockDB{name: "foo"}, arg0: "foo"},
+		expected: `call to DB(foo#0).CompactView() which:
+	- has ddocID: foo`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedCompactView{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).CompactView() which:
+	- has any ddocID
+	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedCompactView{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to DB(foo#0).CompactView() which:
+	- has any ddocID
+	- should delay for: 1s`,
+	})
 	tests.Run(t, testStringer)
 }

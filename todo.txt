@@ -4,8 +4,6 @@
 
 - db.BulkDocs https://godoc.org/github.com/go-kivik/kivik#DB.BulkDocs
 - db.Changes https://godoc.org/github.com/go-kivik/kivik#DB.Changes
-- db.Compact https://godoc.org/github.com/go-kivik/kivik#DB.Compact
-- db.CompactView https://godoc.org/github.com/go-kivik/kivik#DB.CompactView
 - db.Copy https://godoc.org/github.com/go-kivik/kivik#DB.Copy
 - db.Delete https://godoc.org/github.com/go-kivik/kivik#DB.Delete
 - db.DeleteAttachment https://godoc.org/github.com/go-kivik/kivik#DB.DeleteAttachment
@@ -24,4 +22,3 @@
 - db.Security https://godoc.org/github.com/go-kivik/kivik#DB.Security
 - db.SetSecurity https://godoc.org/github.com/go-kivik/kivik#DB.SetSecurity
 - db.Stats https://godoc.org/github.com/go-kivik/kivik#DB.Stats
-- db.ViewCleanup https://godoc.org/github.com/go-kivik/kivik#DB.ViewCleanup
