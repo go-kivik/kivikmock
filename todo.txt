@@ -7,7 +7,6 @@
 - db.DesignDocs https://godoc.org/github.com/go-kivik/kivik#DB.DesignDocs
 - db.GetAttachment https://godoc.org/github.com/go-kivik/kivik#DB.GetAttachment
 - db.GetIndexes https://godoc.org/github.com/go-kivik/kivik#DB.GetIndexes
-- db.PutAttachment https://godoc.org/github.com/go-kivik/kivik#DB.PutAttachment
 - db.Query https://godoc.org/github.com/go-kivik/kivik#DB.Query
 - db.Security https://godoc.org/github.com/go-kivik/kivik#DB.Security
 - db.SetSecurity https://godoc.org/github.com/go-kivik/kivik#DB.SetSecurity

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/flimzy/diff"
+	"github.com/go-kivik/kivik/driver"
 )
 
 // ExpectedDBClose is used to manage *kivik.Client.Close expectation returned
@@ -1010,9 +1011,84 @@ func (e *ExpectedPurge) WithDocRevMap(docRevMap map[string][]string) *ExpectedPu
 	return e
 }
 
-func (e *ExpectedPutAttachment) String() string          { panic("x") }
-func (e *ExpectedPutAttachment) method(v bool) string    { panic("x") }
-func (e *ExpectedPutAttachment) met(ex expectation) bool { panic("x") }
+func (e *ExpectedPutAttachment) String() string {
+	var opts, rets []string
+	if e.arg0 == "" {
+		opts = append(opts, "has any docID")
+	} else {
+		opts = append(opts, fmt.Sprintf("has docID: %s", e.arg0))
+	}
+	if e.arg1 == "" {
+		opts = append(opts, "has any rev")
+	} else {
+		opts = append(opts, "has rev: "+e.arg1)
+	}
+	if e.arg2 == nil {
+		opts = append(opts, "has any attachment")
+	} else {
+		opts = append(opts, fmt.Sprintf("has attachment: %s", e.arg2.Filename))
+	}
+	if e.ret0 != "" {
+		rets = append(rets, "should return rev: "+e.ret0)
+	}
+	return dbStringer("PutAttachment", e.db, &e.commonExpectation, withOptions, opts, rets)
+}
+
+func (e *ExpectedPutAttachment) method(v bool) string {
+	if !v {
+		return "DB.PutAttachment()"
+	}
+	doc, rev, att, options := "?", "?", "?", ""
+	if e.arg0 != "" {
+		doc = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.arg1 != "" {
+		rev = fmt.Sprintf("%q", e.arg1)
+	}
+	if e.arg2 != nil {
+		att = fmt.Sprintf("%v", e.arg2)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(%s).PutAttachment(ctx, %s, %s, %s%s)", e.db.name, doc, rev, att, options)
+}
+
+func (e *ExpectedPutAttachment) met(ex expectation) bool {
+	exp := ex.(*ExpectedPutAttachment)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	if exp.arg0 != "" && e.arg0 != exp.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	if exp.arg2 != nil && !reflect.DeepEqual(exp.arg2, e.arg2) {
+		return false
+	}
+	return exp.options == nil || reflect.DeepEqual(e.options, exp.options)
+}
+
+// WithDocID sets the expectation for the docID passed to the DB.PutAttachment() call.
+func (e *ExpectedPutAttachment) WithDocID(docID string) *ExpectedPutAttachment {
+	e.arg0 = docID
+	return e
+}
+
+// WithRev sets the expectation for the rev passed to the DB.PutAttachment() call.
+func (e *ExpectedPutAttachment) WithRev(rev string) *ExpectedPutAttachment {
+	e.arg1 = rev
+	return e
+}
+
+// WithAttachment sets the expectation for the rev passed to the DB.PutAttachment() call.
+func (e *ExpectedPutAttachment) WithAttachment(att *driver.Attachment) *ExpectedPutAttachment {
+	e.arg2 = att
+	return e
+}
+
 func (e *ExpectedQuery) String() string                  { panic("x") }
 func (e *ExpectedQuery) method(v bool) string            { panic("x") }
 func (e *ExpectedQuery) met(ex expectation) bool         { panic("x") }

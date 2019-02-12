@@ -990,3 +990,58 @@ func TestPurgeString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestPutAttachmentString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedPutAttachment{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).PutAttachment() which:
+	- has any docID
+	- has any rev
+	- has any attachment
+	- has any options`,
+	})
+	tests.Add("docID", stringerTest{
+		input: &ExpectedPutAttachment{db: &MockDB{name: "foo"}, arg0: "foo"},
+		expected: `call to DB(foo#0).PutAttachment() which:
+	- has docID: foo
+	- has any rev
+	- has any attachment
+	- has any options`,
+	})
+	tests.Add("rev", stringerTest{
+		input: &ExpectedPutAttachment{db: &MockDB{name: "foo"}, arg1: "1-foo"},
+		expected: `call to DB(foo#0).PutAttachment() which:
+	- has any docID
+	- has rev: 1-foo
+	- has any attachment
+	- has any options`,
+	})
+	tests.Add("attachment", stringerTest{
+		input: &ExpectedPutAttachment{db: &MockDB{name: "foo"}, arg2: &driver.Attachment{Filename: "foo.txt"}},
+		expected: `call to DB(foo#0).PutAttachment() which:
+	- has any docID
+	- has any rev
+	- has attachment: foo.txt
+	- has any options`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedPutAttachment{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).PutAttachment() which:
+	- has any docID
+	- has any rev
+	- has any attachment
+	- has any options
+	- should return error: foo err`,
+	})
+	tests.Add("return value", stringerTest{
+		input: &ExpectedPutAttachment{db: &MockDB{name: "foo"}, ret0: "2-bar"},
+		expected: `call to DB(foo#0).PutAttachment() which:
+	- has any docID
+	- has any rev
+	- has any attachment
+	- has any options
+	- should return rev: 2-bar`,
+	})
+	tests.Run(t, testStringer)
+}

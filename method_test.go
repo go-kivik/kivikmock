@@ -624,3 +624,33 @@ func TestPurgeMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestPutAttachmentMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedPutAttachment{db: &MockDB{name: "foo"}},
+		standard: "DB.PutAttachment()",
+		verbose:  "DB(foo).PutAttachment(ctx, ?, ?, ?)",
+	})
+	tests.Add("docID", methodTest{
+		input:    &ExpectedPutAttachment{db: &MockDB{name: "foo"}, arg0: "foo"},
+		standard: "DB.PutAttachment()",
+		verbose:  `DB(foo).PutAttachment(ctx, "foo", ?, ?)`,
+	})
+	tests.Add("rev", methodTest{
+		input:    &ExpectedPutAttachment{db: &MockDB{name: "foo"}, arg1: "1-foo"},
+		standard: "DB.PutAttachment()",
+		verbose:  `DB(foo).PutAttachment(ctx, ?, "1-foo", ?)`,
+	})
+	tests.Add("att", methodTest{
+		input:    &ExpectedPutAttachment{db: &MockDB{name: "foo"}, arg2: &driver.Attachment{Filename: "foo.txt"}},
+		standard: "DB.PutAttachment()",
+		verbose:  `DB(foo).PutAttachment(ctx, ?, ?, &{foo.txt  false <nil> 0  0 0 })`,
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedPutAttachment{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
+		standard: "DB.PutAttachment()",
+		verbose:  `DB(foo).PutAttachment(ctx, ?, ?, ?, map[foo:123])`,
+	})
+	tests.Run(t, testMethod)
+}
