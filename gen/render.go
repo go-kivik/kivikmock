@@ -228,6 +228,8 @@ func (m *Method) SetExpectations() string {
 			zero = "&Rows{}"
 		case "*kivik.QueryPlan":
 			zero = "&driver.QueryPlan{}"
+		case "*kivik.PurgeResult":
+			zero = "&driver.PurgeResult{}"
 		}
 		if zero != "" {
 			args = append(args, fmt.Sprintf("ret%d: %s,\n", i, zero))

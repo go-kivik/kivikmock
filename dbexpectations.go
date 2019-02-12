@@ -969,9 +969,47 @@ func (e *ExpectedLocalDocs) met(ex expectation) bool {
 	return reflect.DeepEqual(e.options, exp.options)
 }
 
-func (e *ExpectedPurge) String() string                  { panic("x") }
-func (e *ExpectedPurge) method(v bool) string            { panic("x") }
-func (e *ExpectedPurge) met(ex expectation) bool         { panic("x") }
+func (e *ExpectedPurge) String() string {
+	var opts, rets []string
+	if e.arg0 == nil {
+		opts = []string{"has any docRevMap"}
+	} else {
+		opts = []string{fmt.Sprintf("has docRevMap: %v", e.arg0)}
+	}
+	if e.ret0 != nil {
+		rets = []string{fmt.Sprintf("should return result: %v", e.ret0)}
+	}
+	return dbStringer("Purge", e.db, &e.commonExpectation, 0, opts, rets)
+}
+
+func (e *ExpectedPurge) method(v bool) string {
+	if !v {
+		return "DB.Purge()"
+	}
+	docRevMap := "?"
+	if e.arg0 != nil {
+		docRevMap = fmt.Sprintf("%v", e.arg0)
+	}
+	return fmt.Sprintf("DB(%s).Purge(ctx, %s)", e.db.name, docRevMap)
+}
+
+func (e *ExpectedPurge) met(ex expectation) bool {
+	exp := ex.(*ExpectedPurge)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	if exp.arg0 != nil && !reflect.DeepEqual(e.arg0, exp.arg0) {
+		return false
+	}
+	return true
+}
+
+// WithDocRevMap sets the expected docRevMap for the call to DB.Purge().
+func (e *ExpectedPurge) WithDocRevMap(docRevMap map[string][]string) *ExpectedPurge {
+	e.arg0 = docRevMap
+	return e
+}
+
 func (e *ExpectedPutAttachment) String() string          { panic("x") }
 func (e *ExpectedPutAttachment) method(v bool) string    { panic("x") }
 func (e *ExpectedPutAttachment) met(ex expectation) bool { panic("x") }

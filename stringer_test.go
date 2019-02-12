@@ -969,3 +969,24 @@ func TestLocalDocsString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestPurgeString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedPurge{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).Purge() which:
+	- has any docRevMap`,
+	})
+	tests.Add("docRevMap", stringerTest{
+		input: &ExpectedPurge{db: &MockDB{name: "foo"}, arg0: map[string][]string{"foo": {"a", "b"}}},
+		expected: `call to DB(foo#0).Purge() which:
+	- has docRevMap: map[foo:[a b]]`,
+	})
+	tests.Add("return", stringerTest{
+		input: &ExpectedPurge{db: &MockDB{name: "foo"}, ret0: &driver.PurgeResult{Seq: 123}},
+		expected: `call to DB(foo#0).Purge() which:
+	- has any docRevMap
+	- should return result: &{123 map[]}`,
+	})
+	tests.Run(t, testStringer)
+}
