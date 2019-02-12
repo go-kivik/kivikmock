@@ -569,3 +569,28 @@ func TestGetMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestGetAttachmentMetaMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedGetAttachmentMeta{db: &MockDB{name: "foo"}},
+		standard: "DB.GetAttachmentMeta()",
+		verbose:  "DB(foo).GetAttachmentMeta(ctx, ?, ?)",
+	})
+	tests.Add("docID", methodTest{
+		input:    &ExpectedGetAttachmentMeta{db: &MockDB{name: "foo"}, arg0: "foo"},
+		standard: "DB.GetAttachmentMeta()",
+		verbose:  `DB(foo).GetAttachmentMeta(ctx, "foo", ?)`,
+	})
+	tests.Add("filename", methodTest{
+		input:    &ExpectedGetAttachmentMeta{db: &MockDB{name: "foo"}, arg1: "foo.txt"},
+		standard: "DB.GetAttachmentMeta()",
+		verbose:  `DB(foo).GetAttachmentMeta(ctx, ?, "foo.txt")`,
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedGetAttachmentMeta{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
+		standard: "DB.GetAttachmentMeta()",
+		verbose:  "DB(foo).GetAttachmentMeta(ctx, ?, ?, map[foo:bar])",
+	})
+	tests.Run(t, testMethod)
+}

@@ -6,7 +6,6 @@
 - db.Changes https://godoc.org/github.com/go-kivik/kivik#DB.Changes
 - db.DesignDocs https://godoc.org/github.com/go-kivik/kivik#DB.DesignDocs
 - db.GetAttachment https://godoc.org/github.com/go-kivik/kivik#DB.GetAttachment
-- db.GetAttachmentMeta https://godoc.org/github.com/go-kivik/kivik#DB.GetAttachmentMeta
 - db.GetIndexes https://godoc.org/github.com/go-kivik/kivik#DB.GetIndexes
 - db.LocalDocs https://godoc.org/github.com/go-kivik/kivik#DB.LocalDocs
 - db.Purge https://godoc.org/github.com/go-kivik/kivik#DB.Purge

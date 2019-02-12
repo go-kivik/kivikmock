@@ -899,39 +899,100 @@ func (e *ExpectedGet) WithDocID(docID string) *ExpectedGet {
 	return e
 }
 
-func (e *ExpectedGetAttachmentMeta) String() string          { panic("x") }
-func (e *ExpectedGetAttachmentMeta) method(v bool) string    { panic("x") }
-func (e *ExpectedGetAttachmentMeta) met(ex expectation) bool { panic("x") }
-func (e *ExpectedLocalDocs) String() string                  { panic("x") }
-func (e *ExpectedLocalDocs) method(v bool) string            { panic("x") }
-func (e *ExpectedLocalDocs) met(ex expectation) bool         { panic("x") }
-func (e *ExpectedPurge) String() string                      { panic("x") }
-func (e *ExpectedPurge) method(v bool) string                { panic("x") }
-func (e *ExpectedPurge) met(ex expectation) bool             { panic("x") }
-func (e *ExpectedPutAttachment) String() string              { panic("x") }
-func (e *ExpectedPutAttachment) method(v bool) string        { panic("x") }
-func (e *ExpectedPutAttachment) met(ex expectation) bool     { panic("x") }
-func (e *ExpectedQuery) String() string                      { panic("x") }
-func (e *ExpectedQuery) method(v bool) string                { panic("x") }
-func (e *ExpectedQuery) met(ex expectation) bool             { panic("x") }
-func (e *ExpectedSecurity) String() string                   { panic("x") }
-func (e *ExpectedSecurity) method(v bool) string             { panic("x") }
-func (e *ExpectedSecurity) met(ex expectation) bool          { panic("x") }
-func (e *ExpectedSetSecurity) String() string                { panic("x") }
-func (e *ExpectedSetSecurity) method(v bool) string          { panic("x") }
-func (e *ExpectedSetSecurity) met(ex expectation) bool       { panic("x") }
-func (e *ExpectedStats) String() string                      { panic("x") }
-func (e *ExpectedStats) method(v bool) string                { panic("x") }
-func (e *ExpectedStats) met(ex expectation) bool             { panic("x") }
-func (e *ExpectedBulkDocs) String() string                   { panic("x") }
-func (e *ExpectedBulkDocs) method(v bool) string             { panic("x") }
-func (e *ExpectedBulkDocs) met(ex expectation) bool          { panic("x") }
-func (e *ExpectedGetAttachment) String() string              { panic("x") }
-func (e *ExpectedGetAttachment) method(v bool) string        { panic("x") }
-func (e *ExpectedGetAttachment) met(ex expectation) bool     { panic("x") }
-func (e *ExpectedDesignDocs) String() string                 { panic("x") }
-func (e *ExpectedDesignDocs) method(v bool) string           { panic("x") }
-func (e *ExpectedDesignDocs) met(ex expectation) bool        { panic("x") }
-func (e *ExpectedChanges) String() string                    { panic("x") }
-func (e *ExpectedChanges) method(v bool) string              { panic("x") }
-func (e *ExpectedChanges) met(ex expectation) bool           { panic("x") }
+func (e *ExpectedGetAttachmentMeta) String() string {
+	var opts, rets []string
+	if e.arg0 == "" {
+		opts = []string{"has any docID"}
+	} else {
+		opts = []string{"has docID: " + e.arg0}
+	}
+	if e.arg1 == "" {
+		opts = append(opts, "has any filename")
+	} else {
+		opts = append(opts, "has filename: "+e.arg1)
+	}
+	if e.ret0 != nil {
+		rets = []string{fmt.Sprintf("should return attachment: %s", e.ret0.Filename)}
+	}
+	return dbStringer("GetAttachmentMeta", e.db, &e.commonExpectation, withOptions, opts, rets)
+}
+
+func (e *ExpectedGetAttachmentMeta) method(v bool) string {
+	if !v {
+		return "DB.GetAttachmentMeta()"
+	}
+	id, filename, options := "?", "?", ""
+	if e.arg0 != "" {
+		id = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.arg1 != "" {
+		filename = fmt.Sprintf("%q", e.arg1)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(%s).GetAttachmentMeta(ctx, %s, %s%s)", e.db.name, id, filename, options)
+}
+
+func (e *ExpectedGetAttachmentMeta) met(ex expectation) bool {
+	exp := ex.(*ExpectedGetAttachmentMeta)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	if exp.arg0 != "" && e.arg0 != exp.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && e.arg1 != exp.arg1 {
+		return false
+	}
+	if exp.options != nil && !reflect.DeepEqual(exp.options, e.options) {
+		return false
+	}
+	return true
+}
+
+// WithDocID sets the expectation for the docID passed to the DB.GetAttachmentMeta() call.
+func (e *ExpectedGetAttachmentMeta) WithDocID(docID string) *ExpectedGetAttachmentMeta {
+	e.arg0 = docID
+	return e
+}
+
+// WithFilename sets the expectation for the doc passed to the DB.GetAttachmentMeta() call.
+func (e *ExpectedGetAttachmentMeta) WithFilename(filename string) *ExpectedGetAttachmentMeta {
+	e.arg1 = filename
+	return e
+}
+
+func (e *ExpectedLocalDocs) String() string              { panic("x") }
+func (e *ExpectedLocalDocs) method(v bool) string        { panic("x") }
+func (e *ExpectedLocalDocs) met(ex expectation) bool     { panic("x") }
+func (e *ExpectedPurge) String() string                  { panic("x") }
+func (e *ExpectedPurge) method(v bool) string            { panic("x") }
+func (e *ExpectedPurge) met(ex expectation) bool         { panic("x") }
+func (e *ExpectedPutAttachment) String() string          { panic("x") }
+func (e *ExpectedPutAttachment) method(v bool) string    { panic("x") }
+func (e *ExpectedPutAttachment) met(ex expectation) bool { panic("x") }
+func (e *ExpectedQuery) String() string                  { panic("x") }
+func (e *ExpectedQuery) method(v bool) string            { panic("x") }
+func (e *ExpectedQuery) met(ex expectation) bool         { panic("x") }
+func (e *ExpectedSecurity) String() string               { panic("x") }
+func (e *ExpectedSecurity) method(v bool) string         { panic("x") }
+func (e *ExpectedSecurity) met(ex expectation) bool      { panic("x") }
+func (e *ExpectedSetSecurity) String() string            { panic("x") }
+func (e *ExpectedSetSecurity) method(v bool) string      { panic("x") }
+func (e *ExpectedSetSecurity) met(ex expectation) bool   { panic("x") }
+func (e *ExpectedStats) String() string                  { panic("x") }
+func (e *ExpectedStats) method(v bool) string            { panic("x") }
+func (e *ExpectedStats) met(ex expectation) bool         { panic("x") }
+func (e *ExpectedBulkDocs) String() string               { panic("x") }
+func (e *ExpectedBulkDocs) method(v bool) string         { panic("x") }
+func (e *ExpectedBulkDocs) met(ex expectation) bool      { panic("x") }
+func (e *ExpectedGetAttachment) String() string          { panic("x") }
+func (e *ExpectedGetAttachment) method(v bool) string    { panic("x") }
+func (e *ExpectedGetAttachment) met(ex expectation) bool { panic("x") }
+func (e *ExpectedDesignDocs) String() string             { panic("x") }
+func (e *ExpectedDesignDocs) method(v bool) string       { panic("x") }
+func (e *ExpectedDesignDocs) met(ex expectation) bool    { panic("x") }
+func (e *ExpectedChanges) String() string                { panic("x") }
+func (e *ExpectedChanges) method(v bool) string          { panic("x") }
+func (e *ExpectedChanges) met(ex expectation) bool       { panic("x") }

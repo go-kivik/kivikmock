@@ -244,12 +244,11 @@ func (db *driverDB) Get(ctx context.Context, arg0 string, options map[string]int
 	return expected.ret0, expected.wait(ctx)
 }
 
-func (db *driverDB) GetAttachment(ctx context.Context, arg0 string, arg1 string, arg2 string, options map[string]interface{}) (*driver.Attachment, error) {
+func (db *driverDB) GetAttachment(ctx context.Context, arg0 string, arg1 string, options map[string]interface{}) (*driver.Attachment, error) {
 	expected := &ExpectedGetAttachment{
 		db:                db.MockDB,
 		arg0:              arg0,
 		arg1:              arg1,
-		arg2:              arg2,
 		commonExpectation: commonExpectation{options: options},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -258,12 +257,11 @@ func (db *driverDB) GetAttachment(ctx context.Context, arg0 string, arg1 string,
 	return expected.ret0, expected.wait(ctx)
 }
 
-func (db *driverDB) GetAttachmentMeta(ctx context.Context, arg0 string, arg1 string, arg2 string, options map[string]interface{}) (*driver.Attachment, error) {
+func (db *driverDB) GetAttachmentMeta(ctx context.Context, arg0 string, arg1 string, options map[string]interface{}) (*driver.Attachment, error) {
 	expected := &ExpectedGetAttachmentMeta{
 		db:                db.MockDB,
 		arg0:              arg0,
 		arg1:              arg1,
-		arg2:              arg2,
 		commonExpectation: commonExpectation{options: options},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
