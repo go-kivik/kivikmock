@@ -820,12 +820,127 @@ func (e *ExpectedDeleteAttachment) WithFilename(filename string) *ExpectedDelete
 	return e
 }
 
-func (e *ExpectedDelete) String() string          { return "" }
-func (e *ExpectedDelete) method(v bool) string    { return "" }
-func (e *ExpectedDelete) met(ex expectation) bool { return false }
-func (e *ExpectedCopy) String() string            { return "" }
-func (e *ExpectedCopy) method(v bool) string      { return "" }
-func (e *ExpectedCopy) met(ex expectation) bool   { return false }
+func (e *ExpectedDelete) String() string {
+	var opts, rets []string
+	if e.arg0 == "" {
+		opts = append(opts, "has any docID")
+	} else {
+		opts = append(opts, "has docID: "+e.arg0)
+	}
+	if e.arg1 == "" {
+		opts = append(opts, "has any rev")
+	} else {
+		opts = append(opts, "has rev: "+e.arg1)
+	}
+	if e.ret0 != "" {
+		rets = append(rets, "should return rev: "+e.ret0)
+	}
+	return dbStringer("Delete", e.db, &e.commonExpectation, withOptions, opts, rets)
+}
+
+func (e *ExpectedDelete) method(v bool) string {
+	if !v {
+		return "DB.Delete()"
+	}
+	id, rev, options := "?", "?", ""
+	if e.arg0 != "" {
+		id = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.arg1 != "" {
+		rev = fmt.Sprintf("%q", e.arg1)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(%s).Delete(ctx, %s, %s%s)", e.db.name, id, rev, options)
+}
+
+func (e *ExpectedDelete) met(ex expectation) bool {
+	exp := ex.(*ExpectedDelete)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	return exp.options == nil || reflect.DeepEqual(exp.options, e.options)
+}
+
+// WithDocID sets the expectation for the docID passed to the DB.Delete() call.
+func (e *ExpectedDelete) WithDocID(docID string) *ExpectedDelete {
+	e.arg0 = docID
+	return e
+}
+
+// WithRev sets the expectation for the rev passed to the DB.Delete() call.
+func (e *ExpectedDelete) WithRev(rev string) *ExpectedDelete {
+	e.arg1 = rev
+	return e
+}
+
+func (e *ExpectedCopy) String() string {
+	var opts, rets []string
+	if e.arg0 == "" {
+		opts = append(opts, "has any targetID")
+	} else {
+		opts = append(opts, "has targetID: "+e.arg0)
+	}
+	if e.arg1 == "" {
+		opts = append(opts, "has any sourceID")
+	} else {
+		opts = append(opts, "has sourceID: "+e.arg1)
+	}
+	if e.ret0 != "" {
+		rets = append(rets, "should return rev: "+e.ret0)
+	}
+	return dbStringer("Copy", e.db, &e.commonExpectation, withOptions, opts, rets)
+}
+
+func (e *ExpectedCopy) method(v bool) string {
+	if !v {
+		return "DB.Copy()"
+	}
+	target, source, options := "?", "?", ""
+	if e.arg0 != "" {
+		target = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.arg1 != "" {
+		source = fmt.Sprintf("%q", e.arg1)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(%s).Copy(ctx, %s, %s%s)", e.db.name, target, source, options)
+}
+
+func (e *ExpectedCopy) met(ex expectation) bool {
+	exp := ex.(*ExpectedCopy)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	return exp.options == nil || reflect.DeepEqual(exp.options, e.options)
+}
+
+// WithTargetID sets the expectation for the docID passed to the DB.Copy() call.
+func (e *ExpectedCopy) WithTargetID(docID string) *ExpectedCopy {
+	e.arg0 = docID
+	return e
+}
+
+// WithSourceID sets the expectation for the docID passed to the DB.Copy() call.
+func (e *ExpectedCopy) WithSourceID(docID string) *ExpectedCopy {
+	e.arg1 = docID
+	return e
+}
 
 func (e *ExpectedCompactView) String() string {
 	var opts []string

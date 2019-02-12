@@ -4,8 +4,6 @@
 
 - db.BulkDocs https://godoc.org/github.com/go-kivik/kivik#DB.BulkDocs
 - db.Changes https://godoc.org/github.com/go-kivik/kivik#DB.Changes
-- db.Copy https://godoc.org/github.com/go-kivik/kivik#DB.Copy
-- db.Delete https://godoc.org/github.com/go-kivik/kivik#DB.Delete
 - db.DesignDocs https://godoc.org/github.com/go-kivik/kivik#DB.DesignDocs
 - db.Get https://godoc.org/github.com/go-kivik/kivik#DB.Get
 - db.GetAttachment https://godoc.org/github.com/go-kivik/kivik#DB.GetAttachment

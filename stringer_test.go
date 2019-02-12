@@ -809,3 +809,78 @@ func TestDeleteAttachmentString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestDeleteString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedDelete{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).Delete() which:
+	- has any docID
+	- has any rev
+	- has any options`,
+	})
+	tests.Add("docID", stringerTest{
+		input: &ExpectedDelete{db: &MockDB{name: "foo"}, arg0: "foo"},
+		expected: `call to DB(foo#0).Delete() which:
+	- has docID: foo
+	- has any rev
+	- has any options`,
+	})
+	tests.Add("rev", stringerTest{
+		input: &ExpectedDelete{db: &MockDB{name: "foo"}, arg1: "1-foo"},
+		expected: `call to DB(foo#0).Delete() which:
+	- has any docID
+	- has rev: 1-foo
+	- has any options`,
+	})
+	tests.Add("options", stringerTest{
+		input: &ExpectedDelete{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
+		expected: `call to DB(foo#0).Delete() which:
+	- has any docID
+	- has any rev
+	- has options: map[foo:bar]`,
+	})
+	tests.Add("return", stringerTest{
+		input: &ExpectedDelete{db: &MockDB{name: "foo"}, ret0: "2-bar"},
+		expected: `call to DB(foo#0).Delete() which:
+	- has any docID
+	- has any rev
+	- has any options
+	- should return rev: 2-bar`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestCopyString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedCopy{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).Copy() which:
+	- has any targetID
+	- has any sourceID
+	- has any options`,
+	})
+	tests.Add("targetID", stringerTest{
+		input: &ExpectedCopy{db: &MockDB{name: "foo"}, arg0: "foo"},
+		expected: `call to DB(foo#0).Copy() which:
+	- has targetID: foo
+	- has any sourceID
+	- has any options`,
+	})
+	tests.Add("sourceID", stringerTest{
+		input: &ExpectedCopy{db: &MockDB{name: "foo"}, arg1: "foo"},
+		expected: `call to DB(foo#0).Copy() which:
+	- has any targetID
+	- has sourceID: foo
+	- has any options`,
+	})
+	tests.Add("return value", stringerTest{
+		input: &ExpectedCopy{db: &MockDB{name: "foo"}, ret0: "1-foo"},
+		expected: `call to DB(foo#0).Copy() which:
+	- has any targetID
+	- has any sourceID
+	- has any options
+	- should return rev: 1-foo`,
+	})
+	tests.Run(t, testStringer)
+}
