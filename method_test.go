@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/flimzy/testy"
+	"github.com/go-kivik/kivik"
 	"github.com/go-kivik/kivik/driver"
 )
 
@@ -42,7 +43,7 @@ func TestAllDBsMethod(t *testing.T) {
 		verbose:  "AllDBs(ctx, nil)",
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedAllDBs{options: map[string]interface{}{"foo": 123}},
+		input:    &ExpectedAllDBs{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
 		standard: "AllDBs()",
 		verbose:  `AllDBs(ctx, map[foo:123])`,
 	})
@@ -87,12 +88,12 @@ func TestClusterStatusMethod(t *testing.T) {
 		verbose:  "ClusterStatus(ctx, ?)",
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedClusterStatus{options: map[string]interface{}{"foo": 123}},
+		input:    &ExpectedClusterStatus{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
 		standard: "ClusterStatus()",
 		verbose:  "ClusterStatus(ctx, map[foo:123])",
 	})
 	tests.Add("no options", methodTest{
-		input:    &ExpectedClusterStatus{options: map[string]interface{}{}},
+		input:    &ExpectedClusterStatus{commonExpectation: commonExpectation{options: map[string]interface{}{}}},
 		standard: "ClusterStatus()",
 		verbose:  "ClusterStatus(ctx, map[])",
 	})
@@ -112,12 +113,12 @@ func TestDBExistsMethod(t *testing.T) {
 		verbose:  `DBExists(ctx, "foo", ?)`,
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedDBExists{options: map[string]interface{}{"foo": 321}},
+		input:    &ExpectedDBExists{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 321}}},
 		standard: "DBExists()",
 		verbose:  `DBExists(ctx, ?, map[foo:321])`,
 	})
 	tests.Add("full", methodTest{
-		input:    &ExpectedDBExists{arg0: "foo", options: map[string]interface{}{"foo": 321}},
+		input:    &ExpectedDBExists{arg0: "foo", commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 321}}},
 		standard: "DBExists()",
 		verbose:  `DBExists(ctx, "foo", map[foo:321])`,
 	})
@@ -137,7 +138,7 @@ func TestDestroyDBMethod(t *testing.T) {
 		verbose:  `DestroyDB(ctx, "foo", ?)`,
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedDestroyDB{options: map[string]interface{}{"foo": 12}},
+		input:    &ExpectedDestroyDB{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 12}}},
 		standard: "DestroyDB()",
 		verbose:  `DestroyDB(ctx, ?, map[foo:12])`,
 	})
@@ -372,9 +373,74 @@ func TestCreateDocMethod(t *testing.T) {
 		verbose:  "DB(foo).CreateDoc(ctx, map[foo:bar])",
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedCreateDoc{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": "bar"}},
+		input:    &ExpectedCreateDoc{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
 		standard: "DB.CreateDoc()",
 		verbose:  "DB(foo).CreateDoc(ctx, ?, map[foo:bar])",
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestCompactMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedCompact{db: &MockDB{name: "foo"}},
+		standard: "DB.Compact()",
+		verbose:  "DB(foo).Compact(ctx)",
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestViewCleanupMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedViewCleanup{db: &MockDB{name: "foo"}},
+		standard: "DB.ViewCleanup()",
+		verbose:  "DB(foo).ViewCleanup(ctx)",
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestPutMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedPut{db: &MockDB{name: "foo"}},
+		standard: "DB.Put()",
+		verbose:  "DB(foo).Put(ctx, ?, ?)",
+	})
+	tests.Add("docID", methodTest{
+		input:    &ExpectedPut{db: &MockDB{name: "foo"}, arg0: "asdf"},
+		standard: "DB.Put()",
+		verbose:  `DB(foo).Put(ctx, "asdf", ?)`,
+	})
+	tests.Add("doc", methodTest{
+		input:    &ExpectedPut{db: &MockDB{name: "foo"}, arg1: map[string]interface{}{"foo": 123}},
+		standard: "DB.Put()",
+		verbose:  "DB(foo).Put(ctx, ?, map[foo:123])",
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedPut{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: kivik.Options{"foo": "bar"}}},
+		standard: "DB.Put()",
+		verbose:  "DB(foo).Put(ctx, ?, ?, map[foo:bar])",
+	})
+	tests.Run(t, testMethod)
+}
+
+func TestGetMetaMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedGetMeta{db: &MockDB{name: "foo"}},
+		standard: "DB.GetMeta()",
+		verbose:  "DB(foo).GetMeta(ctx, ?)",
+	})
+	tests.Add("docID", methodTest{
+		input:    &ExpectedGetMeta{db: &MockDB{name: "foo"}, arg0: "foo"},
+		standard: "DB.GetMeta()",
+		verbose:  `DB(foo).GetMeta(ctx, "foo")`,
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedGetMeta{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: kivik.Options{"foo": "bar"}}},
+		standard: "DB.GetMeta()",
+		verbose:  `DB(foo).GetMeta(ctx, ?, map[foo:bar])`,
 	})
 	tests.Run(t, testMethod)
 }

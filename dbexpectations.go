@@ -558,17 +558,142 @@ func (e *ExpectedCreateDoc) WithDoc(doc interface{}) *ExpectedCreateDoc {
 	return e
 }
 
-func (e *ExpectedCompact) String() string                   { return "" }
-func (e *ExpectedCompact) method(v bool) string             { return "" }
-func (e *ExpectedCompact) met(ex expectation) bool          { return false }
-func (e *ExpectedViewCleanup) String() string               { return "" }
-func (e *ExpectedViewCleanup) method(v bool) string         { return "" }
-func (e *ExpectedViewCleanup) met(ex expectation) bool      { return false }
-func (e *ExpectedPut) String() string                       { return "" }
-func (e *ExpectedPut) method(v bool) string                 { return "" }
-func (e *ExpectedPut) met(ex expectation) bool              { return false }
-func (e *ExpectedGetMeta) String() string                   { return "" }
-func (e *ExpectedGetMeta) method(v bool) string             { return "" }
+const (
+	withOptions = 1 << iota
+)
+
+func dbStringer(methodName string, db *MockDB, e *commonExpectation, flags int, opts []string, rets []string) string {
+	msg := fmt.Sprintf("call to DB(%s#%d).%s()", db.name, db.id, methodName)
+	var extra string
+	for _, c := range opts {
+		extra += "\n\t- " + c
+	}
+	if flags&withOptions > 0 {
+		extra += optionsString(e.options)
+	}
+	for _, c := range rets {
+		extra += "\n\t- " + c
+	}
+	extra += delayString(e.delay)
+	extra += errorString(e.err)
+	if extra != "" {
+		msg += " which:" + extra
+	}
+	return msg
+}
+
+func (e *ExpectedCompact) String() string {
+	return dbStringer("Compact", e.db, &e.commonExpectation, 0, nil, nil)
+}
+
+func (e *ExpectedCompact) method(v bool) string {
+	if !v {
+		return "DB.Compact()"
+	}
+	return fmt.Sprintf("DB(%s).Compact(ctx)", e.db.name)
+}
+
+func (e *ExpectedCompact) met(ex expectation) bool {
+	exp := ex.(*ExpectedCreateDoc)
+	return e.db.name != exp.db.name && e.db.id == exp.db.id
+}
+
+func (e *ExpectedViewCleanup) String() string {
+	return dbStringer("ViewCleanup", e.db, &e.commonExpectation, 0, nil, nil)
+}
+
+func (e *ExpectedViewCleanup) method(v bool) string {
+	if !v {
+		return "DB.ViewCleanup()"
+	}
+	return fmt.Sprintf("DB(%s).ViewCleanup(ctx)", e.db.name)
+}
+
+func (e *ExpectedViewCleanup) met(ex expectation) bool {
+	exp := ex.(*ExpectedCreateDoc)
+	return e.db.name != exp.db.name && e.db.id == exp.db.id
+}
+
+func (e *ExpectedPut) String() string {
+	custom := []string{}
+	if e.arg0 == "" {
+		custom = append(custom, "has any docID")
+	} else {
+		custom = append(custom, fmt.Sprintf("has docID: %s", e.arg0))
+	}
+	if e.arg1 == nil {
+		custom = append(custom, "has any doc")
+	} else {
+		custom = append(custom, fmt.Sprintf("has doc: %v", e.arg1))
+	}
+	return dbStringer("Put", e.db, &e.commonExpectation, withOptions, custom, nil)
+}
+
+func (e *ExpectedPut) method(v bool) string {
+	if !v {
+		return "DB.Put()"
+	}
+	docID, doc, options := "?", "?", ""
+	if e.arg0 != "" {
+		docID = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.arg1 != nil {
+		doc = fmt.Sprintf("%v", e.arg1)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(%s).Put(ctx, %s, %s%s)", e.db.name, docID, doc, options)
+}
+
+func (e *ExpectedPut) met(ex expectation) bool {
+	exp := ex.(*ExpectedPut)
+	if e.db.name != exp.db.name || e.db.id == exp.db.id {
+		return false
+	}
+	if e.arg0 != "" && e.arg0 != exp.arg0 {
+		return false
+	}
+	if e.arg1 != nil && diff.AsJSON(e.arg1, exp.arg1) != nil {
+		return false
+	}
+	if e.options != nil && !reflect.DeepEqual(e.options, exp.options) {
+		return false
+	}
+	return true
+}
+
+func (e *ExpectedGetMeta) String() string {
+	var opts []string
+	if e.arg0 == "" {
+		opts = append(opts, "has any docID")
+	} else {
+		opts = append(opts, fmt.Sprintf("has docID: %s", e.arg0))
+	}
+	var rets []string
+	if e.ret0 != 0 {
+		rets = append(rets, fmt.Sprintf("should return size: %d", e.ret0))
+	}
+	if e.ret1 != "" {
+		rets = append(rets, "should return rev: "+e.ret1)
+	}
+	return dbStringer("GetMeta", e.db, &e.commonExpectation, withOptions, opts, rets)
+}
+
+func (e *ExpectedGetMeta) method(v bool) string {
+	if !v {
+		return "DB.GetMeta()"
+	}
+	docID, options := "?", ""
+	if e.arg0 != "" {
+		docID = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(%s).GetMeta(ctx, %s%s)", e.db.name, docID, options)
+}
+
 func (e *ExpectedGetMeta) met(ex expectation) bool          { return false }
 func (e *ExpectedFlush) String() string                     { return "" }
 func (e *ExpectedFlush) method(v bool) string               { return "" }

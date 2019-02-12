@@ -1,11 +1,11 @@
 // ExpectedCreateDoc represents an expectation for a call to DB.CreateDoc().
 type ExpectedCreateDoc struct {
 	commonExpectation
-	db      *MockDB
-	arg0    interface{}
-	options map[string]interface{}
-	ret0    string
-	ret1    string
+	db *MockDB
+	arg0 interface{}
+	ret0 string
+	ret1 string
+
 }
 
 // WithOptions sets the expected options for the call to DB.CreateDoc().

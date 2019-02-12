@@ -53,16 +53,6 @@ func (db *MockDB) ExpectFind() *ExpectedFind {
 	return e
 }
 
-// ExpectCreateIndex queues an expectation that DB.CreateIndex will be called.
-func (db *MockDB) ExpectCreateIndex() *ExpectedCreateIndex {
-	e := &ExpectedCreateIndex{
-		db: db,
-	}
-	db.count++
-	db.client.expected = append(db.client.expected, e)
-	return e
-}
-
 // ExpectGetIndexes queues an expectation that DB.GetIndexes will be called.
 func (db *MockDB) ExpectGetIndexes() *ExpectedGetIndexes {
 	e := &ExpectedGetIndexes{
@@ -73,29 +63,9 @@ func (db *MockDB) ExpectGetIndexes() *ExpectedGetIndexes {
 	return e
 }
 
-// ExpectDeleteIndex queues an expectation that DB.DeleteIndex will be called.
-func (db *MockDB) ExpectDeleteIndex() *ExpectedDeleteIndex {
-	e := &ExpectedDeleteIndex{
-		db: db,
-	}
-	db.count++
-	db.client.expected = append(db.client.expected, e)
-	return e
-}
-
 // ExpectExplain queues an expectation to call the Explain() method.
 func (db *MockDB) ExpectExplain() *ExpectedExplain {
 	e := &ExpectedExplain{
-		db: db,
-	}
-	db.count++
-	db.client.expected = append(db.client.expected, e)
-	return e
-}
-
-// ExpectCreateDoc queues an expectation to call the Createdoc() method.
-func (db *MockDB) ExpectCreateDoc() *ExpectedCreateDoc {
-	e := &ExpectedCreateDoc{
 		db: db,
 	}
 	db.count++

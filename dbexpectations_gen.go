@@ -44,11 +44,10 @@ func (e *ExpectedCompactView) WillDelay(delay time.Duration) *ExpectedCompactVie
 // ExpectedCopy represents an expectation for a call to DB.Copy().
 type ExpectedCopy struct {
 	commonExpectation
-	db      *MockDB
-	arg0    string
-	arg1    string
-	options map[string]interface{}
-	ret0    string
+	db   *MockDB
+	arg0 string
+	arg1 string
+	ret0 string
 }
 
 // WithOptions sets the expected options for the call to DB.Copy().
@@ -78,11 +77,10 @@ func (e *ExpectedCopy) WillDelay(delay time.Duration) *ExpectedCopy {
 // ExpectedCreateDoc represents an expectation for a call to DB.CreateDoc().
 type ExpectedCreateDoc struct {
 	commonExpectation
-	db      *MockDB
-	arg0    interface{}
-	options map[string]interface{}
-	ret0    string
-	ret1    string
+	db   *MockDB
+	arg0 interface{}
+	ret0 string
+	ret1 string
 }
 
 // WithOptions sets the expected options for the call to DB.CreateDoc().
@@ -134,11 +132,10 @@ func (e *ExpectedCreateIndex) WillDelay(delay time.Duration) *ExpectedCreateInde
 // ExpectedDelete represents an expectation for a call to DB.Delete().
 type ExpectedDelete struct {
 	commonExpectation
-	db      *MockDB
-	arg0    string
-	arg1    string
-	options map[string]interface{}
-	ret0    string
+	db   *MockDB
+	arg0 string
+	arg1 string
+	ret0 string
 }
 
 // WithOptions sets the expected options for the call to DB.Delete().
@@ -168,12 +165,11 @@ func (e *ExpectedDelete) WillDelay(delay time.Duration) *ExpectedDelete {
 // ExpectedDeleteAttachment represents an expectation for a call to DB.DeleteAttachment().
 type ExpectedDeleteAttachment struct {
 	commonExpectation
-	db      *MockDB
-	arg0    string
-	arg1    string
-	arg2    string
-	options map[string]interface{}
-	ret0    string
+	db   *MockDB
+	arg0 string
+	arg1 string
+	arg2 string
+	ret0 string
 }
 
 // WithOptions sets the expected options for the call to DB.DeleteAttachment().
@@ -241,11 +237,10 @@ func (e *ExpectedFlush) WillDelay(delay time.Duration) *ExpectedFlush {
 // ExpectedGetMeta represents an expectation for a call to DB.GetMeta().
 type ExpectedGetMeta struct {
 	commonExpectation
-	db      *MockDB
-	arg0    string
-	options map[string]interface{}
-	ret0    int64
-	ret1    string
+	db   *MockDB
+	arg0 string
+	ret0 int64
+	ret1 string
 }
 
 // WithOptions sets the expected options for the call to DB.GetMeta().
@@ -276,11 +271,10 @@ func (e *ExpectedGetMeta) WillDelay(delay time.Duration) *ExpectedGetMeta {
 // ExpectedPut represents an expectation for a call to DB.Put().
 type ExpectedPut struct {
 	commonExpectation
-	db      *MockDB
-	arg0    string
-	arg1    interface{}
-	options map[string]interface{}
-	ret0    string
+	db   *MockDB
+	arg0 string
+	arg1 interface{}
+	ret0 string
 }
 
 // WithOptions sets the expected options for the call to DB.Put().

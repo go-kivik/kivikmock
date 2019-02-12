@@ -27,6 +27,14 @@ func RenderExpectationsGo(filename string, methods []*Method) error {
 	return tmpl.ExecuteTemplate(file, "expectations.go.tmpl", methods)
 }
 
+func RenderClientGo(filename string, methods []*Method) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	return tmpl.ExecuteTemplate(file, "client.go.tmpl", methods)
+}
+
 func RenderMockGo(filename string, methods []*Method) error {
 	file, err := os.Create(filename)
 	if err != nil {
@@ -81,36 +89,18 @@ func (m *Method) ReturnArgs() string {
 	return args[0]
 }
 
-func (m *Method) VariableDefinitions(indent int) string {
-	args := make([]string, 0, len(m.Accepts)+len(m.Returns)+2)
-	types := make([]string, 0, len(args))
+func (m *Method) VariableDefinitions() string {
+	var result []string
 	if m.DBMethod {
-		args = append(args, "db")
-		types = append(types, "*MockDB")
+		result = append(result, "\tdb *MockDB\n")
 	}
 	for i, arg := range m.Accepts {
-		args = append(args, fmt.Sprintf("arg%d", i))
-		types = append(types, typeName(arg))
-	}
-	if m.AcceptsOptions {
-		args = append(args, "options")
-		types = append(types, "map[string]interface{}")
+		result = append(result, fmt.Sprintf("\targ%d %s\n", i, typeName(arg)))
 	}
 	for i, ret := range m.Returns {
-		args = append(args, fmt.Sprintf("ret%d", i))
-		types = append(types, typeName(ret))
+		result = append(result, fmt.Sprintf("\tret%d %s\n", i, typeName(ret)))
 	}
-	var maxLen int
-	for _, arg := range args {
-		if l := len(arg); l > maxLen {
-			maxLen = l
-		}
-	}
-	final := make([]string, len(args))
-	for i, arg := range args {
-		final[i] = fmt.Sprintf("%s%*s %s", strings.Repeat("\t", indent), -maxLen, arg, types[i])
-	}
-	return strings.Join(final, "\n")
+	return strings.Join(result, "")
 }
 
 func (m *Method) inputVars() []string {
@@ -124,13 +114,27 @@ func (m *Method) inputVars() []string {
 	return args
 }
 
-func (m *Method) InputVariables(indent int) string {
+func (m *Method) ExpectedVariables() string {
 	args := []string{}
 	if m.DBMethod {
 		args = append(args, "db")
 	}
 	args = append(args, m.inputVars()...)
-	return strings.Replace(alignVars(indent, args), "db,", "db.MockDB,", 1) // amazingly ugly hack
+	return alignVars(0, args)
+}
+
+func (m *Method) InputVariables() string {
+	var result []string
+	if m.DBMethod {
+		result = append(result, "\t\tdb: db.MockDB,\n")
+	}
+	for i := range m.Accepts {
+		result = append(result, fmt.Sprintf("\t\targ%d: arg%d,\n", i, i))
+	}
+	if m.AcceptsOptions {
+		result = append(result, fmt.Sprintf("\t\tcommonExpectation: commonExpectation{options:options},\n"))
+	}
+	return strings.Join(result, "")
 }
 
 func (m *Method) Variables(indent int) string {

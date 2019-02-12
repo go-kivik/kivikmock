@@ -2,8 +2,10 @@
 
 package kivikmock
 
-import "context"
+import "github.com/go-kivik/kivik"
+
+var _ = kivik.EndKeySuffix // To ensure a reference to kivik package
 
 {{ range $method := . -}}
-{{ template "drivermethod.tmpl" $method }}
-{{ end -}}
+{{ template "mockmethod.tmpl" $method -}}
+{{- end -}}

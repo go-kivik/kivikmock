@@ -1,7 +1,7 @@
 // Expected{{ .Name }} represents an expectation for a call to {{if .DBMethod}}DB.{{end}}{{.Name}}().
 type Expected{{ .Name }} struct {
 	commonExpectation
-{{ .VariableDefinitions 1 }}
+{{ .VariableDefinitions }}
 }
 {{ if .AcceptsOptions }}
 // WithOptions sets the expected options for the call to {{if .DBMethod}}DB.{{end}}{{.Name}}().
