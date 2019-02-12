@@ -852,9 +852,53 @@ func (e *ExpectedCompactView) WithDDoc(ddocID string) *ExpectedCompactView {
 	return e
 }
 
-func (e *ExpectedGet) String() string                        { panic("x") }
-func (e *ExpectedGet) method(v bool) string                  { panic("x") }
-func (e *ExpectedGet) met(ex expectation) bool               { panic("x") }
+func (e *ExpectedGet) String() string {
+	var opts, rets []string
+	if e.arg0 == "" {
+		opts = []string{"has any docID"}
+	} else {
+		opts = []string{"has docID: " + e.arg0}
+	}
+	if e.ret0 != nil {
+		rets = []string{fmt.Sprintf("should return document with rev: %s", e.ret0.Rev)}
+	}
+	return dbStringer("Get", e.db, &e.commonExpectation, withOptions, opts, rets)
+}
+
+func (e *ExpectedGet) method(v bool) string {
+	if !v {
+		return "DB.Get()"
+	}
+	id, options := "?", ""
+	if e.arg0 != "" {
+		id = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(%s).Get(ctx, %s%s)", e.db.name, id, options)
+}
+
+func (e *ExpectedGet) met(ex expectation) bool {
+	exp := ex.(*ExpectedGet)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	if exp.arg0 != "" && e.arg0 != exp.arg0 {
+		return false
+	}
+	if exp.options != nil && !reflect.DeepEqual(exp.options, e.options) {
+		return false
+	}
+	return true
+}
+
+// WithDocID sets the expected docID for the DB.Get() call.
+func (e *ExpectedGet) WithDocID(docID string) *ExpectedGet {
+	e.arg0 = docID
+	return e
+}
+
 func (e *ExpectedGetAttachmentMeta) String() string          { panic("x") }
 func (e *ExpectedGetAttachmentMeta) method(v bool) string    { panic("x") }
 func (e *ExpectedGetAttachmentMeta) met(ex expectation) bool { panic("x") }

@@ -549,3 +549,23 @@ func TestCopyMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestGetMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedGet{db: &MockDB{name: "foo"}},
+		standard: "DB.Get()",
+		verbose:  "DB(foo).Get(ctx, ?)",
+	})
+	tests.Add("docID", methodTest{
+		input:    &ExpectedGet{db: &MockDB{name: "foo"}, arg0: "foo"},
+		standard: "DB.Get()",
+		verbose:  `DB(foo).Get(ctx, "foo")`,
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedGet{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
+		standard: "DB.Get()",
+		verbose:  "DB(foo).Get(ctx, ?, map[foo:bar])",
+	})
+	tests.Run(t, testMethod)
+}
