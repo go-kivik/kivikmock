@@ -945,9 +945,30 @@ func (e *ExpectedGetAttachmentMeta) WithFilename(filename string) *ExpectedGetAt
 	return e
 }
 
-func (e *ExpectedLocalDocs) String() string              { panic("x") }
-func (e *ExpectedLocalDocs) method(v bool) string        { panic("x") }
-func (e *ExpectedLocalDocs) met(ex expectation) bool     { panic("x") }
+func (e *ExpectedLocalDocs) String() string {
+	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	return dbStringer("LocalDocs", e.db, &e.commonExpectation, withOptions, nil, rets)
+}
+
+func (e *ExpectedLocalDocs) method(v bool) string {
+	if !v {
+		return "DB.LocalDocs()"
+	}
+	var options string
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(%s).LocalDocs(ctx%s)", e.db.name, options)
+}
+
+func (e *ExpectedLocalDocs) met(ex expectation) bool {
+	exp := ex.(*ExpectedLocalDocs)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	return reflect.DeepEqual(e.options, exp.options)
+}
+
 func (e *ExpectedPurge) String() string                  { panic("x") }
 func (e *ExpectedPurge) method(v bool) string            { panic("x") }
 func (e *ExpectedPurge) met(ex expectation) bool         { panic("x") }

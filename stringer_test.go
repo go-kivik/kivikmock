@@ -942,3 +942,30 @@ func TestGetAttachmentMetaString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestLocalDocsString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedLocalDocs{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).LocalDocs() which:
+	- has any options
+	- should return: 0 results`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedLocalDocs{
+			db: &MockDB{name: "foo"},
+			ret0: &Rows{results: []*delayedRow{
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+				{delay: 15},
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+			},
+			},
+		},
+		expected: `call to DB(foo#0).LocalDocs() which:
+	- has any options
+	- should return: 4 results`,
+	})
+	tests.Run(t, testStringer)
+}

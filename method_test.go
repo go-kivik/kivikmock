@@ -594,3 +594,18 @@ func TestGetAttachmentMetaMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestLocalDocsMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedLocalDocs{db: &MockDB{name: "foo"}},
+		standard: "DB.LocalDocs()",
+		verbose:  "DB(foo).LocalDocs(ctx)",
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedLocalDocs{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
+		standard: "DB.LocalDocs()",
+		verbose:  "DB(foo).LocalDocs(ctx, map[foo:123])",
+	})
+	tests.Run(t, testMethod)
+}
