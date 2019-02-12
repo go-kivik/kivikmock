@@ -1,6 +1,7 @@
 func (c *driverClient) NoCtx(options map[string]interface{}) error {
 	expected := &ExpectedNoCtx{
-		options: options,
+		commonExpectation: commonExpectation{options:options},
+
 	}
 	if err := c.nextExpectation(expected); err != nil {
 		return err

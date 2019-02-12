@@ -7,8 +7,7 @@ import "time"
 // ExpectedAllDBs represents an expectation for a call to AllDBs().
 type ExpectedAllDBs struct {
 	commonExpectation
-	options map[string]interface{}
-	ret0    []string
+	ret0 []string
 }
 
 // WithOptions sets the expected options for the call to AllDBs().
@@ -73,8 +72,7 @@ func (e *ExpectedClusterSetup) WillDelay(delay time.Duration) *ExpectedClusterSe
 // ExpectedClusterStatus represents an expectation for a call to ClusterStatus().
 type ExpectedClusterStatus struct {
 	commonExpectation
-	options map[string]interface{}
-	ret0    string
+	ret0 string
 }
 
 // WithOptions sets the expected options for the call to ClusterStatus().
@@ -104,9 +102,8 @@ func (e *ExpectedClusterStatus) WillDelay(delay time.Duration) *ExpectedClusterS
 // ExpectedDBExists represents an expectation for a call to DBExists().
 type ExpectedDBExists struct {
 	commonExpectation
-	arg0    string
-	options map[string]interface{}
-	ret0    bool
+	arg0 string
+	ret0 bool
 }
 
 // WithOptions sets the expected options for the call to DBExists().
@@ -136,8 +133,7 @@ func (e *ExpectedDBExists) WillDelay(delay time.Duration) *ExpectedDBExists {
 // ExpectedDestroyDB represents an expectation for a call to DestroyDB().
 type ExpectedDestroyDB struct {
 	commonExpectation
-	arg0    string
-	options map[string]interface{}
+	arg0 string
 }
 
 // WithOptions sets the expected options for the call to DestroyDB().

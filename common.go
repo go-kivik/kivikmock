@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/go-kivik/kivik"
 )
 
 type expectation interface {
@@ -31,6 +33,7 @@ type commonExpectation struct {
 	triggered bool
 	err       error // nolint: structcheck
 	delay     time.Duration
+	options   kivik.Options
 }
 
 func (e *commonExpectation) fulfill() {

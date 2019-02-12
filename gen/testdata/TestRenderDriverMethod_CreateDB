@@ -1,7 +1,8 @@
 func (c *driverClient) CreateDB(ctx context.Context, arg0 string, options map[string]interface{}) error {
 	expected := &ExpectedCreateDB{
-		arg0:    arg0,
-		options: options,
+		arg0: arg0,
+		commonExpectation: commonExpectation{options:options},
+
 	}
 	if err := c.nextExpectation(expected); err != nil {
 		return err

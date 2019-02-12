@@ -50,7 +50,7 @@ func TestAllDBsString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("options", stringerTest{
-		input: &ExpectedAllDBs{options: map[string]interface{}{"foo": 123}},
+		input: &ExpectedAllDBs{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
 		expected: `call to AllDBs() which:
 	- has options: map[foo:123]`,
 	})
@@ -131,7 +131,7 @@ func TestClusterStatusString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("options", stringerTest{
-		input: &ExpectedClusterStatus{options: map[string]interface{}{"foo": 123}},
+		input: &ExpectedClusterStatus{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
 		expected: `call to ClusterStatus() which:
 	- has options: map[foo:123]`,
 	})
@@ -160,7 +160,7 @@ func TestDBExistsString(t *testing.T) {
 	- should return: false`,
 	})
 	tests.Add("full", stringerTest{
-		input: &ExpectedDBExists{arg0: "foo", ret0: true, options: map[string]interface{}{"foo": 123}},
+		input: &ExpectedDBExists{arg0: "foo", ret0: true, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
 		expected: `call to DBExists() which:
 	- has name: foo
 	- has options: map[foo:123]
@@ -565,7 +565,7 @@ func TestCreateDocString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("options", stringerTest{
-		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": "bar"}},
+		input: &ExpectedCreateDoc{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
 		expected: `call to DB(foo#0).CreateDoc() which:
 	- has any doc
 	- has options: map[foo:bar]`,
@@ -598,5 +598,133 @@ func TestCreateDocString(t *testing.T) {
 	- has any options
 	- should return rev: 1-foo`,
 	})
+	tests.Run(t, testStringer)
+}
+
+func TestCompactString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input:    &ExpectedCompact{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).Compact()`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedCompact{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).Compact() which:
+	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedCompact{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to DB(foo#0).Compact() which:
+	- should delay for: 1s`,
+	})
+
+	tests.Run(t, testStringer)
+}
+
+func TestViewCleanupString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input:    &ExpectedViewCleanup{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).ViewCleanup()`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedViewCleanup{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).ViewCleanup() which:
+	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedViewCleanup{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to DB(foo#0).ViewCleanup() which:
+	- should delay for: 1s`,
+	})
+
+	tests.Run(t, testStringer)
+}
+
+func TestPutString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedPut{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).Put() which:
+	- has any docID
+	- has any doc
+	- has any options`,
+	})
+	tests.Add("docID", stringerTest{
+		input: &ExpectedPut{db: &MockDB{name: "foo"}, arg0: "foo"},
+		expected: `call to DB(foo#0).Put() which:
+	- has docID: foo
+	- has any doc
+	- has any options`,
+	})
+	tests.Add("doc", stringerTest{
+		input: &ExpectedPut{db: &MockDB{name: "foo"}, arg1: map[string]string{"foo": "bar"}},
+		expected: `call to DB(foo#0).Put() which:
+	- has any docID
+	- has doc: map[foo:bar]
+	- has any options`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedPut{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).Put() which:
+	- has any docID
+	- has any doc
+	- has any options
+	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedPut{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to DB(foo#0).Put() which:
+	- has any docID
+	- has any doc
+	- has any options
+	- should delay for: 1s`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestGetMetaString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedGetMeta{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).GetMeta() which:
+	- has any docID
+	- has any options`,
+	})
+	tests.Add("docID", stringerTest{
+		input: &ExpectedGetMeta{db: &MockDB{name: "foo"}, arg0: "foo"},
+		expected: `call to DB(foo#0).GetMeta() which:
+	- has docID: foo
+	- has any options`,
+	})
+	tests.Add("size", stringerTest{
+		input: &ExpectedGetMeta{db: &MockDB{name: "foo"}, ret0: 123},
+		expected: `call to DB(foo#0).GetMeta() which:
+	- has any docID
+	- has any options
+	- should return size: 123`,
+	})
+	tests.Add("rev", stringerTest{
+		input: &ExpectedGetMeta{db: &MockDB{name: "foo"}, ret1: "1-xxx"},
+		expected: `call to DB(foo#0).GetMeta() which:
+	- has any docID
+	- has any options
+	- should return rev: 1-xxx`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedGetMeta{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).GetMeta() which:
+	- has any docID
+	- has any options
+	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedGetMeta{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to DB(foo#0).GetMeta() which:
+	- has any docID
+	- has any options
+	- should delay for: 1s`,
+	})
+
 	tests.Run(t, testStringer)
 }
