@@ -1525,3 +1525,83 @@ func TestCopy(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestGet(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGet().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").Get(context.TODO(), "foo").Err
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGet().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").Get(newCanceledContext(), "foo").Err
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectGet()
+			foo.ExpectGet()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			err := foo.Get(context.TODO(), "foo").Err
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
+	tests.Add("wrong docID", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGet().WithDocID("bar")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").Get(context.TODO(), "foo").Err
+			testy.ErrorRE(t, "has docID: bar", err)
+		},
+	})
+	tests.Add("wrong options", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGet().WithOptions(map[string]interface{}{"foo": "baz"})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").Get(context.TODO(), "foo").Err
+			testy.ErrorRE(t, `has options: map\[foo:baz]`, err)
+		},
+	})
+	tests.Add("success", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGet().WillReturn(&driver.Document{Rev: "2-bar"})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			row := c.DB(context.TODO(), "foo").Get(context.TODO(), "foo")
+			testy.Error(t, "", row.Err)
+			if rev := row.Rev; rev != "2-bar" {
+				t.Errorf("Unexpected rev: %s", rev)
+			}
+		},
+	})
+	tests.Run(t, testMock)
+}

@@ -884,3 +884,27 @@ func TestCopyString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestGetString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedGet{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).Get() which:
+	- has any docID
+	- has any options`,
+	})
+	tests.Add("docID", stringerTest{
+		input: &ExpectedGet{db: &MockDB{name: "foo"}, arg0: "foo"},
+		expected: `call to DB(foo#0).Get() which:
+	- has docID: foo
+	- has any options`,
+	})
+	tests.Add("return value", stringerTest{
+		input: &ExpectedGet{db: &MockDB{name: "foo"}, ret0: &driver.Document{Rev: "1-foo"}},
+		expected: `call to DB(foo#0).Get() which:
+	- has any docID
+	- has any options
+	- should return document with rev: 1-foo`,
+	})
+	tests.Run(t, testStringer)
+}
