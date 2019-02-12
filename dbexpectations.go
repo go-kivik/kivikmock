@@ -562,7 +562,7 @@ const (
 	withOptions = 1 << iota
 )
 
-func dbStringer(methodName string, db *MockDB, e commonExpectation, flags int, opts []string, rets []string) string {
+func dbStringer(methodName string, db *MockDB, e *commonExpectation, flags int, opts []string, rets []string) string {
 	msg := fmt.Sprintf("call to DB(%s#%d).%s()", db.name, db.id, methodName)
 	var extra string
 	for _, c := range opts {
@@ -583,7 +583,7 @@ func dbStringer(methodName string, db *MockDB, e commonExpectation, flags int, o
 }
 
 func (e *ExpectedCompact) String() string {
-	return dbStringer("Compact", e.db, e.commonExpectation, 0, nil, nil)
+	return dbStringer("Compact", e.db, &e.commonExpectation, 0, nil, nil)
 }
 
 func (e *ExpectedCompact) method(v bool) string {
@@ -599,7 +599,7 @@ func (e *ExpectedCompact) met(ex expectation) bool {
 }
 
 func (e *ExpectedViewCleanup) String() string {
-	return dbStringer("ViewCleanup", e.db, e.commonExpectation, 0, nil, nil)
+	return dbStringer("ViewCleanup", e.db, &e.commonExpectation, 0, nil, nil)
 }
 
 func (e *ExpectedViewCleanup) method(v bool) string {
@@ -626,7 +626,7 @@ func (e *ExpectedPut) String() string {
 	} else {
 		custom = append(custom, fmt.Sprintf("has doc: %v", e.arg1))
 	}
-	return dbStringer("Put", e.db, e.commonExpectation, withOptions, custom, nil)
+	return dbStringer("Put", e.db, &e.commonExpectation, withOptions, custom, nil)
 }
 
 func (e *ExpectedPut) method(v bool) string {
@@ -677,7 +677,7 @@ func (e *ExpectedGetMeta) String() string {
 	if e.ret1 != "" {
 		rets = append(rets, "should return rev: "+e.ret1)
 	}
-	return dbStringer("GetMeta", e.db, e.commonExpectation, withOptions, opts, rets)
+	return dbStringer("GetMeta", e.db, &e.commonExpectation, withOptions, opts, rets)
 }
 
 func (e *ExpectedGetMeta) method(v bool) string {
