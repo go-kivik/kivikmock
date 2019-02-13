@@ -3,6 +3,7 @@
 package kivikmock
 
 import (
+	"fmt"
 	"reflect"
 	"time"
 
@@ -46,6 +47,17 @@ func (e *ExpectedAllDBs) met(_ expectation) bool {
 	return true
 }
 
+func (e *ExpectedAllDBs) method(v bool) string {
+	if !v {
+		return "AllDBs()"
+	}
+	options := defaultOptionPlaceholder
+	if e.options != nil {
+		options = fmt.Sprintf("%v", e.options)
+	}
+	return fmt.Sprintf("AllDBs(ctx, %s)", options)
+}
+
 // ExpectedClose represents an expectation for a call to Close().
 type ExpectedClose struct {
 	commonExpectation
@@ -65,6 +77,13 @@ func (e *ExpectedClose) WillDelay(delay time.Duration) *ExpectedClose {
 
 func (e *ExpectedClose) met(_ expectation) bool {
 	return true
+}
+
+func (e *ExpectedClose) method(v bool) string {
+	if !v {
+		return "Close()"
+	}
+	return fmt.Sprintf("Close(ctx)")
 }
 
 // ExpectedClusterSetup represents an expectation for a call to ClusterSetup().
@@ -91,6 +110,17 @@ func (e *ExpectedClusterSetup) met(ex expectation) bool {
 		return false
 	}
 	return true
+}
+
+func (e *ExpectedClusterSetup) method(v bool) string {
+	if !v {
+		return "ClusterSetup()"
+	}
+	arg0 := "?"
+	if e.arg0 != nil {
+		arg0 = fmt.Sprintf("%v", e.arg0)
+	}
+	return fmt.Sprintf("ClusterSetup(ctx, %s)", arg0)
 }
 
 // ExpectedClusterStatus represents an expectation for a call to ClusterStatus().
@@ -125,6 +155,17 @@ func (e *ExpectedClusterStatus) WillDelay(delay time.Duration) *ExpectedClusterS
 
 func (e *ExpectedClusterStatus) met(_ expectation) bool {
 	return true
+}
+
+func (e *ExpectedClusterStatus) method(v bool) string {
+	if !v {
+		return "ClusterStatus()"
+	}
+	options := defaultOptionPlaceholder
+	if e.options != nil {
+		options = fmt.Sprintf("%v", e.options)
+	}
+	return fmt.Sprintf("ClusterStatus(ctx, %s)", options)
 }
 
 // ExpectedDBExists represents an expectation for a call to DBExists().
@@ -166,6 +207,20 @@ func (e *ExpectedDBExists) met(ex expectation) bool {
 	return true
 }
 
+func (e *ExpectedDBExists) method(v bool) string {
+	if !v {
+		return "DBExists()"
+	}
+	arg0, options := "?", defaultOptionPlaceholder
+	if e.arg0 != "" {
+		arg0 = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf("%v", e.options)
+	}
+	return fmt.Sprintf("DBExists(ctx, %s, %s)", arg0, options)
+}
+
 // ExpectedDestroyDB represents an expectation for a call to DestroyDB().
 type ExpectedDestroyDB struct {
 	commonExpectation
@@ -198,6 +253,20 @@ func (e *ExpectedDestroyDB) met(ex expectation) bool {
 	return true
 }
 
+func (e *ExpectedDestroyDB) method(v bool) string {
+	if !v {
+		return "DestroyDB()"
+	}
+	arg0, options := "?", defaultOptionPlaceholder
+	if e.arg0 != "" {
+		arg0 = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf("%v", e.options)
+	}
+	return fmt.Sprintf("DestroyDB(ctx, %s, %s)", arg0, options)
+}
+
 // ExpectedPing represents an expectation for a call to Ping().
 type ExpectedPing struct {
 	commonExpectation
@@ -224,4 +293,11 @@ func (e *ExpectedPing) WillDelay(delay time.Duration) *ExpectedPing {
 
 func (e *ExpectedPing) met(_ expectation) bool {
 	return true
+}
+
+func (e *ExpectedPing) method(v bool) string {
+	if !v {
+		return "Ping()"
+	}
+	return fmt.Sprintf("Ping(ctx)")
 }

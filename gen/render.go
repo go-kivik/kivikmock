@@ -262,24 +262,40 @@ func (m *Method) MetExpectations() string {
 	return strings.Join(args, "\n")
 }
 
-/* {{ define "metString" }}
-    if exp.arg{{.}} != "" && exp.arg{{.}} != e.arg{{.}} {
-        return false
-    }
-{{ end }}
-{{ define "metInt" }}
-    if exp.arg{{.}} != 0 && exp.arg{{.}} != e.arg{{.}} {
-        return false
-    }
-{{ end }}
-{{ define "metJSON" }}
-    if exp.arg{{.}} != nil && !jsonEqual(exp.arg{{.}}, e.arg{{.}}) {
-        return false
-    }
-{{ end}}
-{{ define "metAny" }}
-    if exp.arg{{.}} != nil && !reflect.DeepEqual(exp.arg{{.}}, e.arg{{.}}) {
-        return false
-    }
-{{ end }}
-*/
+func (m *Method) MethodArgs() string {
+	var args, vars, str, def, mid []string
+	prefix := ""
+	if m.DBMethod {
+		prefix = "DB(%s)."
+		args = append(args, "e.DB().name")
+	}
+	if m.AcceptsContext {
+		vars = append(vars, "ctx")
+	}
+	var lines []string
+	for i, acc := range m.Accepts {
+		str = append(str, fmt.Sprintf("arg%d", i))
+		def = append(def, `"?"`)
+		vars = append(vars, "%s")
+		switch acc.String() {
+		case "string":
+			mid = append(mid, fmt.Sprintf(`	if e.arg%[1]d != "" { arg%[1]d = fmt.Sprintf("%%q", e.arg%[1]d)}`, i))
+		case "int":
+			mid = append(mid, fmt.Sprintf(`	if e.arg%[1]d != 0 { arg%[1]d = fmt.Sprintf("%%q", e.arg%[1]d)}`, i))
+		default:
+			mid = append(mid, fmt.Sprintf(`	if e.arg%[1]d != nil { arg%[1]d = fmt.Sprintf("%%v", e.arg%[1]d) }`, i))
+		}
+	}
+	if m.AcceptsOptions {
+		str = append(str, "options")
+		def = append(def, `defaultOptionPlaceholder`)
+		vars = append(vars, "%s")
+		mid = append(mid, `	if e.options != nil { options = fmt.Sprintf("%v", e.options) }`)
+	}
+	if len(str) > 0 {
+		lines = append(lines, fmt.Sprintf("\t%s := %s", strings.Join(str, ", "), strings.Join(def, ", ")))
+	}
+	lines = append(lines, mid...)
+	lines = append(lines, fmt.Sprintf("\treturn fmt.Sprintf(\"%s%s(%s)\", %s)", prefix, m.Name, strings.Join(vars, ", "), strings.Join(append(args, str...), ", ")))
+	return strings.Join(lines, "\n")
+}
