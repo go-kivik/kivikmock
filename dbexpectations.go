@@ -13,7 +13,6 @@ import (
 // by Mock.ExpectClose.
 type ExpectedDBClose struct {
 	commonExpectation
-	db *MockDB
 }
 
 func (e *ExpectedDBClose) method(v bool) string {
@@ -24,8 +23,7 @@ func (e *ExpectedDBClose) method(v bool) string {
 }
 
 func (e *ExpectedDBClose) met(ex expectation) bool {
-	exp := ex.(*ExpectedDBClose)
-	return e.db.name == exp.db.name
+	return true
 }
 
 // WillReturnError allows setting an error for *kivik.Client.Close action.
@@ -35,7 +33,7 @@ func (e *ExpectedDBClose) WillReturnError(err error) *ExpectedDBClose {
 }
 
 func (e *ExpectedDBClose) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).Close()", e.db.name, e.db.id)
+	msg := fmt.Sprintf("call to DB(%s#%d).Close()", e.DB().name, e.DB().id)
 	extra := delayString(e.delay)
 	extra += errorString(e.err)
 	if extra != "" {
@@ -60,21 +58,18 @@ func (e *ExpectedAllDocs) method(v bool) string {
 		return "DB.AllDocs()"
 	}
 	if e.options == nil {
-		return fmt.Sprintf("DB(%s).AllDocs(ctx)", e.db.name)
+		return fmt.Sprintf("DB(%s).AllDocs(ctx)", e.DB().name)
 	}
-	return fmt.Sprintf("DB(%s).AllDocs(ctx, %v)", e.db.name, e.options)
+	return fmt.Sprintf("DB(%s).AllDocs(ctx, %v)", e.DB().name, e.options)
 }
 
 func (e *ExpectedAllDocs) met(ex expectation) bool {
 	exp := ex.(*ExpectedAllDocs)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	return reflect.DeepEqual(e.options, exp.options)
 }
 
 func (e *ExpectedBulkGet) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).BulkGet() which:", e.db.name, e.db.id)
+	msg := fmt.Sprintf("call to DB(%s#%d).BulkGet() which:", e.DB().name, e.DB().id)
 	if e.arg0 == nil {
 		msg += "\n\t- has any doc references"
 	} else {
@@ -110,14 +105,11 @@ func (e *ExpectedBulkGet) method(v bool) string {
 	} else {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).BulkGet(ctx, %s%s)", e.db.name, docs, options)
+	return fmt.Sprintf("DB(%s).BulkGet(ctx, %s%s)", e.DB().name, docs, options)
 }
 
 func (e *ExpectedBulkGet) met(ex expectation) bool {
 	exp := ex.(*ExpectedBulkGet)
-	if e.db.name != exp.db.name {
-		return false
-	}
 	return reflect.DeepEqual(e.options, exp.options)
 }
 
@@ -137,16 +129,13 @@ func (e *ExpectedFind) method(v bool) string {
 		return "DB.Find()"
 	}
 	if e.arg0 == nil {
-		return fmt.Sprintf("DB(%s).Find(ctx, ?)", e.db.name)
+		return fmt.Sprintf("DB(%s).Find(ctx, ?)", e.DB().name)
 	}
-	return fmt.Sprintf("DB(%s).Find(ctx, %v)", e.db.name, e.arg0)
+	return fmt.Sprintf("DB(%s).Find(ctx, %v)", e.DB().name, e.arg0)
 }
 
 func (e *ExpectedFind) met(ex expectation) bool {
 	exp := ex.(*ExpectedFind)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	return exp.arg0 == nil || diff.AsJSON(e.arg0, exp.arg0) == nil
 }
 
@@ -157,7 +146,7 @@ func (e *ExpectedFind) WithQuery(query interface{}) *ExpectedFind {
 }
 
 func (e *ExpectedCreateIndex) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).CreateIndex() which:", e.db.name, e.db.id)
+	msg := fmt.Sprintf("call to DB(%s#%d).CreateIndex() which:", e.DB().name, e.DB().id)
 	if e.arg0 == "" {
 		msg += "\n\t- has any ddoc"
 	} else {
@@ -198,14 +187,11 @@ func (e *ExpectedCreateIndex) method(v bool) string {
 	} else {
 		index = fmt.Sprintf("%v", e.arg2)
 	}
-	return fmt.Sprintf("DB(%s).CreateIndex(ctx, %s, %s, %s)", e.db.name, ddoc, name, index)
+	return fmt.Sprintf("DB(%s).CreateIndex(ctx, %s, %s, %s)", e.DB().name, ddoc, name, index)
 }
 
 func (e *ExpectedCreateIndex) met(ex expectation) bool {
 	exp := ex.(*ExpectedCreateIndex)
-	if e.db.name != exp.db.name {
-		return false
-	}
 	if exp.arg0 != "" && exp.arg0 != e.arg0 {
 		return false
 	}
@@ -234,7 +220,7 @@ func (e *ExpectedCreateIndex) WithIndex(index interface{}) *ExpectedCreateIndex 
 }
 
 func (e *ExpectedGetIndexes) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).GetIndexes()", e.db.name, e.db.id)
+	msg := fmt.Sprintf("call to DB(%s#%d).GetIndexes()", e.DB().name, e.DB().id)
 	var extra string
 	if e.ret0 != nil {
 		extra += fmt.Sprintf("\n\t- should return indexes: %v", e.ret0)
@@ -251,16 +237,15 @@ func (e *ExpectedGetIndexes) method(v bool) string {
 	if !v {
 		return "DB.GetIndexes()"
 	}
-	return fmt.Sprintf("DB(%s).GetIndexes(ctx)", e.db.name)
+	return fmt.Sprintf("DB(%s).GetIndexes(ctx)", e.DB().name)
 }
 
 func (e *ExpectedGetIndexes) met(ex expectation) bool {
-	exp := ex.(*ExpectedGetIndexes)
-	return e.db.name == exp.db.name
+	return true
 }
 
 func (e *ExpectedDeleteIndex) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).DeleteIndex() which:", e.db.name, e.db.id)
+	msg := fmt.Sprintf("call to DB(%s#%d).DeleteIndex() which:", e.DB().name, e.DB().id)
 	if e.arg0 == "" {
 		msg += "\n\t- has any ddoc"
 	} else {
@@ -287,14 +272,11 @@ func (e *ExpectedDeleteIndex) method(v bool) string {
 	} else {
 		name = fmt.Sprintf("%q", e.arg1)
 	}
-	return fmt.Sprintf("DB(%s).DeleteIndex(ctx, %s, %s)", e.db.name, ddoc, name)
+	return fmt.Sprintf("DB(%s).DeleteIndex(ctx, %s, %s)", e.DB().name, ddoc, name)
 }
 
 func (e *ExpectedDeleteIndex) met(ex expectation) bool {
 	exp := ex.(*ExpectedDeleteIndex)
-	if e.db.name != exp.db.name {
-		return false
-	}
 	if exp.arg0 != "" && exp.arg0 != e.arg0 {
 		return false
 	}
@@ -317,7 +299,7 @@ func (e *ExpectedDeleteIndex) WithName(name string) *ExpectedDeleteIndex {
 }
 
 func (e *ExpectedExplain) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).Explain() which:", e.db.name, e.db.id)
+	msg := fmt.Sprintf("call to DB(%s#%d).Explain() which:", e.DB().name, e.DB().id)
 	if e.arg0 == nil {
 		msg += "\n\t- has any query"
 	} else {
@@ -336,17 +318,14 @@ func (e *ExpectedExplain) method(v bool) string {
 		return "DB.Explain()"
 	}
 	if e.arg0 != nil {
-		return fmt.Sprintf("DB(%s).Explain(ctx, %v)", e.db.name, e.arg0)
+		return fmt.Sprintf("DB(%s).Explain(ctx, %v)", e.DB().name, e.arg0)
 	}
-	return fmt.Sprintf("DB(%s).Explain(ctx, ?)", e.db.name)
+	return fmt.Sprintf("DB(%s).Explain(ctx, ?)", e.DB().name)
 }
 
 func (e *ExpectedExplain) met(ex expectation) bool {
 	exp := ex.(*ExpectedExplain)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
-	return e.ret0 == nil || diff.AsJSON(e.ret0, exp.ret0) == nil
+	return exp.ret0 != nil && diff.AsJSON(e.ret0, exp.ret0) != nil
 }
 
 // WithQuery sets the expected query for the Explain() call.
@@ -356,7 +335,7 @@ func (e *ExpectedExplain) WithQuery(query interface{}) *ExpectedExplain {
 }
 
 func (e *ExpectedCreateDoc) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).CreateDoc() which:", e.db.name, e.db.id)
+	msg := fmt.Sprintf("call to DB(%s#%d).CreateDoc() which:", e.DB().name, e.DB().id)
 	if e.arg0 == nil {
 		msg += "\n\t- has any doc"
 	} else {
@@ -387,14 +366,11 @@ func (e *ExpectedCreateDoc) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).CreateDoc(ctx, %s%s)", e.db.name, doc, options)
+	return fmt.Sprintf("DB(%s).CreateDoc(ctx, %s%s)", e.DB().name, doc, options)
 }
 
 func (e *ExpectedCreateDoc) met(ex expectation) bool {
 	exp := ex.(*ExpectedCreateDoc)
-	if e.db.name != exp.db.name {
-		return false
-	}
 	if exp.arg0 != nil && diff.AsJSON(e.arg0, exp.arg0) != nil {
 		return false
 	}
@@ -439,12 +415,11 @@ func (e *ExpectedCompact) method(v bool) string {
 	if !v {
 		return "DB.Compact()"
 	}
-	return fmt.Sprintf("DB(%s).Compact(ctx)", e.db.name)
+	return fmt.Sprintf("DB(%s).Compact(ctx)", e.DB().name)
 }
 
 func (e *ExpectedCompact) met(ex expectation) bool {
-	exp := ex.(*ExpectedCompact)
-	return e.db.name == exp.db.name && e.db.id == exp.db.id
+	return true
 }
 
 func (e *ExpectedViewCleanup) String() string {
@@ -455,12 +430,11 @@ func (e *ExpectedViewCleanup) method(v bool) string {
 	if !v {
 		return "DB.ViewCleanup()"
 	}
-	return fmt.Sprintf("DB(%s).ViewCleanup(ctx)", e.db.name)
+	return fmt.Sprintf("DB(%s).ViewCleanup(ctx)", e.DB().name)
 }
 
 func (e *ExpectedViewCleanup) met(ex expectation) bool {
-	exp := ex.(*ExpectedViewCleanup)
-	return e.db.name == exp.db.name && e.db.id == exp.db.id
+	return true
 }
 
 func (e *ExpectedPut) String() string {
@@ -492,14 +466,11 @@ func (e *ExpectedPut) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).Put(ctx, %s, %s%s)", e.db.name, docID, doc, options)
+	return fmt.Sprintf("DB(%s).Put(ctx, %s, %s%s)", e.DB().name, docID, doc, options)
 }
 
 func (e *ExpectedPut) met(ex expectation) bool {
 	exp := ex.(*ExpectedPut)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	if exp.arg0 != "" && e.arg0 != exp.arg0 {
 		return false
 	}
@@ -552,14 +523,11 @@ func (e *ExpectedGetMeta) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).GetMeta(ctx, %s%s)", e.db.name, docID, options)
+	return fmt.Sprintf("DB(%s).GetMeta(ctx, %s%s)", e.DB().name, docID, options)
 }
 
 func (e *ExpectedGetMeta) met(ex expectation) bool {
 	exp := ex.(*ExpectedGetMeta)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	if exp.arg0 != "" && e.arg0 != exp.arg0 {
 		return false
 	}
@@ -583,12 +551,11 @@ func (e *ExpectedFlush) method(v bool) string {
 	if !v {
 		return "DB.Flush()"
 	}
-	return fmt.Sprintf("DB(%s).Flush(ctx)", e.db.name)
+	return fmt.Sprintf("DB(%s).Flush(ctx)", e.DB().name)
 }
 
 func (e *ExpectedFlush) met(ex expectation) bool {
-	exp := ex.(*ExpectedFlush)
-	return e.db.name == exp.db.name && e.db.id == exp.db.id
+	return true
 }
 
 func (e *ExpectedDeleteAttachment) String() string {
@@ -631,14 +598,11 @@ func (e *ExpectedDeleteAttachment) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).DeleteAttachment(ctx, %s, %s, %s%s)", e.db.name, id, rev, filename, options)
+	return fmt.Sprintf("DB(%s).DeleteAttachment(ctx, %s, %s, %s%s)", e.DB().name, id, rev, filename, options)
 }
 
 func (e *ExpectedDeleteAttachment) met(ex expectation) bool {
 	exp := ex.(*ExpectedDeleteAttachment)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	if exp.arg0 != "" && exp.arg0 != e.arg0 {
 		return false
 	}
@@ -701,14 +665,11 @@ func (e *ExpectedDelete) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).Delete(ctx, %s, %s%s)", e.db.name, id, rev, options)
+	return fmt.Sprintf("DB(%s).Delete(ctx, %s, %s%s)", e.DB().name, id, rev, options)
 }
 
 func (e *ExpectedDelete) met(ex expectation) bool {
 	exp := ex.(*ExpectedDelete)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	if exp.arg0 != "" && exp.arg0 != e.arg0 {
 		return false
 	}
@@ -762,14 +723,11 @@ func (e *ExpectedCopy) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).Copy(ctx, %s, %s%s)", e.db.name, target, source, options)
+	return fmt.Sprintf("DB(%s).Copy(ctx, %s, %s%s)", e.DB().name, target, source, options)
 }
 
 func (e *ExpectedCopy) met(ex expectation) bool {
 	exp := ex.(*ExpectedCopy)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	if exp.arg0 != "" && exp.arg0 != e.arg0 {
 		return false
 	}
@@ -809,14 +767,11 @@ func (e *ExpectedCompactView) method(v bool) string {
 	if e.arg0 != "" {
 		ddoc = fmt.Sprintf("%q", e.arg0)
 	}
-	return fmt.Sprintf("DB(%s).CompactView(ctx, %s)", e.db.name, ddoc)
+	return fmt.Sprintf("DB(%s).CompactView(ctx, %s)", e.DB().name, ddoc)
 }
 
 func (e *ExpectedCompactView) met(ex expectation) bool {
 	exp := ex.(*ExpectedCompactView)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	if exp.arg0 != "" && e.arg0 != exp.arg0 {
 		return false
 	}
@@ -853,14 +808,11 @@ func (e *ExpectedGet) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).Get(ctx, %s%s)", e.db.name, id, options)
+	return fmt.Sprintf("DB(%s).Get(ctx, %s%s)", e.DB().name, id, options)
 }
 
 func (e *ExpectedGet) met(ex expectation) bool {
 	exp := ex.(*ExpectedGet)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	if exp.arg0 != "" && e.arg0 != exp.arg0 {
 		return false
 	}
@@ -908,14 +860,11 @@ func (e *ExpectedGetAttachmentMeta) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).GetAttachmentMeta(ctx, %s, %s%s)", e.db.name, id, filename, options)
+	return fmt.Sprintf("DB(%s).GetAttachmentMeta(ctx, %s, %s%s)", e.DB().name, id, filename, options)
 }
 
 func (e *ExpectedGetAttachmentMeta) met(ex expectation) bool {
 	exp := ex.(*ExpectedGetAttachmentMeta)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	if exp.arg0 != "" && e.arg0 != exp.arg0 {
 		return false
 	}
@@ -953,14 +902,11 @@ func (e *ExpectedLocalDocs) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).LocalDocs(ctx%s)", e.db.name, options)
+	return fmt.Sprintf("DB(%s).LocalDocs(ctx%s)", e.DB().name, options)
 }
 
 func (e *ExpectedLocalDocs) met(ex expectation) bool {
 	exp := ex.(*ExpectedLocalDocs)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	return reflect.DeepEqual(e.options, exp.options)
 }
 
@@ -985,14 +931,11 @@ func (e *ExpectedPurge) method(v bool) string {
 	if e.arg0 != nil {
 		docRevMap = fmt.Sprintf("%v", e.arg0)
 	}
-	return fmt.Sprintf("DB(%s).Purge(ctx, %s)", e.db.name, docRevMap)
+	return fmt.Sprintf("DB(%s).Purge(ctx, %s)", e.DB().name, docRevMap)
 }
 
 func (e *ExpectedPurge) met(ex expectation) bool {
 	exp := ex.(*ExpectedPurge)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	if exp.arg0 != nil && !reflect.DeepEqual(e.arg0, exp.arg0) {
 		return false
 	}
@@ -1045,14 +988,11 @@ func (e *ExpectedPutAttachment) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).PutAttachment(ctx, %s, %s, %s%s)", e.db.name, doc, rev, att, options)
+	return fmt.Sprintf("DB(%s).PutAttachment(ctx, %s, %s, %s%s)", e.DB().name, doc, rev, att, options)
 }
 
 func (e *ExpectedPutAttachment) met(ex expectation) bool {
 	exp := ex.(*ExpectedPutAttachment)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	if exp.arg0 != "" && e.arg0 != exp.arg0 {
 		return false
 	}
@@ -1113,14 +1053,11 @@ func (e *ExpectedQuery) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf(", %v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).Query(ctx, %s, %s%s)", e.db.name, ddocID, view, options)
+	return fmt.Sprintf("DB(%s).Query(ctx, %s, %s%s)", e.DB().name, ddocID, view, options)
 }
 
 func (e *ExpectedQuery) met(ex expectation) bool {
 	exp := ex.(*ExpectedQuery)
-	if e.db.name != exp.db.name || e.db.id != exp.db.id {
-		return false
-	}
 	if exp.arg0 != "" && exp.arg0 != e.arg0 {
 		return false
 	}

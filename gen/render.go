@@ -91,9 +91,6 @@ func (m *Method) ReturnArgs() string {
 
 func (m *Method) VariableDefinitions() string {
 	var result []string
-	if m.DBMethod {
-		result = append(result, "\tdb *MockDB\n")
-	}
 	for i, arg := range m.Accepts {
 		result = append(result, fmt.Sprintf("\targ%d %s\n", i, typeName(arg)))
 	}
@@ -124,15 +121,19 @@ func (m *Method) ExpectedVariables() string {
 }
 
 func (m *Method) InputVariables() string {
-	var result []string
+	var result, common []string
 	if m.DBMethod {
-		result = append(result, "\t\tdb: db.MockDB,\n")
+		common = append(common, "\t\t\tdb: db.MockDB,\n")
 	}
 	for i := range m.Accepts {
 		result = append(result, fmt.Sprintf("\t\targ%d: arg%d,\n", i, i))
 	}
 	if m.AcceptsOptions {
-		result = append(result, fmt.Sprintf("\t\tcommonExpectation: commonExpectation{options:options},\n"))
+		common = append(common, "\t\t\toptions: options,\n")
+	}
+	if len(common) > 0 {
+		result = append(result, fmt.Sprintf("\t\tcommonExpectation: commonExpectation{\n%s\t\t},\n",
+			strings.Join(common, "")))
 	}
 	return strings.Join(result, "")
 }
@@ -219,7 +220,7 @@ func typeName(t reflect.Type) string {
 func (m *Method) SetExpectations() string {
 	var args []string
 	if m.DBMethod {
-		args = append(args, "db: db,\n")
+		args = append(args, "commonExpectation: commonExpectation{db: db},\n")
 	}
 	for i, ret := range m.Returns {
 		var zero string

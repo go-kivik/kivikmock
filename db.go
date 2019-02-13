@@ -16,7 +16,7 @@ var _ driver.Finder = &driverDB{}
 
 func (db *driverDB) Close(ctx context.Context) error {
 	expected := &ExpectedDBClose{
-		db: db.MockDB,
+		commonExpectation: commonExpectation{db: db.MockDB},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err

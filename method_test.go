@@ -243,12 +243,12 @@ func TestDBCloseMethod(t *testing.T) {
 func TestAllDocsMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedAllDocs{db: &MockDB{name: "foo"}},
+		input:    &ExpectedAllDocs{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.AllDocs()",
 		verbose:  "DB(foo).AllDocs(ctx)",
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedAllDocs{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
+		input:    &ExpectedAllDocs{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}, db: &MockDB{name: "foo"}}},
 		standard: "DB.AllDocs()",
 		verbose:  "DB(foo).AllDocs(ctx, map[foo:123])",
 	})
@@ -258,17 +258,17 @@ func TestAllDocsMethod(t *testing.T) {
 func TestBulkGetMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedBulkGet{db: &MockDB{name: "foo"}},
+		input:    &ExpectedBulkGet{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.BulkGet()",
 		verbose:  "DB(foo).BulkGet(ctx, ?)",
 	})
 	tests.Add("docs", methodTest{
-		input:    &ExpectedBulkGet{db: &MockDB{name: "foo"}, arg0: []driver.BulkGetReference{{ID: "foo"}}},
+		input:    &ExpectedBulkGet{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: []driver.BulkGetReference{{ID: "foo"}}},
 		standard: "DB.BulkGet()",
 		verbose:  "DB(foo).BulkGet(ctx, [{foo  }])",
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedBulkGet{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
+		input:    &ExpectedBulkGet{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}, db: &MockDB{name: "foo"}}},
 		standard: "DB.BulkGet()",
 		verbose:  "DB(foo).BulkGet(ctx, ?, map[foo:123])",
 	})
@@ -278,12 +278,12 @@ func TestBulkGetMethod(t *testing.T) {
 func TestFindMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedFind{db: &MockDB{name: "foo"}},
+		input:    &ExpectedFind{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.Find()",
 		verbose:  "DB(foo).Find(ctx, ?)",
 	})
 	tests.Add("query", methodTest{
-		input:    &ExpectedFind{db: &MockDB{name: "foo"}, arg0: map[string]string{"foo": "bar"}},
+		input:    &ExpectedFind{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: map[string]string{"foo": "bar"}},
 		standard: "DB.Find()",
 		verbose:  "DB(foo).Find(ctx, map[foo:bar])",
 	})
@@ -293,22 +293,22 @@ func TestFindMethod(t *testing.T) {
 func TestCreateIndexMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}},
+		input:    &ExpectedCreateIndex{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.CreateIndex()",
 		verbose:  "DB(foo).CreateIndex(ctx, ?, ?, ?)",
 	})
 	tests.Add("ddoc", methodTest{
-		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}, arg0: "foo"},
+		input:    &ExpectedCreateIndex{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "foo"},
 		standard: "DB.CreateIndex()",
 		verbose:  `DB(foo).CreateIndex(ctx, "foo", ?, ?)`,
 	})
 	tests.Add("name", methodTest{
-		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}, arg1: "foo"},
+		input:    &ExpectedCreateIndex{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg1: "foo"},
 		standard: "DB.CreateIndex()",
 		verbose:  `DB(foo).CreateIndex(ctx, ?, "foo", ?)`,
 	})
 	tests.Add("index", methodTest{
-		input:    &ExpectedCreateIndex{db: &MockDB{name: "foo"}, arg2: map[string]string{"foo": "bar"}},
+		input:    &ExpectedCreateIndex{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg2: map[string]string{"foo": "bar"}},
 		standard: "DB.CreateIndex()",
 		verbose:  `DB(foo).CreateIndex(ctx, ?, ?, map[foo:bar])`,
 	})
@@ -318,7 +318,7 @@ func TestCreateIndexMethod(t *testing.T) {
 func TestGetIndexesMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedGetIndexes{db: &MockDB{name: "foo"}},
+		input:    &ExpectedGetIndexes{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.GetIndexes()",
 		verbose:  "DB(foo).GetIndexes(ctx)",
 	})
@@ -328,17 +328,17 @@ func TestGetIndexesMethod(t *testing.T) {
 func TestDeleteIndexMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedDeleteIndex{db: &MockDB{name: "foo"}},
+		input:    &ExpectedDeleteIndex{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.DeleteIndex()",
 		verbose:  "DB(foo).DeleteIndex(ctx, ?, ?)",
 	})
 	tests.Add("ddoc", methodTest{
-		input:    &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, arg0: "foo"},
+		input:    &ExpectedDeleteIndex{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "foo"},
 		standard: "DB.DeleteIndex()",
 		verbose:  `DB(foo).DeleteIndex(ctx, "foo", ?)`,
 	})
 	tests.Add("name", methodTest{
-		input:    &ExpectedDeleteIndex{db: &MockDB{name: "foo"}, arg1: "foo"},
+		input:    &ExpectedDeleteIndex{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg1: "foo"},
 		standard: "DB.DeleteIndex()",
 		verbose:  `DB(foo).DeleteIndex(ctx, ?, "foo")`,
 	})
@@ -348,12 +348,12 @@ func TestDeleteIndexMethod(t *testing.T) {
 func TestExplainMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedExplain{db: &MockDB{name: "foo"}},
+		input:    &ExpectedExplain{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.Explain()",
 		verbose:  "DB(foo).Explain(ctx, ?)",
 	})
 	tests.Add("query", methodTest{
-		input:    &ExpectedExplain{db: &MockDB{name: "foo"}, arg0: map[string]string{"foo": "bar"}},
+		input:    &ExpectedExplain{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: map[string]string{"foo": "bar"}},
 		standard: "DB.Explain()",
 		verbose:  "DB(foo).Explain(ctx, map[foo:bar])",
 	})
@@ -363,17 +363,17 @@ func TestExplainMethod(t *testing.T) {
 func TestCreateDocMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedCreateDoc{db: &MockDB{name: "foo"}},
+		input:    &ExpectedCreateDoc{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.CreateDoc()",
 		verbose:  "DB(foo).CreateDoc(ctx, ?)",
 	})
 	tests.Add("docs", methodTest{
-		input:    &ExpectedCreateDoc{db: &MockDB{name: "foo"}, arg0: map[string]string{"foo": "bar"}},
+		input:    &ExpectedCreateDoc{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: map[string]string{"foo": "bar"}},
 		standard: "DB.CreateDoc()",
 		verbose:  "DB(foo).CreateDoc(ctx, map[foo:bar])",
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedCreateDoc{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
+		input:    &ExpectedCreateDoc{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": "bar"}}},
 		standard: "DB.CreateDoc()",
 		verbose:  "DB(foo).CreateDoc(ctx, ?, map[foo:bar])",
 	})
@@ -383,7 +383,7 @@ func TestCreateDocMethod(t *testing.T) {
 func TestCompactMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedCompact{db: &MockDB{name: "foo"}},
+		input:    &ExpectedCompact{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.Compact()",
 		verbose:  "DB(foo).Compact(ctx)",
 	})
@@ -393,7 +393,7 @@ func TestCompactMethod(t *testing.T) {
 func TestViewCleanupMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedViewCleanup{db: &MockDB{name: "foo"}},
+		input:    &ExpectedViewCleanup{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.ViewCleanup()",
 		verbose:  "DB(foo).ViewCleanup(ctx)",
 	})
@@ -403,22 +403,22 @@ func TestViewCleanupMethod(t *testing.T) {
 func TestPutMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedPut{db: &MockDB{name: "foo"}},
+		input:    &ExpectedPut{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.Put()",
 		verbose:  "DB(foo).Put(ctx, ?, ?)",
 	})
 	tests.Add("docID", methodTest{
-		input:    &ExpectedPut{db: &MockDB{name: "foo"}, arg0: "asdf"},
+		input:    &ExpectedPut{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "asdf"},
 		standard: "DB.Put()",
 		verbose:  `DB(foo).Put(ctx, "asdf", ?)`,
 	})
 	tests.Add("doc", methodTest{
-		input:    &ExpectedPut{db: &MockDB{name: "foo"}, arg1: map[string]interface{}{"foo": 123}},
+		input:    &ExpectedPut{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg1: map[string]interface{}{"foo": 123}},
 		standard: "DB.Put()",
 		verbose:  "DB(foo).Put(ctx, ?, map[foo:123])",
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedPut{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: kivik.Options{"foo": "bar"}}},
+		input:    &ExpectedPut{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, options: kivik.Options{"foo": "bar"}}},
 		standard: "DB.Put()",
 		verbose:  "DB(foo).Put(ctx, ?, ?, map[foo:bar])",
 	})
@@ -428,17 +428,17 @@ func TestPutMethod(t *testing.T) {
 func TestGetMetaMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedGetMeta{db: &MockDB{name: "foo"}},
+		input:    &ExpectedGetMeta{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.GetMeta()",
 		verbose:  "DB(foo).GetMeta(ctx, ?)",
 	})
 	tests.Add("docID", methodTest{
-		input:    &ExpectedGetMeta{db: &MockDB{name: "foo"}, arg0: "foo"},
+		input:    &ExpectedGetMeta{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "foo"},
 		standard: "DB.GetMeta()",
 		verbose:  `DB(foo).GetMeta(ctx, "foo")`,
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedGetMeta{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: kivik.Options{"foo": "bar"}}},
+		input:    &ExpectedGetMeta{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, options: kivik.Options{"foo": "bar"}}},
 		standard: "DB.GetMeta()",
 		verbose:  `DB(foo).GetMeta(ctx, ?, map[foo:bar])`,
 	})
@@ -448,12 +448,12 @@ func TestGetMetaMethod(t *testing.T) {
 func TestCompactViewMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedCompactView{db: &MockDB{name: "foo"}},
+		input:    &ExpectedCompactView{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.CompactView()",
 		verbose:  "DB(foo).CompactView(ctx, ?)",
 	})
 	tests.Add("ddocID", methodTest{
-		input:    &ExpectedCompactView{db: &MockDB{name: "foo"}, arg0: "foo"},
+		input:    &ExpectedCompactView{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "foo"},
 		standard: "DB.CompactView()",
 		verbose:  `DB(foo).CompactView(ctx, "foo")`,
 	})
@@ -463,7 +463,7 @@ func TestCompactViewMethod(t *testing.T) {
 func TestFlushMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedFlush{db: &MockDB{name: "foo"}},
+		input:    &ExpectedFlush{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.Flush()",
 		verbose:  "DB(foo).Flush(ctx)",
 	})
@@ -473,27 +473,27 @@ func TestFlushMethod(t *testing.T) {
 func TestDeleteAttachmentMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}},
+		input:    &ExpectedDeleteAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.DeleteAttachment()",
 		verbose:  "DB(foo).DeleteAttachment(ctx, ?, ?, ?)",
 	})
 	tests.Add("docID", methodTest{
-		input:    &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}, arg0: "foo"},
+		input:    &ExpectedDeleteAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "foo"},
 		standard: "DB.DeleteAttachment()",
 		verbose:  `DB(foo).DeleteAttachment(ctx, "foo", ?, ?)`,
 	})
 	tests.Add("rev", methodTest{
-		input:    &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}, arg1: "1-foo"},
+		input:    &ExpectedDeleteAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg1: "1-foo"},
 		standard: "DB.DeleteAttachment()",
 		verbose:  `DB(foo).DeleteAttachment(ctx, ?, "1-foo", ?)`,
 	})
 	tests.Add("filename", methodTest{
-		input:    &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}, arg2: "foo.txt"},
+		input:    &ExpectedDeleteAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg2: "foo.txt"},
 		standard: "DB.DeleteAttachment()",
 		verbose:  `DB(foo).DeleteAttachment(ctx, ?, ?, "foo.txt")`,
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedDeleteAttachment{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
+		input:    &ExpectedDeleteAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": "bar"}}},
 		standard: "DB.DeleteAttachment()",
 		verbose:  `DB(foo).DeleteAttachment(ctx, ?, ?, ?, map[foo:bar])`,
 	})
@@ -503,22 +503,22 @@ func TestDeleteAttachmentMethod(t *testing.T) {
 func TestDeleteMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedDelete{db: &MockDB{name: "foo"}},
+		input:    &ExpectedDelete{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.Delete()",
 		verbose:  "DB(foo).Delete(ctx, ?, ?)",
 	})
 	tests.Add("docID", methodTest{
-		input:    &ExpectedDelete{db: &MockDB{name: "foo"}, arg0: "foo"},
+		input:    &ExpectedDelete{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "foo"},
 		standard: "DB.Delete()",
 		verbose:  `DB(foo).Delete(ctx, "foo", ?)`,
 	})
 	tests.Add("rev", methodTest{
-		input:    &ExpectedDelete{db: &MockDB{name: "foo"}, arg1: "1-foo"},
+		input:    &ExpectedDelete{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg1: "1-foo"},
 		standard: "DB.Delete()",
 		verbose:  `DB(foo).Delete(ctx, ?, "1-foo")`,
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedDelete{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
+		input:    &ExpectedDelete{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": "bar"}}},
 		standard: "DB.Delete()",
 		verbose:  "DB(foo).Delete(ctx, ?, ?, map[foo:bar])",
 	})
@@ -528,22 +528,22 @@ func TestDeleteMethod(t *testing.T) {
 func TestCopyMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedCopy{db: &MockDB{name: "foo"}},
+		input:    &ExpectedCopy{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.Copy()",
 		verbose:  "DB(foo).Copy(ctx, ?, ?)",
 	})
 	tests.Add("targetID", methodTest{
-		input:    &ExpectedCopy{db: &MockDB{name: "foo"}, arg0: "foo"},
+		input:    &ExpectedCopy{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "foo"},
 		standard: "DB.Copy()",
 		verbose:  `DB(foo).Copy(ctx, "foo", ?)`,
 	})
 	tests.Add("sourceID", methodTest{
-		input:    &ExpectedCopy{db: &MockDB{name: "foo"}, arg1: "bar"},
+		input:    &ExpectedCopy{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg1: "bar"},
 		standard: "DB.Copy()",
 		verbose:  `DB(foo).Copy(ctx, ?, "bar")`,
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedCopy{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
+		input:    &ExpectedCopy{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": "bar"}}},
 		standard: "DB.Copy()",
 		verbose:  "DB(foo).Copy(ctx, ?, ?, map[foo:bar])",
 	})
@@ -553,17 +553,17 @@ func TestCopyMethod(t *testing.T) {
 func TestGetMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedGet{db: &MockDB{name: "foo"}},
+		input:    &ExpectedGet{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.Get()",
 		verbose:  "DB(foo).Get(ctx, ?)",
 	})
 	tests.Add("docID", methodTest{
-		input:    &ExpectedGet{db: &MockDB{name: "foo"}, arg0: "foo"},
+		input:    &ExpectedGet{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "foo"},
 		standard: "DB.Get()",
 		verbose:  `DB(foo).Get(ctx, "foo")`,
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedGet{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
+		input:    &ExpectedGet{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": "bar"}}},
 		standard: "DB.Get()",
 		verbose:  "DB(foo).Get(ctx, ?, map[foo:bar])",
 	})
@@ -573,22 +573,22 @@ func TestGetMethod(t *testing.T) {
 func TestGetAttachmentMetaMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedGetAttachmentMeta{db: &MockDB{name: "foo"}},
+		input:    &ExpectedGetAttachmentMeta{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.GetAttachmentMeta()",
 		verbose:  "DB(foo).GetAttachmentMeta(ctx, ?, ?)",
 	})
 	tests.Add("docID", methodTest{
-		input:    &ExpectedGetAttachmentMeta{db: &MockDB{name: "foo"}, arg0: "foo"},
+		input:    &ExpectedGetAttachmentMeta{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "foo"},
 		standard: "DB.GetAttachmentMeta()",
 		verbose:  `DB(foo).GetAttachmentMeta(ctx, "foo", ?)`,
 	})
 	tests.Add("filename", methodTest{
-		input:    &ExpectedGetAttachmentMeta{db: &MockDB{name: "foo"}, arg1: "foo.txt"},
+		input:    &ExpectedGetAttachmentMeta{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg1: "foo.txt"},
 		standard: "DB.GetAttachmentMeta()",
 		verbose:  `DB(foo).GetAttachmentMeta(ctx, ?, "foo.txt")`,
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedGetAttachmentMeta{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": "bar"}}},
+		input:    &ExpectedGetAttachmentMeta{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, options: map[string]interface{}{"foo": "bar"}}},
 		standard: "DB.GetAttachmentMeta()",
 		verbose:  "DB(foo).GetAttachmentMeta(ctx, ?, ?, map[foo:bar])",
 	})
@@ -598,12 +598,12 @@ func TestGetAttachmentMetaMethod(t *testing.T) {
 func TestLocalDocsMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedLocalDocs{db: &MockDB{name: "foo"}},
+		input:    &ExpectedLocalDocs{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.LocalDocs()",
 		verbose:  "DB(foo).LocalDocs(ctx)",
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedLocalDocs{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
+		input:    &ExpectedLocalDocs{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}, db: &MockDB{name: "foo"}}},
 		standard: "DB.LocalDocs()",
 		verbose:  "DB(foo).LocalDocs(ctx, map[foo:123])",
 	})
@@ -613,12 +613,12 @@ func TestLocalDocsMethod(t *testing.T) {
 func TestPurgeMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedPurge{db: &MockDB{name: "foo"}},
+		input:    &ExpectedPurge{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.Purge()",
 		verbose:  "DB(foo).Purge(ctx, ?)",
 	})
 	tests.Add("docRevMap", methodTest{
-		input:    &ExpectedPurge{db: &MockDB{name: "foo"}, arg0: map[string][]string{"foo": {"a", "b"}}},
+		input:    &ExpectedPurge{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: map[string][]string{"foo": {"a", "b"}}},
 		standard: "DB.Purge()",
 		verbose:  "DB(foo).Purge(ctx, map[foo:[a b]])",
 	})
@@ -628,27 +628,27 @@ func TestPurgeMethod(t *testing.T) {
 func TestPutAttachmentMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedPutAttachment{db: &MockDB{name: "foo"}},
+		input:    &ExpectedPutAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.PutAttachment()",
 		verbose:  "DB(foo).PutAttachment(ctx, ?, ?, ?)",
 	})
 	tests.Add("docID", methodTest{
-		input:    &ExpectedPutAttachment{db: &MockDB{name: "foo"}, arg0: "foo"},
+		input:    &ExpectedPutAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "foo"},
 		standard: "DB.PutAttachment()",
 		verbose:  `DB(foo).PutAttachment(ctx, "foo", ?, ?)`,
 	})
 	tests.Add("rev", methodTest{
-		input:    &ExpectedPutAttachment{db: &MockDB{name: "foo"}, arg1: "1-foo"},
+		input:    &ExpectedPutAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg1: "1-foo"},
 		standard: "DB.PutAttachment()",
 		verbose:  `DB(foo).PutAttachment(ctx, ?, "1-foo", ?)`,
 	})
 	tests.Add("att", methodTest{
-		input:    &ExpectedPutAttachment{db: &MockDB{name: "foo"}, arg2: &driver.Attachment{Filename: "foo.txt"}},
+		input:    &ExpectedPutAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg2: &driver.Attachment{Filename: "foo.txt"}},
 		standard: "DB.PutAttachment()",
 		verbose:  `DB(foo).PutAttachment(ctx, ?, ?, &{foo.txt  false <nil> 0  0 0 })`,
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedPutAttachment{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
+		input:    &ExpectedPutAttachment{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}, db: &MockDB{name: "foo"}}},
 		standard: "DB.PutAttachment()",
 		verbose:  `DB(foo).PutAttachment(ctx, ?, ?, ?, map[foo:123])`,
 	})
@@ -658,22 +658,22 @@ func TestPutAttachmentMethod(t *testing.T) {
 func TestQueryMethod(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", methodTest{
-		input:    &ExpectedQuery{db: &MockDB{name: "foo"}},
+		input:    &ExpectedQuery{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		standard: "DB.Query()",
 		verbose:  "DB(foo).Query(ctx, ?, ?)",
 	})
 	tests.Add("ddocID", methodTest{
-		input:    &ExpectedQuery{db: &MockDB{name: "foo"}, arg0: "foo"},
+		input:    &ExpectedQuery{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "foo"},
 		standard: "DB.Query()",
 		verbose:  `DB(foo).Query(ctx, "foo", ?)`,
 	})
 	tests.Add("view", methodTest{
-		input:    &ExpectedQuery{db: &MockDB{name: "foo"}, arg1: "bar"},
+		input:    &ExpectedQuery{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg1: "bar"},
 		standard: "DB.Query()",
 		verbose:  `DB(foo).Query(ctx, ?, "bar")`,
 	})
 	tests.Add("options", methodTest{
-		input:    &ExpectedQuery{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
+		input:    &ExpectedQuery{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}, db: &MockDB{name: "foo"}}},
 		standard: "DB.Query()",
 		verbose:  "DB(foo).Query(ctx, ?, ?, map[foo:123])",
 	})

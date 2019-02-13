@@ -13,7 +13,7 @@ var _ = &driver.Attachment{}
 // ExpectCompact queues an expectation that DB.Compact will be called.
 func (db *MockDB) ExpectCompact() *ExpectedCompact {
 	e := &ExpectedCompact{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -23,7 +23,7 @@ func (db *MockDB) ExpectCompact() *ExpectedCompact {
 // ExpectCompactView queues an expectation that DB.CompactView will be called.
 func (db *MockDB) ExpectCompactView() *ExpectedCompactView {
 	e := &ExpectedCompactView{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -33,7 +33,7 @@ func (db *MockDB) ExpectCompactView() *ExpectedCompactView {
 // ExpectCopy queues an expectation that DB.Copy will be called.
 func (db *MockDB) ExpectCopy() *ExpectedCopy {
 	e := &ExpectedCopy{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -43,7 +43,7 @@ func (db *MockDB) ExpectCopy() *ExpectedCopy {
 // ExpectCreateDoc queues an expectation that DB.CreateDoc will be called.
 func (db *MockDB) ExpectCreateDoc() *ExpectedCreateDoc {
 	e := &ExpectedCreateDoc{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -53,7 +53,7 @@ func (db *MockDB) ExpectCreateDoc() *ExpectedCreateDoc {
 // ExpectCreateIndex queues an expectation that DB.CreateIndex will be called.
 func (db *MockDB) ExpectCreateIndex() *ExpectedCreateIndex {
 	e := &ExpectedCreateIndex{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -63,7 +63,7 @@ func (db *MockDB) ExpectCreateIndex() *ExpectedCreateIndex {
 // ExpectDelete queues an expectation that DB.Delete will be called.
 func (db *MockDB) ExpectDelete() *ExpectedDelete {
 	e := &ExpectedDelete{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -73,7 +73,7 @@ func (db *MockDB) ExpectDelete() *ExpectedDelete {
 // ExpectDeleteAttachment queues an expectation that DB.DeleteAttachment will be called.
 func (db *MockDB) ExpectDeleteAttachment() *ExpectedDeleteAttachment {
 	e := &ExpectedDeleteAttachment{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -83,7 +83,7 @@ func (db *MockDB) ExpectDeleteAttachment() *ExpectedDeleteAttachment {
 // ExpectDeleteIndex queues an expectation that DB.DeleteIndex will be called.
 func (db *MockDB) ExpectDeleteIndex() *ExpectedDeleteIndex {
 	e := &ExpectedDeleteIndex{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -93,7 +93,7 @@ func (db *MockDB) ExpectDeleteIndex() *ExpectedDeleteIndex {
 // ExpectFlush queues an expectation that DB.Flush will be called.
 func (db *MockDB) ExpectFlush() *ExpectedFlush {
 	e := &ExpectedFlush{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -103,7 +103,7 @@ func (db *MockDB) ExpectFlush() *ExpectedFlush {
 // ExpectGetMeta queues an expectation that DB.GetMeta will be called.
 func (db *MockDB) ExpectGetMeta() *ExpectedGetMeta {
 	e := &ExpectedGetMeta{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -113,7 +113,7 @@ func (db *MockDB) ExpectGetMeta() *ExpectedGetMeta {
 // ExpectPut queues an expectation that DB.Put will be called.
 func (db *MockDB) ExpectPut() *ExpectedPut {
 	e := &ExpectedPut{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -123,7 +123,7 @@ func (db *MockDB) ExpectPut() *ExpectedPut {
 // ExpectViewCleanup queues an expectation that DB.ViewCleanup will be called.
 func (db *MockDB) ExpectViewCleanup() *ExpectedViewCleanup {
 	e := &ExpectedViewCleanup{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -133,8 +133,8 @@ func (db *MockDB) ExpectViewCleanup() *ExpectedViewCleanup {
 // ExpectAllDocs queues an expectation that DB.AllDocs will be called.
 func (db *MockDB) ExpectAllDocs() *ExpectedAllDocs {
 	e := &ExpectedAllDocs{
-		db:   db,
-		ret0: &Rows{},
+		commonExpectation: commonExpectation{db: db},
+		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -144,7 +144,7 @@ func (db *MockDB) ExpectAllDocs() *ExpectedAllDocs {
 // ExpectBulkDocs queues an expectation that DB.BulkDocs will be called.
 func (db *MockDB) ExpectBulkDocs() *ExpectedBulkDocs {
 	e := &ExpectedBulkDocs{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -154,8 +154,8 @@ func (db *MockDB) ExpectBulkDocs() *ExpectedBulkDocs {
 // ExpectBulkGet queues an expectation that DB.BulkGet will be called.
 func (db *MockDB) ExpectBulkGet() *ExpectedBulkGet {
 	e := &ExpectedBulkGet{
-		db:   db,
-		ret0: &Rows{},
+		commonExpectation: commonExpectation{db: db},
+		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -165,7 +165,7 @@ func (db *MockDB) ExpectBulkGet() *ExpectedBulkGet {
 // ExpectChanges queues an expectation that DB.Changes will be called.
 func (db *MockDB) ExpectChanges() *ExpectedChanges {
 	e := &ExpectedChanges{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -175,8 +175,8 @@ func (db *MockDB) ExpectChanges() *ExpectedChanges {
 // ExpectDesignDocs queues an expectation that DB.DesignDocs will be called.
 func (db *MockDB) ExpectDesignDocs() *ExpectedDesignDocs {
 	e := &ExpectedDesignDocs{
-		db:   db,
-		ret0: &Rows{},
+		commonExpectation: commonExpectation{db: db},
+		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -186,8 +186,8 @@ func (db *MockDB) ExpectDesignDocs() *ExpectedDesignDocs {
 // ExpectExplain queues an expectation that DB.Explain will be called.
 func (db *MockDB) ExpectExplain() *ExpectedExplain {
 	e := &ExpectedExplain{
-		db:   db,
-		ret0: &driver.QueryPlan{},
+		commonExpectation: commonExpectation{db: db},
+		ret0:              &driver.QueryPlan{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -197,8 +197,8 @@ func (db *MockDB) ExpectExplain() *ExpectedExplain {
 // ExpectFind queues an expectation that DB.Find will be called.
 func (db *MockDB) ExpectFind() *ExpectedFind {
 	e := &ExpectedFind{
-		db:   db,
-		ret0: &Rows{},
+		commonExpectation: commonExpectation{db: db},
+		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -208,7 +208,7 @@ func (db *MockDB) ExpectFind() *ExpectedFind {
 // ExpectGet queues an expectation that DB.Get will be called.
 func (db *MockDB) ExpectGet() *ExpectedGet {
 	e := &ExpectedGet{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -218,7 +218,7 @@ func (db *MockDB) ExpectGet() *ExpectedGet {
 // ExpectGetAttachment queues an expectation that DB.GetAttachment will be called.
 func (db *MockDB) ExpectGetAttachment() *ExpectedGetAttachment {
 	e := &ExpectedGetAttachment{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -228,7 +228,7 @@ func (db *MockDB) ExpectGetAttachment() *ExpectedGetAttachment {
 // ExpectGetAttachmentMeta queues an expectation that DB.GetAttachmentMeta will be called.
 func (db *MockDB) ExpectGetAttachmentMeta() *ExpectedGetAttachmentMeta {
 	e := &ExpectedGetAttachmentMeta{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -238,7 +238,7 @@ func (db *MockDB) ExpectGetAttachmentMeta() *ExpectedGetAttachmentMeta {
 // ExpectGetIndexes queues an expectation that DB.GetIndexes will be called.
 func (db *MockDB) ExpectGetIndexes() *ExpectedGetIndexes {
 	e := &ExpectedGetIndexes{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -248,8 +248,8 @@ func (db *MockDB) ExpectGetIndexes() *ExpectedGetIndexes {
 // ExpectLocalDocs queues an expectation that DB.LocalDocs will be called.
 func (db *MockDB) ExpectLocalDocs() *ExpectedLocalDocs {
 	e := &ExpectedLocalDocs{
-		db:   db,
-		ret0: &Rows{},
+		commonExpectation: commonExpectation{db: db},
+		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -259,8 +259,8 @@ func (db *MockDB) ExpectLocalDocs() *ExpectedLocalDocs {
 // ExpectPurge queues an expectation that DB.Purge will be called.
 func (db *MockDB) ExpectPurge() *ExpectedPurge {
 	e := &ExpectedPurge{
-		db:   db,
-		ret0: &driver.PurgeResult{},
+		commonExpectation: commonExpectation{db: db},
+		ret0:              &driver.PurgeResult{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -270,7 +270,7 @@ func (db *MockDB) ExpectPurge() *ExpectedPurge {
 // ExpectPutAttachment queues an expectation that DB.PutAttachment will be called.
 func (db *MockDB) ExpectPutAttachment() *ExpectedPutAttachment {
 	e := &ExpectedPutAttachment{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -280,8 +280,8 @@ func (db *MockDB) ExpectPutAttachment() *ExpectedPutAttachment {
 // ExpectQuery queues an expectation that DB.Query will be called.
 func (db *MockDB) ExpectQuery() *ExpectedQuery {
 	e := &ExpectedQuery{
-		db:   db,
-		ret0: &Rows{},
+		commonExpectation: commonExpectation{db: db},
+		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -291,7 +291,7 @@ func (db *MockDB) ExpectQuery() *ExpectedQuery {
 // ExpectSecurity queues an expectation that DB.Security will be called.
 func (db *MockDB) ExpectSecurity() *ExpectedSecurity {
 	e := &ExpectedSecurity{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -301,7 +301,7 @@ func (db *MockDB) ExpectSecurity() *ExpectedSecurity {
 // ExpectSetSecurity queues an expectation that DB.SetSecurity will be called.
 func (db *MockDB) ExpectSetSecurity() *ExpectedSetSecurity {
 	e := &ExpectedSetSecurity{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -311,7 +311,7 @@ func (db *MockDB) ExpectSetSecurity() *ExpectedSetSecurity {
 // ExpectStats queues an expectation that DB.Stats will be called.
 func (db *MockDB) ExpectStats() *ExpectedStats {
 	e := &ExpectedStats{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)

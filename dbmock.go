@@ -16,7 +16,7 @@ func (db *MockDB) expectations() int {
 // ExpectClose queues an expectation for DB.Close() to be called.
 func (db *MockDB) ExpectClose() *ExpectedDBClose {
 	e := &ExpectedDBClose{
-		db: db,
+		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
