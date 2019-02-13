@@ -125,7 +125,7 @@ func (e *ExpectedCopy) method(v bool) string {
 	if !v {
 		return "DB.Copy()"
 	}
-	arg0, arg1, options := "?", "?", "[?]"
+	arg0, arg1, options := "?", "?", defaultOptionPlaceholder
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}
@@ -183,7 +183,7 @@ func (e *ExpectedCreateDoc) method(v bool) string {
 	if !v {
 		return "DB.CreateDoc()"
 	}
-	arg0, options := "?", "[?]"
+	arg0, options := "?", defaultOptionPlaceholder
 	if e.arg0 != nil {
 		arg0 = fmt.Sprintf("%v", e.arg0)
 	}
@@ -291,7 +291,7 @@ func (e *ExpectedDelete) method(v bool) string {
 	if !v {
 		return "DB.Delete()"
 	}
-	arg0, arg1, options := "?", "?", "[?]"
+	arg0, arg1, options := "?", "?", defaultOptionPlaceholder
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}
@@ -355,7 +355,7 @@ func (e *ExpectedDeleteAttachment) method(v bool) string {
 	if !v {
 		return "DB.DeleteAttachment()"
 	}
-	arg0, arg1, arg2, options := "?", "?", "?", "[?]"
+	arg0, arg1, arg2, options := "?", "?", "?", defaultOptionPlaceholder
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}
@@ -488,7 +488,7 @@ func (e *ExpectedGetMeta) method(v bool) string {
 	if !v {
 		return "DB.GetMeta()"
 	}
-	arg0, options := "?", "[?]"
+	arg0, options := "?", defaultOptionPlaceholder
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}
@@ -545,7 +545,7 @@ func (e *ExpectedPut) method(v bool) string {
 	if !v {
 		return "DB.Put()"
 	}
-	arg0, arg1, options := "?", "?", "[?]"
+	arg0, arg1, options := "?", "?", defaultOptionPlaceholder
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}
@@ -624,7 +624,7 @@ func (e *ExpectedAllDocs) method(v bool) string {
 	if !v {
 		return "DB.AllDocs()"
 	}
-	options := "[?]"
+	options := defaultOptionPlaceholder
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
@@ -674,7 +674,7 @@ func (e *ExpectedBulkDocs) method(v bool) string {
 	if !v {
 		return "DB.BulkDocs()"
 	}
-	arg0, options := "?", "[?]"
+	arg0, options := "?", defaultOptionPlaceholder
 	if e.arg0 != nil {
 		arg0 = fmt.Sprintf("%v", e.arg0)
 	}
@@ -727,7 +727,7 @@ func (e *ExpectedBulkGet) method(v bool) string {
 	if !v {
 		return "DB.BulkGet()"
 	}
-	arg0, options := "?", "[?]"
+	arg0, options := "?", defaultOptionPlaceholder
 	if e.arg0 != nil {
 		arg0 = fmt.Sprintf("%v", e.arg0)
 	}
@@ -775,7 +775,7 @@ func (e *ExpectedChanges) method(v bool) string {
 	if !v {
 		return "DB.Changes()"
 	}
-	options := "[?]"
+	options := defaultOptionPlaceholder
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
@@ -820,7 +820,7 @@ func (e *ExpectedDesignDocs) method(v bool) string {
 	if !v {
 		return "DB.DesignDocs()"
 	}
-	options := "[?]"
+	options := defaultOptionPlaceholder
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
@@ -958,7 +958,7 @@ func (e *ExpectedGet) method(v bool) string {
 	if !v {
 		return "DB.Get()"
 	}
-	arg0, options := "?", "[?]"
+	arg0, options := "?", defaultOptionPlaceholder
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}
@@ -1015,7 +1015,7 @@ func (e *ExpectedGetAttachment) method(v bool) string {
 	if !v {
 		return "DB.GetAttachment()"
 	}
-	arg0, arg1, options := "?", "?", "[?]"
+	arg0, arg1, options := "?", "?", defaultOptionPlaceholder
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}
@@ -1075,7 +1075,7 @@ func (e *ExpectedGetAttachmentMeta) method(v bool) string {
 	if !v {
 		return "DB.GetAttachmentMeta()"
 	}
-	arg0, arg1, options := "?", "?", "[?]"
+	arg0, arg1, options := "?", "?", defaultOptionPlaceholder
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}
@@ -1161,7 +1161,7 @@ func (e *ExpectedLocalDocs) method(v bool) string {
 	if !v {
 		return "DB.LocalDocs()"
 	}
-	options := "[?]"
+	options := defaultOptionPlaceholder
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
@@ -1263,7 +1263,7 @@ func (e *ExpectedPutAttachment) method(v bool) string {
 	if !v {
 		return "DB.PutAttachment()"
 	}
-	arg0, arg1, arg2, options := "?", "?", "?", "[?]"
+	arg0, arg1, arg2, options := "?", "?", "?", defaultOptionPlaceholder
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}
@@ -1326,7 +1326,7 @@ func (e *ExpectedQuery) method(v bool) string {
 	if !v {
 		return "DB.Query()"
 	}
-	arg0, arg1, options := "?", "?", "[?]"
+	arg0, arg1, options := "?", "?", defaultOptionPlaceholder
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}

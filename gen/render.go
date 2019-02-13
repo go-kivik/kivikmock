@@ -288,7 +288,7 @@ func (m *Method) MethodArgs() string {
 	}
 	if m.AcceptsOptions {
 		str = append(str, "options")
-		def = append(def, `"[?]"`)
+		def = append(def, `defaultOptionPlaceholder`)
 		vars = append(vars, "%s")
 		mid = append(mid, `	if e.options != nil { options = fmt.Sprintf("%v", e.options) }`)
 	}

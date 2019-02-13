@@ -51,7 +51,7 @@ func (e *ExpectedAllDBs) method(v bool) string {
 	if !v {
 		return "AllDBs()"
 	}
-	options := "[?]"
+	options := defaultOptionPlaceholder
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
@@ -161,7 +161,7 @@ func (e *ExpectedClusterStatus) method(v bool) string {
 	if !v {
 		return "ClusterStatus()"
 	}
-	options := "[?]"
+	options := defaultOptionPlaceholder
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
@@ -211,7 +211,7 @@ func (e *ExpectedDBExists) method(v bool) string {
 	if !v {
 		return "DBExists()"
 	}
-	arg0, options := "?", "[?]"
+	arg0, options := "?", defaultOptionPlaceholder
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}
@@ -257,7 +257,7 @@ func (e *ExpectedDestroyDB) method(v bool) string {
 	if !v {
 		return "DestroyDB()"
 	}
-	arg0, options := "?", "[?]"
+	arg0, options := "?", defaultOptionPlaceholder
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}

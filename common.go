@@ -85,3 +85,7 @@ func pause(ctx context.Context, delay time.Duration) error {
 		return ctx.Err()
 	}
 }
+
+const (
+	defaultOptionPlaceholder = "[?]"
+)
