@@ -654,3 +654,28 @@ func TestPutAttachmentMethod(t *testing.T) {
 	})
 	tests.Run(t, testMethod)
 }
+
+func TestQueryMethod(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", methodTest{
+		input:    &ExpectedQuery{db: &MockDB{name: "foo"}},
+		standard: "DB.Query()",
+		verbose:  "DB(foo).Query(ctx, ?, ?)",
+	})
+	tests.Add("ddocID", methodTest{
+		input:    &ExpectedQuery{db: &MockDB{name: "foo"}, arg0: "foo"},
+		standard: "DB.Query()",
+		verbose:  `DB(foo).Query(ctx, "foo", ?)`,
+	})
+	tests.Add("view", methodTest{
+		input:    &ExpectedQuery{db: &MockDB{name: "foo"}, arg1: "bar"},
+		standard: "DB.Query()",
+		verbose:  `DB(foo).Query(ctx, ?, "bar")`,
+	})
+	tests.Add("options", methodTest{
+		input:    &ExpectedQuery{db: &MockDB{name: "foo"}, commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
+		standard: "DB.Query()",
+		verbose:  "DB(foo).Query(ctx, ?, ?, map[foo:123])",
+	})
+	tests.Run(t, testMethod)
+}

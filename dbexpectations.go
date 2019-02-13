@@ -51,12 +51,8 @@ func (e *ExpectedDBClose) WillDelay(d time.Duration) *ExpectedDBClose {
 }
 
 func (e *ExpectedAllDocs) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).AllDocs() which:", e.db.name, e.db.id)
-	msg += optionsString(e.options)
-	msg += fmt.Sprintf("\n\t- should return: %d results", e.ret0.rowCount())
-	msg += delayString(e.delay)
-	msg += errorString(e.err)
-	return msg
+	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	return dbStringer("AllDocs", e.db, &e.commonExpectation, withOptions, nil, rets)
 }
 
 func (e *ExpectedAllDocs) method(v bool) string {
@@ -126,16 +122,14 @@ func (e *ExpectedBulkGet) met(ex expectation) bool {
 }
 
 func (e *ExpectedFind) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).Find() which:", e.db.name, e.db.id)
+	var opts []string
 	if e.arg0 == nil {
-		msg += "\n\t- has any query"
+		opts = append(opts, "has any query")
 	} else {
-		msg += fmt.Sprintf("\n\t- has query: %v", e.arg0)
+		opts = append(opts, fmt.Sprintf("has query: %v", e.arg0))
 	}
-	msg += fmt.Sprintf("\n\t- should return: %d results", e.ret0.rowCount())
-	msg += delayString(e.delay)
-	msg += errorString(e.err)
-	return msg
+	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	return dbStringer("Find", e.db, &e.commonExpectation, withOptions, opts, rets)
 }
 
 func (e *ExpectedFind) method(v bool) string {
@@ -221,9 +215,9 @@ func (e *ExpectedCreateIndex) met(ex expectation) bool {
 	return exp.arg2 == nil || diff.AsJSON(exp.arg2, e.arg2) == nil
 }
 
-// WithDDoc sets the expected ddoc value for the DB.CreateIndex() call.
-func (e *ExpectedCreateIndex) WithDDoc(ddoc string) *ExpectedCreateIndex {
-	e.arg0 = ddoc
+// WithDDocID sets the expected ddocID value for the DB.CreateIndex() call.
+func (e *ExpectedCreateIndex) WithDDocID(ddocID string) *ExpectedCreateIndex {
+	e.arg0 = ddocID
 	return e
 }
 
@@ -1089,9 +1083,65 @@ func (e *ExpectedPutAttachment) WithAttachment(att *driver.Attachment) *Expected
 	return e
 }
 
-func (e *ExpectedQuery) String() string                  { panic("x") }
-func (e *ExpectedQuery) method(v bool) string            { panic("x") }
-func (e *ExpectedQuery) met(ex expectation) bool         { panic("x") }
+func (e *ExpectedQuery) String() string {
+	var opts []string
+	if e.arg0 == "" {
+		opts = append(opts, "has any ddocID")
+	} else {
+		opts = append(opts, "has ddocID: "+e.arg0)
+	}
+	if e.arg1 == "" {
+		opts = append(opts, "has any view")
+	} else {
+		opts = append(opts, "has view: "+e.arg1)
+	}
+	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	return dbStringer("Query", e.db, &e.commonExpectation, withOptions, opts, rets)
+}
+
+func (e *ExpectedQuery) method(v bool) string {
+	if !v {
+		return "DB.Query()"
+	}
+	ddocID, view, options := "?", "?", ""
+	if e.arg0 != "" {
+		ddocID = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.arg1 != "" {
+		view = fmt.Sprintf("%q", e.arg1)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf(", %v", e.options)
+	}
+	return fmt.Sprintf("DB(%s).Query(ctx, %s, %s%s)", e.db.name, ddocID, view, options)
+}
+
+func (e *ExpectedQuery) met(ex expectation) bool {
+	exp := ex.(*ExpectedQuery)
+	if e.db.name != exp.db.name || e.db.id != exp.db.id {
+		return false
+	}
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	return reflect.DeepEqual(e.options, exp.options)
+}
+
+// WithDDocID sets the expected ddocID value for the DB.Query() call.
+func (e *ExpectedQuery) WithDDocID(ddocID string) *ExpectedQuery {
+	e.arg0 = ddocID
+	return e
+}
+
+// WithView sets the expected view value for the DB.Query() call.
+func (e *ExpectedQuery) WithView(view string) *ExpectedQuery {
+	e.arg1 = view
+	return e
+}
+
 func (e *ExpectedSecurity) String() string               { panic("x") }
 func (e *ExpectedSecurity) method(v bool) string         { panic("x") }
 func (e *ExpectedSecurity) met(ex expectation) bool      { panic("x") }
