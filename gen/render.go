@@ -238,3 +238,48 @@ func (m *Method) SetExpectations() string {
 	}
 	return strings.Join(args, "")
 }
+
+func (m *Method) MetExpectations() string {
+	if len(m.Accepts) == 0 {
+		return ""
+	}
+	args := make([]string, 0, len(m.Accepts)+1)
+	args = append(args, fmt.Sprintf("\texp := ex.(*Expected%s)", m.Name))
+	var check string
+	for i, arg := range m.Accepts {
+		switch arg.String() {
+		case "string":
+			check = `exp.arg%[1]d != "" && exp.arg%[1]d != e.arg%[1]d`
+		case "int":
+			check = "exp.arg%[1]d != 0 && exp.arg%[1]d != e.arg%[1]d"
+		case "interface {}":
+			check = "exp.arg%[1]d != nil && !jsonMeets(exp.arg%[1]d, e.arg%[1]d)"
+		default:
+			check = "exp.arg%[1]d != nil && !reflect.DeepEqual(exp.arg%[1]d, e.arg%[1]d)"
+		}
+		args = append(args, fmt.Sprintf("if "+check+" {\n\t\treturn false\n\t}", i))
+	}
+	return strings.Join(args, "\n")
+}
+
+/* {{ define "metString" }}
+    if exp.arg{{.}} != "" && exp.arg{{.}} != e.arg{{.}} {
+        return false
+    }
+{{ end }}
+{{ define "metInt" }}
+    if exp.arg{{.}} != 0 && exp.arg{{.}} != e.arg{{.}} {
+        return false
+    }
+{{ end }}
+{{ define "metJSON" }}
+    if exp.arg{{.}} != nil && !jsonEqual(exp.arg{{.}}, e.arg{{.}}) {
+        return false
+    }
+{{ end}}
+{{ define "metAny" }}
+    if exp.arg{{.}} != nil && !reflect.DeepEqual(exp.arg{{.}}, e.arg{{.}}) {
+        return false
+    }
+{{ end }}
+*/

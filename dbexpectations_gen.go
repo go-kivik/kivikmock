@@ -3,12 +3,14 @@
 package kivikmock
 
 import (
+	"reflect"
 	"time"
 
 	"github.com/go-kivik/kivik/driver"
 )
 
 var _ = &driver.Attachment{}
+var _ = reflect.Int
 
 // ExpectedCompact represents an expectation for a call to DB.Compact().
 type ExpectedCompact struct {
@@ -27,6 +29,10 @@ func (e *ExpectedCompact) WillDelay(delay time.Duration) *ExpectedCompact {
 	return e
 }
 
+func (e *ExpectedCompact) met(_ expectation) bool {
+	return true
+}
+
 // ExpectedCompactView represents an expectation for a call to DB.CompactView().
 type ExpectedCompactView struct {
 	commonExpectation
@@ -43,6 +49,14 @@ func (e *ExpectedCompactView) WillReturnError(err error) *ExpectedCompactView {
 func (e *ExpectedCompactView) WillDelay(delay time.Duration) *ExpectedCompactView {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedCompactView) met(ex expectation) bool {
+	exp := ex.(*ExpectedCompactView)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	return true
 }
 
 // ExpectedCopy represents an expectation for a call to DB.Copy().
@@ -75,6 +89,17 @@ func (e *ExpectedCopy) WillReturnError(err error) *ExpectedCopy {
 func (e *ExpectedCopy) WillDelay(delay time.Duration) *ExpectedCopy {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedCopy) met(ex expectation) bool {
+	exp := ex.(*ExpectedCopy)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	return true
 }
 
 // ExpectedCreateDoc represents an expectation for a call to DB.CreateDoc().
@@ -110,6 +135,14 @@ func (e *ExpectedCreateDoc) WillDelay(delay time.Duration) *ExpectedCreateDoc {
 	return e
 }
 
+func (e *ExpectedCreateDoc) met(ex expectation) bool {
+	exp := ex.(*ExpectedCreateDoc)
+	if exp.arg0 != nil && !jsonMeets(exp.arg0, e.arg0) {
+		return false
+	}
+	return true
+}
+
 // ExpectedCreateIndex represents an expectation for a call to DB.CreateIndex().
 type ExpectedCreateIndex struct {
 	commonExpectation
@@ -128,6 +161,20 @@ func (e *ExpectedCreateIndex) WillReturnError(err error) *ExpectedCreateIndex {
 func (e *ExpectedCreateIndex) WillDelay(delay time.Duration) *ExpectedCreateIndex {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedCreateIndex) met(ex expectation) bool {
+	exp := ex.(*ExpectedCreateIndex)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	if exp.arg2 != nil && !jsonMeets(exp.arg2, e.arg2) {
+		return false
+	}
+	return true
 }
 
 // ExpectedDelete represents an expectation for a call to DB.Delete().
@@ -160,6 +207,17 @@ func (e *ExpectedDelete) WillReturnError(err error) *ExpectedDelete {
 func (e *ExpectedDelete) WillDelay(delay time.Duration) *ExpectedDelete {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedDelete) met(ex expectation) bool {
+	exp := ex.(*ExpectedDelete)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	return true
 }
 
 // ExpectedDeleteAttachment represents an expectation for a call to DB.DeleteAttachment().
@@ -195,6 +253,20 @@ func (e *ExpectedDeleteAttachment) WillDelay(delay time.Duration) *ExpectedDelet
 	return e
 }
 
+func (e *ExpectedDeleteAttachment) met(ex expectation) bool {
+	exp := ex.(*ExpectedDeleteAttachment)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	if exp.arg2 != "" && exp.arg2 != e.arg2 {
+		return false
+	}
+	return true
+}
+
 // ExpectedDeleteIndex represents an expectation for a call to DB.DeleteIndex().
 type ExpectedDeleteIndex struct {
 	commonExpectation
@@ -214,6 +286,17 @@ func (e *ExpectedDeleteIndex) WillDelay(delay time.Duration) *ExpectedDeleteInde
 	return e
 }
 
+func (e *ExpectedDeleteIndex) met(ex expectation) bool {
+	exp := ex.(*ExpectedDeleteIndex)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	return true
+}
+
 // ExpectedFlush represents an expectation for a call to DB.Flush().
 type ExpectedFlush struct {
 	commonExpectation
@@ -229,6 +312,10 @@ func (e *ExpectedFlush) WillReturnError(err error) *ExpectedFlush {
 func (e *ExpectedFlush) WillDelay(delay time.Duration) *ExpectedFlush {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedFlush) met(_ expectation) bool {
+	return true
 }
 
 // ExpectedGetMeta represents an expectation for a call to DB.GetMeta().
@@ -264,6 +351,14 @@ func (e *ExpectedGetMeta) WillDelay(delay time.Duration) *ExpectedGetMeta {
 	return e
 }
 
+func (e *ExpectedGetMeta) met(ex expectation) bool {
+	exp := ex.(*ExpectedGetMeta)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	return true
+}
+
 // ExpectedPut represents an expectation for a call to DB.Put().
 type ExpectedPut struct {
 	commonExpectation
@@ -296,6 +391,17 @@ func (e *ExpectedPut) WillDelay(delay time.Duration) *ExpectedPut {
 	return e
 }
 
+func (e *ExpectedPut) met(ex expectation) bool {
+	exp := ex.(*ExpectedPut)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != nil && !jsonMeets(exp.arg1, e.arg1) {
+		return false
+	}
+	return true
+}
+
 // ExpectedViewCleanup represents an expectation for a call to DB.ViewCleanup().
 type ExpectedViewCleanup struct {
 	commonExpectation
@@ -311,6 +417,10 @@ func (e *ExpectedViewCleanup) WillReturnError(err error) *ExpectedViewCleanup {
 func (e *ExpectedViewCleanup) WillDelay(delay time.Duration) *ExpectedViewCleanup {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedViewCleanup) met(_ expectation) bool {
+	return true
 }
 
 // ExpectedAllDocs represents an expectation for a call to DB.AllDocs().
@@ -341,6 +451,10 @@ func (e *ExpectedAllDocs) WillReturnError(err error) *ExpectedAllDocs {
 func (e *ExpectedAllDocs) WillDelay(delay time.Duration) *ExpectedAllDocs {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedAllDocs) met(_ expectation) bool {
+	return true
 }
 
 // ExpectedBulkDocs represents an expectation for a call to DB.BulkDocs().
@@ -374,6 +488,14 @@ func (e *ExpectedBulkDocs) WillDelay(delay time.Duration) *ExpectedBulkDocs {
 	return e
 }
 
+func (e *ExpectedBulkDocs) met(ex expectation) bool {
+	exp := ex.(*ExpectedBulkDocs)
+	if exp.arg0 != nil && !reflect.DeepEqual(exp.arg0, e.arg0) {
+		return false
+	}
+	return true
+}
+
 // ExpectedBulkGet represents an expectation for a call to DB.BulkGet().
 type ExpectedBulkGet struct {
 	commonExpectation
@@ -403,6 +525,14 @@ func (e *ExpectedBulkGet) WillReturnError(err error) *ExpectedBulkGet {
 func (e *ExpectedBulkGet) WillDelay(delay time.Duration) *ExpectedBulkGet {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedBulkGet) met(ex expectation) bool {
+	exp := ex.(*ExpectedBulkGet)
+	if exp.arg0 != nil && !reflect.DeepEqual(exp.arg0, e.arg0) {
+		return false
+	}
+	return true
 }
 
 // ExpectedChanges represents an expectation for a call to DB.Changes().
@@ -435,6 +565,10 @@ func (e *ExpectedChanges) WillDelay(delay time.Duration) *ExpectedChanges {
 	return e
 }
 
+func (e *ExpectedChanges) met(_ expectation) bool {
+	return true
+}
+
 // ExpectedDesignDocs represents an expectation for a call to DB.DesignDocs().
 type ExpectedDesignDocs struct {
 	commonExpectation
@@ -465,6 +599,10 @@ func (e *ExpectedDesignDocs) WillDelay(delay time.Duration) *ExpectedDesignDocs 
 	return e
 }
 
+func (e *ExpectedDesignDocs) met(_ expectation) bool {
+	return true
+}
+
 // ExpectedExplain represents an expectation for a call to DB.Explain().
 type ExpectedExplain struct {
 	commonExpectation
@@ -490,6 +628,14 @@ func (e *ExpectedExplain) WillDelay(delay time.Duration) *ExpectedExplain {
 	return e
 }
 
+func (e *ExpectedExplain) met(ex expectation) bool {
+	exp := ex.(*ExpectedExplain)
+	if exp.arg0 != nil && !jsonMeets(exp.arg0, e.arg0) {
+		return false
+	}
+	return true
+}
+
 // ExpectedFind represents an expectation for a call to DB.Find().
 type ExpectedFind struct {
 	commonExpectation
@@ -513,6 +659,14 @@ func (e *ExpectedFind) WillReturnError(err error) *ExpectedFind {
 func (e *ExpectedFind) WillDelay(delay time.Duration) *ExpectedFind {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedFind) met(ex expectation) bool {
+	exp := ex.(*ExpectedFind)
+	if exp.arg0 != nil && !jsonMeets(exp.arg0, e.arg0) {
+		return false
+	}
+	return true
 }
 
 // ExpectedGet represents an expectation for a call to DB.Get().
@@ -544,6 +698,14 @@ func (e *ExpectedGet) WillReturnError(err error) *ExpectedGet {
 func (e *ExpectedGet) WillDelay(delay time.Duration) *ExpectedGet {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedGet) met(ex expectation) bool {
+	exp := ex.(*ExpectedGet)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	return true
 }
 
 // ExpectedGetAttachment represents an expectation for a call to DB.GetAttachment().
@@ -578,6 +740,17 @@ func (e *ExpectedGetAttachment) WillDelay(delay time.Duration) *ExpectedGetAttac
 	return e
 }
 
+func (e *ExpectedGetAttachment) met(ex expectation) bool {
+	exp := ex.(*ExpectedGetAttachment)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	return true
+}
+
 // ExpectedGetAttachmentMeta represents an expectation for a call to DB.GetAttachmentMeta().
 type ExpectedGetAttachmentMeta struct {
 	commonExpectation
@@ -610,6 +783,17 @@ func (e *ExpectedGetAttachmentMeta) WillDelay(delay time.Duration) *ExpectedGetA
 	return e
 }
 
+func (e *ExpectedGetAttachmentMeta) met(ex expectation) bool {
+	exp := ex.(*ExpectedGetAttachmentMeta)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	return true
+}
+
 // ExpectedGetIndexes represents an expectation for a call to DB.GetIndexes().
 type ExpectedGetIndexes struct {
 	commonExpectation
@@ -632,6 +816,10 @@ func (e *ExpectedGetIndexes) WillReturnError(err error) *ExpectedGetIndexes {
 func (e *ExpectedGetIndexes) WillDelay(delay time.Duration) *ExpectedGetIndexes {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedGetIndexes) met(_ expectation) bool {
+	return true
 }
 
 // ExpectedLocalDocs represents an expectation for a call to DB.LocalDocs().
@@ -664,6 +852,10 @@ func (e *ExpectedLocalDocs) WillDelay(delay time.Duration) *ExpectedLocalDocs {
 	return e
 }
 
+func (e *ExpectedLocalDocs) met(_ expectation) bool {
+	return true
+}
+
 // ExpectedPurge represents an expectation for a call to DB.Purge().
 type ExpectedPurge struct {
 	commonExpectation
@@ -687,6 +879,14 @@ func (e *ExpectedPurge) WillReturnError(err error) *ExpectedPurge {
 func (e *ExpectedPurge) WillDelay(delay time.Duration) *ExpectedPurge {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedPurge) met(ex expectation) bool {
+	exp := ex.(*ExpectedPurge)
+	if exp.arg0 != nil && !reflect.DeepEqual(exp.arg0, e.arg0) {
+		return false
+	}
+	return true
 }
 
 // ExpectedPutAttachment represents an expectation for a call to DB.PutAttachment().
@@ -722,6 +922,20 @@ func (e *ExpectedPutAttachment) WillDelay(delay time.Duration) *ExpectedPutAttac
 	return e
 }
 
+func (e *ExpectedPutAttachment) met(ex expectation) bool {
+	exp := ex.(*ExpectedPutAttachment)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	if exp.arg2 != nil && !reflect.DeepEqual(exp.arg2, e.arg2) {
+		return false
+	}
+	return true
+}
+
 // ExpectedQuery represents an expectation for a call to DB.Query().
 type ExpectedQuery struct {
 	commonExpectation
@@ -754,6 +968,17 @@ func (e *ExpectedQuery) WillDelay(delay time.Duration) *ExpectedQuery {
 	return e
 }
 
+func (e *ExpectedQuery) met(ex expectation) bool {
+	exp := ex.(*ExpectedQuery)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	return true
+}
+
 // ExpectedSecurity represents an expectation for a call to DB.Security().
 type ExpectedSecurity struct {
 	commonExpectation
@@ -778,6 +1003,10 @@ func (e *ExpectedSecurity) WillDelay(delay time.Duration) *ExpectedSecurity {
 	return e
 }
 
+func (e *ExpectedSecurity) met(_ expectation) bool {
+	return true
+}
+
 // ExpectedSetSecurity represents an expectation for a call to DB.SetSecurity().
 type ExpectedSetSecurity struct {
 	commonExpectation
@@ -794,6 +1023,14 @@ func (e *ExpectedSetSecurity) WillReturnError(err error) *ExpectedSetSecurity {
 func (e *ExpectedSetSecurity) WillDelay(delay time.Duration) *ExpectedSetSecurity {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedSetSecurity) met(ex expectation) bool {
+	exp := ex.(*ExpectedSetSecurity)
+	if exp.arg0 != nil && !reflect.DeepEqual(exp.arg0, e.arg0) {
+		return false
+	}
+	return true
 }
 
 // ExpectedStats represents an expectation for a call to DB.Stats().
@@ -818,4 +1055,8 @@ func (e *ExpectedStats) WillReturnError(err error) *ExpectedStats {
 func (e *ExpectedStats) WillDelay(delay time.Duration) *ExpectedStats {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedStats) met(_ expectation) bool {
+	return true
 }

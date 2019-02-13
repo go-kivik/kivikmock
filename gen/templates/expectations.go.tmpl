@@ -4,11 +4,13 @@ package kivikmock
 
 import (
 	"time"
+	"reflect"
 
 	"github.com/go-kivik/kivik/driver"
 )
 
 var _ = &driver.Attachment{}
+var _ = reflect.Int
 
 {{ range $method := . -}}
 {{ template "expectedtype.tmpl" $method -}}

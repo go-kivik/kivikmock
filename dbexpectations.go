@@ -2,10 +2,8 @@ package kivikmock
 
 import (
 	"fmt"
-	"reflect"
 	"time"
 
-	"github.com/flimzy/diff"
 	"github.com/go-kivik/kivik/driver"
 )
 
@@ -63,10 +61,6 @@ func (e *ExpectedAllDocs) method(v bool) string {
 	return fmt.Sprintf("DB(%s).AllDocs(ctx, %v)", e.DB().name, e.options)
 }
 
-func (e *ExpectedAllDocs) met(ex expectation) bool {
-	return true
-}
-
 func (e *ExpectedBulkGet) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).BulkGet() which:", e.DB().name, e.DB().id)
 	if e.arg0 == nil {
@@ -107,10 +101,6 @@ func (e *ExpectedBulkGet) method(v bool) string {
 	return fmt.Sprintf("DB(%s).BulkGet(ctx, %s%s)", e.DB().name, docs, options)
 }
 
-func (e *ExpectedBulkGet) met(ex expectation) bool {
-	return true
-}
-
 func (e *ExpectedFind) String() string {
 	var opts []string
 	if e.arg0 == nil {
@@ -130,11 +120,6 @@ func (e *ExpectedFind) method(v bool) string {
 		return fmt.Sprintf("DB(%s).Find(ctx, ?)", e.DB().name)
 	}
 	return fmt.Sprintf("DB(%s).Find(ctx, %v)", e.DB().name, e.arg0)
-}
-
-func (e *ExpectedFind) met(ex expectation) bool {
-	exp := ex.(*ExpectedFind)
-	return exp.arg0 == nil || diff.AsJSON(e.arg0, exp.arg0) == nil
 }
 
 // WithQuery sets the expected query for the Find() call.
@@ -188,17 +173,6 @@ func (e *ExpectedCreateIndex) method(v bool) string {
 	return fmt.Sprintf("DB(%s).CreateIndex(ctx, %s, %s, %s)", e.DB().name, ddoc, name, index)
 }
 
-func (e *ExpectedCreateIndex) met(ex expectation) bool {
-	exp := ex.(*ExpectedCreateIndex)
-	if exp.arg0 != "" && exp.arg0 != e.arg0 {
-		return false
-	}
-	if exp.arg1 != "" && exp.arg1 != e.arg1 {
-		return false
-	}
-	return exp.arg2 == nil || diff.AsJSON(exp.arg2, e.arg2) == nil
-}
-
 // WithDDocID sets the expected ddocID value for the DB.CreateIndex() call.
 func (e *ExpectedCreateIndex) WithDDocID(ddocID string) *ExpectedCreateIndex {
 	e.arg0 = ddocID
@@ -238,10 +212,6 @@ func (e *ExpectedGetIndexes) method(v bool) string {
 	return fmt.Sprintf("DB(%s).GetIndexes(ctx)", e.DB().name)
 }
 
-func (e *ExpectedGetIndexes) met(ex expectation) bool {
-	return true
-}
-
 func (e *ExpectedDeleteIndex) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).DeleteIndex() which:", e.DB().name, e.DB().id)
 	if e.arg0 == "" {
@@ -271,17 +241,6 @@ func (e *ExpectedDeleteIndex) method(v bool) string {
 		name = fmt.Sprintf("%q", e.arg1)
 	}
 	return fmt.Sprintf("DB(%s).DeleteIndex(ctx, %s, %s)", e.DB().name, ddoc, name)
-}
-
-func (e *ExpectedDeleteIndex) met(ex expectation) bool {
-	exp := ex.(*ExpectedDeleteIndex)
-	if exp.arg0 != "" && exp.arg0 != e.arg0 {
-		return false
-	}
-	if exp.arg1 != "" && exp.arg1 != e.arg1 {
-		return false
-	}
-	return true
 }
 
 // WithDDoc sets the expected ddoc to be passed to the DB.DeleteIndex() call.
@@ -319,11 +278,6 @@ func (e *ExpectedExplain) method(v bool) string {
 		return fmt.Sprintf("DB(%s).Explain(ctx, %v)", e.DB().name, e.arg0)
 	}
 	return fmt.Sprintf("DB(%s).Explain(ctx, ?)", e.DB().name)
-}
-
-func (e *ExpectedExplain) met(ex expectation) bool {
-	exp := ex.(*ExpectedExplain)
-	return exp.ret0 != nil && diff.AsJSON(e.ret0, exp.ret0) != nil
 }
 
 // WithQuery sets the expected query for the Explain() call.
@@ -367,14 +321,6 @@ func (e *ExpectedCreateDoc) method(v bool) string {
 	return fmt.Sprintf("DB(%s).CreateDoc(ctx, %s%s)", e.DB().name, doc, options)
 }
 
-func (e *ExpectedCreateDoc) met(ex expectation) bool {
-	exp := ex.(*ExpectedCreateDoc)
-	if exp.arg0 != nil && diff.AsJSON(e.arg0, exp.arg0) != nil {
-		return false
-	}
-	return true
-}
-
 // WithDoc sets the expected doc for the call to CreateDoc().
 func (e *ExpectedCreateDoc) WithDoc(doc interface{}) *ExpectedCreateDoc {
 	e.arg0 = doc
@@ -416,10 +362,6 @@ func (e *ExpectedCompact) method(v bool) string {
 	return fmt.Sprintf("DB(%s).Compact(ctx)", e.DB().name)
 }
 
-func (e *ExpectedCompact) met(ex expectation) bool {
-	return true
-}
-
 func (e *ExpectedViewCleanup) String() string {
 	return dbStringer("ViewCleanup", e.db, &e.commonExpectation, 0, nil, nil)
 }
@@ -429,10 +371,6 @@ func (e *ExpectedViewCleanup) method(v bool) string {
 		return "DB.ViewCleanup()"
 	}
 	return fmt.Sprintf("DB(%s).ViewCleanup(ctx)", e.DB().name)
-}
-
-func (e *ExpectedViewCleanup) met(ex expectation) bool {
-	return true
 }
 
 func (e *ExpectedPut) String() string {
@@ -465,17 +403,6 @@ func (e *ExpectedPut) method(v bool) string {
 		options = fmt.Sprintf(", %v", e.options)
 	}
 	return fmt.Sprintf("DB(%s).Put(ctx, %s, %s%s)", e.DB().name, docID, doc, options)
-}
-
-func (e *ExpectedPut) met(ex expectation) bool {
-	exp := ex.(*ExpectedPut)
-	if exp.arg0 != "" && e.arg0 != exp.arg0 {
-		return false
-	}
-	if exp.arg1 != nil && diff.AsJSON(e.arg1, exp.arg1) != nil {
-		return false
-	}
-	return true
 }
 
 // WithDocID sets the expectation for the docID passed to the DB.Put() call.
@@ -521,14 +448,6 @@ func (e *ExpectedGetMeta) method(v bool) string {
 	return fmt.Sprintf("DB(%s).GetMeta(ctx, %s%s)", e.DB().name, docID, options)
 }
 
-func (e *ExpectedGetMeta) met(ex expectation) bool {
-	exp := ex.(*ExpectedGetMeta)
-	if exp.arg0 != "" && e.arg0 != exp.arg0 {
-		return false
-	}
-	return true
-}
-
 // WithDocID sets the expectation for the docID passed to the DB.GetMeta() call.
 func (e *ExpectedGetMeta) WithDocID(docID string) *ExpectedGetMeta {
 	e.arg0 = docID
@@ -544,10 +463,6 @@ func (e *ExpectedFlush) method(v bool) string {
 		return "DB.Flush()"
 	}
 	return fmt.Sprintf("DB(%s).Flush(ctx)", e.DB().name)
-}
-
-func (e *ExpectedFlush) met(ex expectation) bool {
-	return true
 }
 
 func (e *ExpectedDeleteAttachment) String() string {
@@ -591,20 +506,6 @@ func (e *ExpectedDeleteAttachment) method(v bool) string {
 		options = fmt.Sprintf(", %v", e.options)
 	}
 	return fmt.Sprintf("DB(%s).DeleteAttachment(ctx, %s, %s, %s%s)", e.DB().name, id, rev, filename, options)
-}
-
-func (e *ExpectedDeleteAttachment) met(ex expectation) bool {
-	exp := ex.(*ExpectedDeleteAttachment)
-	if exp.arg0 != "" && exp.arg0 != e.arg0 {
-		return false
-	}
-	if exp.arg1 != "" && exp.arg1 != e.arg1 {
-		return false
-	}
-	if exp.arg2 != "" && exp.arg2 != e.arg2 {
-		return false
-	}
-	return true
 }
 
 // WithDocID sets the expectation for the docID passed to the DB.DeleteAttachment() call.
@@ -660,17 +561,6 @@ func (e *ExpectedDelete) method(v bool) string {
 	return fmt.Sprintf("DB(%s).Delete(ctx, %s, %s%s)", e.DB().name, id, rev, options)
 }
 
-func (e *ExpectedDelete) met(ex expectation) bool {
-	exp := ex.(*ExpectedDelete)
-	if exp.arg0 != "" && exp.arg0 != e.arg0 {
-		return false
-	}
-	if exp.arg1 != "" && exp.arg1 != e.arg1 {
-		return false
-	}
-	return true
-}
-
 // WithDocID sets the expectation for the docID passed to the DB.Delete() call.
 func (e *ExpectedDelete) WithDocID(docID string) *ExpectedDelete {
 	e.arg0 = docID
@@ -718,17 +608,6 @@ func (e *ExpectedCopy) method(v bool) string {
 	return fmt.Sprintf("DB(%s).Copy(ctx, %s, %s%s)", e.DB().name, target, source, options)
 }
 
-func (e *ExpectedCopy) met(ex expectation) bool {
-	exp := ex.(*ExpectedCopy)
-	if exp.arg0 != "" && exp.arg0 != e.arg0 {
-		return false
-	}
-	if exp.arg1 != "" && exp.arg1 != e.arg1 {
-		return false
-	}
-	return true
-}
-
 // WithTargetID sets the expectation for the docID passed to the DB.Copy() call.
 func (e *ExpectedCopy) WithTargetID(docID string) *ExpectedCopy {
 	e.arg0 = docID
@@ -762,14 +641,6 @@ func (e *ExpectedCompactView) method(v bool) string {
 	return fmt.Sprintf("DB(%s).CompactView(ctx, %s)", e.DB().name, ddoc)
 }
 
-func (e *ExpectedCompactView) met(ex expectation) bool {
-	exp := ex.(*ExpectedCompactView)
-	if exp.arg0 != "" && e.arg0 != exp.arg0 {
-		return false
-	}
-	return true
-}
-
 // WithDDoc sets the expected design doc name for the call to DB.CompactView().
 func (e *ExpectedCompactView) WithDDoc(ddocID string) *ExpectedCompactView {
 	e.arg0 = ddocID
@@ -801,14 +672,6 @@ func (e *ExpectedGet) method(v bool) string {
 		options = fmt.Sprintf(", %v", e.options)
 	}
 	return fmt.Sprintf("DB(%s).Get(ctx, %s%s)", e.DB().name, id, options)
-}
-
-func (e *ExpectedGet) met(ex expectation) bool {
-	exp := ex.(*ExpectedGet)
-	if exp.arg0 != "" && e.arg0 != exp.arg0 {
-		return false
-	}
-	return true
 }
 
 // WithDocID sets the expected docID for the DB.Get() call.
@@ -852,17 +715,6 @@ func (e *ExpectedGetAttachmentMeta) method(v bool) string {
 	return fmt.Sprintf("DB(%s).GetAttachmentMeta(ctx, %s, %s%s)", e.DB().name, id, filename, options)
 }
 
-func (e *ExpectedGetAttachmentMeta) met(ex expectation) bool {
-	exp := ex.(*ExpectedGetAttachmentMeta)
-	if exp.arg0 != "" && e.arg0 != exp.arg0 {
-		return false
-	}
-	if exp.arg1 != "" && e.arg1 != exp.arg1 {
-		return false
-	}
-	return true
-}
-
 // WithDocID sets the expectation for the docID passed to the DB.GetAttachmentMeta() call.
 func (e *ExpectedGetAttachmentMeta) WithDocID(docID string) *ExpectedGetAttachmentMeta {
 	e.arg0 = docID
@@ -891,10 +743,6 @@ func (e *ExpectedLocalDocs) method(v bool) string {
 	return fmt.Sprintf("DB(%s).LocalDocs(ctx%s)", e.DB().name, options)
 }
 
-func (e *ExpectedLocalDocs) met(ex expectation) bool {
-	return true
-}
-
 func (e *ExpectedPurge) String() string {
 	var opts, rets []string
 	if e.arg0 == nil {
@@ -917,14 +765,6 @@ func (e *ExpectedPurge) method(v bool) string {
 		docRevMap = fmt.Sprintf("%v", e.arg0)
 	}
 	return fmt.Sprintf("DB(%s).Purge(ctx, %s)", e.DB().name, docRevMap)
-}
-
-func (e *ExpectedPurge) met(ex expectation) bool {
-	exp := ex.(*ExpectedPurge)
-	if exp.arg0 != nil && !reflect.DeepEqual(e.arg0, exp.arg0) {
-		return false
-	}
-	return true
 }
 
 // WithDocRevMap sets the expected docRevMap for the call to DB.Purge().
@@ -974,20 +814,6 @@ func (e *ExpectedPutAttachment) method(v bool) string {
 		options = fmt.Sprintf(", %v", e.options)
 	}
 	return fmt.Sprintf("DB(%s).PutAttachment(ctx, %s, %s, %s%s)", e.DB().name, doc, rev, att, options)
-}
-
-func (e *ExpectedPutAttachment) met(ex expectation) bool {
-	exp := ex.(*ExpectedPutAttachment)
-	if exp.arg0 != "" && e.arg0 != exp.arg0 {
-		return false
-	}
-	if exp.arg1 != "" && exp.arg1 != e.arg1 {
-		return false
-	}
-	if exp.arg2 != nil && !reflect.DeepEqual(exp.arg2, e.arg2) {
-		return false
-	}
-	return true
 }
 
 // WithDocID sets the expectation for the docID passed to the DB.PutAttachment() call.
@@ -1041,17 +867,6 @@ func (e *ExpectedQuery) method(v bool) string {
 	return fmt.Sprintf("DB(%s).Query(ctx, %s, %s%s)", e.DB().name, ddocID, view, options)
 }
 
-func (e *ExpectedQuery) met(ex expectation) bool {
-	exp := ex.(*ExpectedQuery)
-	if exp.arg0 != "" && exp.arg0 != e.arg0 {
-		return false
-	}
-	if exp.arg1 != "" && exp.arg1 != e.arg1 {
-		return false
-	}
-	return true
-}
-
 // WithDDocID sets the expected ddocID value for the DB.Query() call.
 func (e *ExpectedQuery) WithDDocID(ddocID string) *ExpectedQuery {
 	e.arg0 = ddocID
@@ -1064,24 +879,17 @@ func (e *ExpectedQuery) WithView(view string) *ExpectedQuery {
 	return e
 }
 
-func (e *ExpectedSecurity) String() string               { panic("x") }
-func (e *ExpectedSecurity) method(v bool) string         { panic("x") }
-func (e *ExpectedSecurity) met(ex expectation) bool      { panic("x") }
-func (e *ExpectedSetSecurity) String() string            { panic("x") }
-func (e *ExpectedSetSecurity) method(v bool) string      { panic("x") }
-func (e *ExpectedSetSecurity) met(ex expectation) bool   { panic("x") }
-func (e *ExpectedStats) String() string                  { panic("x") }
-func (e *ExpectedStats) method(v bool) string            { panic("x") }
-func (e *ExpectedStats) met(ex expectation) bool         { panic("x") }
-func (e *ExpectedBulkDocs) String() string               { panic("x") }
-func (e *ExpectedBulkDocs) method(v bool) string         { panic("x") }
-func (e *ExpectedBulkDocs) met(ex expectation) bool      { panic("x") }
-func (e *ExpectedGetAttachment) String() string          { panic("x") }
-func (e *ExpectedGetAttachment) method(v bool) string    { panic("x") }
-func (e *ExpectedGetAttachment) met(ex expectation) bool { panic("x") }
-func (e *ExpectedDesignDocs) String() string             { panic("x") }
-func (e *ExpectedDesignDocs) method(v bool) string       { panic("x") }
-func (e *ExpectedDesignDocs) met(ex expectation) bool    { panic("x") }
-func (e *ExpectedChanges) String() string                { panic("x") }
-func (e *ExpectedChanges) method(v bool) string          { panic("x") }
-func (e *ExpectedChanges) met(ex expectation) bool       { panic("x") }
+func (e *ExpectedSecurity) String() string            { panic("x") }
+func (e *ExpectedSecurity) method(v bool) string      { panic("x") }
+func (e *ExpectedSetSecurity) String() string         { panic("x") }
+func (e *ExpectedSetSecurity) method(v bool) string   { panic("x") }
+func (e *ExpectedStats) String() string               { panic("x") }
+func (e *ExpectedStats) method(v bool) string         { panic("x") }
+func (e *ExpectedBulkDocs) String() string            { panic("x") }
+func (e *ExpectedBulkDocs) method(v bool) string      { panic("x") }
+func (e *ExpectedGetAttachment) String() string       { panic("x") }
+func (e *ExpectedGetAttachment) method(v bool) string { panic("x") }
+func (e *ExpectedDesignDocs) String() string          { panic("x") }
+func (e *ExpectedDesignDocs) method(v bool) string    { panic("x") }
+func (e *ExpectedChanges) String() string             { panic("x") }
+func (e *ExpectedChanges) method(v bool) string       { panic("x") }

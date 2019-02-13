@@ -3,12 +3,14 @@
 package kivikmock
 
 import (
+	"reflect"
 	"time"
 
 	"github.com/go-kivik/kivik/driver"
 )
 
 var _ = &driver.Attachment{}
+var _ = reflect.Int
 
 // ExpectedAllDBs represents an expectation for a call to AllDBs().
 type ExpectedAllDBs struct {
@@ -40,6 +42,10 @@ func (e *ExpectedAllDBs) WillDelay(delay time.Duration) *ExpectedAllDBs {
 	return e
 }
 
+func (e *ExpectedAllDBs) met(_ expectation) bool {
+	return true
+}
+
 // ExpectedClose represents an expectation for a call to Close().
 type ExpectedClose struct {
 	commonExpectation
@@ -55,6 +61,10 @@ func (e *ExpectedClose) WillReturnError(err error) *ExpectedClose {
 func (e *ExpectedClose) WillDelay(delay time.Duration) *ExpectedClose {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedClose) met(_ expectation) bool {
+	return true
 }
 
 // ExpectedClusterSetup represents an expectation for a call to ClusterSetup().
@@ -73,6 +83,14 @@ func (e *ExpectedClusterSetup) WillReturnError(err error) *ExpectedClusterSetup 
 func (e *ExpectedClusterSetup) WillDelay(delay time.Duration) *ExpectedClusterSetup {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedClusterSetup) met(ex expectation) bool {
+	exp := ex.(*ExpectedClusterSetup)
+	if exp.arg0 != nil && !jsonMeets(exp.arg0, e.arg0) {
+		return false
+	}
+	return true
 }
 
 // ExpectedClusterStatus represents an expectation for a call to ClusterStatus().
@@ -103,6 +121,10 @@ func (e *ExpectedClusterStatus) WillReturnError(err error) *ExpectedClusterStatu
 func (e *ExpectedClusterStatus) WillDelay(delay time.Duration) *ExpectedClusterStatus {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedClusterStatus) met(_ expectation) bool {
+	return true
 }
 
 // ExpectedDBExists represents an expectation for a call to DBExists().
@@ -136,6 +158,14 @@ func (e *ExpectedDBExists) WillDelay(delay time.Duration) *ExpectedDBExists {
 	return e
 }
 
+func (e *ExpectedDBExists) met(ex expectation) bool {
+	exp := ex.(*ExpectedDBExists)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	return true
+}
+
 // ExpectedDestroyDB represents an expectation for a call to DestroyDB().
 type ExpectedDestroyDB struct {
 	commonExpectation
@@ -160,6 +190,14 @@ func (e *ExpectedDestroyDB) WillDelay(delay time.Duration) *ExpectedDestroyDB {
 	return e
 }
 
+func (e *ExpectedDestroyDB) met(ex expectation) bool {
+	exp := ex.(*ExpectedDestroyDB)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	return true
+}
+
 // ExpectedPing represents an expectation for a call to Ping().
 type ExpectedPing struct {
 	commonExpectation
@@ -182,4 +220,8 @@ func (e *ExpectedPing) WillReturnError(err error) *ExpectedPing {
 func (e *ExpectedPing) WillDelay(delay time.Duration) *ExpectedPing {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedPing) met(_ expectation) bool {
+	return true
 }

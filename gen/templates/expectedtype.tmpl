@@ -33,3 +33,8 @@ func (e *Expected{{.Name}}) WillDelay(delay time.Duration) *Expected{{.Name}} {
 	return e
 }
 {{ end }}
+
+func (e *Expected{{.Name}}) met({{$len := len .Accepts}}{{if eq $len 0}}_{{else}}ex{{end}} expectation) bool {
+{{- .MetExpectations }}
+	return true
+}
