@@ -26,6 +26,7 @@ type expectation interface {
 	met(expectation) bool
 	// for DB methods, this returns the associated *MockDB object
 	DB() *MockDB
+	opts() kivik.Options
 }
 
 // commonExpectation satisfies the expectation interface, except the String()
@@ -37,6 +38,10 @@ type commonExpectation struct {
 	delay     time.Duration
 	options   kivik.Options
 	db        *MockDB
+}
+
+func (e *commonExpectation) opts() kivik.Options {
+	return e.options
 }
 
 func (e *commonExpectation) DB() *MockDB {

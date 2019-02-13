@@ -64,8 +64,7 @@ func (e *ExpectedAllDocs) method(v bool) string {
 }
 
 func (e *ExpectedAllDocs) met(ex expectation) bool {
-	exp := ex.(*ExpectedAllDocs)
-	return reflect.DeepEqual(e.options, exp.options)
+	return true
 }
 
 func (e *ExpectedBulkGet) String() string {
@@ -109,8 +108,7 @@ func (e *ExpectedBulkGet) method(v bool) string {
 }
 
 func (e *ExpectedBulkGet) met(ex expectation) bool {
-	exp := ex.(*ExpectedBulkGet)
-	return reflect.DeepEqual(e.options, exp.options)
+	return true
 }
 
 func (e *ExpectedFind) String() string {
@@ -374,7 +372,7 @@ func (e *ExpectedCreateDoc) met(ex expectation) bool {
 	if exp.arg0 != nil && diff.AsJSON(e.arg0, exp.arg0) != nil {
 		return false
 	}
-	return exp.options == nil || reflect.DeepEqual(e.options, exp.options)
+	return true
 }
 
 // WithDoc sets the expected doc for the call to CreateDoc().
@@ -477,9 +475,6 @@ func (e *ExpectedPut) met(ex expectation) bool {
 	if exp.arg1 != nil && diff.AsJSON(e.arg1, exp.arg1) != nil {
 		return false
 	}
-	if exp.options != nil && !reflect.DeepEqual(e.options, exp.options) {
-		return false
-	}
 	return true
 }
 
@@ -529,9 +524,6 @@ func (e *ExpectedGetMeta) method(v bool) string {
 func (e *ExpectedGetMeta) met(ex expectation) bool {
 	exp := ex.(*ExpectedGetMeta)
 	if exp.arg0 != "" && e.arg0 != exp.arg0 {
-		return false
-	}
-	if exp.options != nil && !reflect.DeepEqual(e.options, exp.options) {
 		return false
 	}
 	return true
@@ -612,7 +604,7 @@ func (e *ExpectedDeleteAttachment) met(ex expectation) bool {
 	if exp.arg2 != "" && exp.arg2 != e.arg2 {
 		return false
 	}
-	return exp.options == nil || reflect.DeepEqual(exp.options, e.options)
+	return true
 }
 
 // WithDocID sets the expectation for the docID passed to the DB.DeleteAttachment() call.
@@ -676,7 +668,7 @@ func (e *ExpectedDelete) met(ex expectation) bool {
 	if exp.arg1 != "" && exp.arg1 != e.arg1 {
 		return false
 	}
-	return exp.options == nil || reflect.DeepEqual(exp.options, e.options)
+	return true
 }
 
 // WithDocID sets the expectation for the docID passed to the DB.Delete() call.
@@ -734,7 +726,7 @@ func (e *ExpectedCopy) met(ex expectation) bool {
 	if exp.arg1 != "" && exp.arg1 != e.arg1 {
 		return false
 	}
-	return exp.options == nil || reflect.DeepEqual(exp.options, e.options)
+	return true
 }
 
 // WithTargetID sets the expectation for the docID passed to the DB.Copy() call.
@@ -816,9 +808,6 @@ func (e *ExpectedGet) met(ex expectation) bool {
 	if exp.arg0 != "" && e.arg0 != exp.arg0 {
 		return false
 	}
-	if exp.options != nil && !reflect.DeepEqual(exp.options, e.options) {
-		return false
-	}
 	return true
 }
 
@@ -871,9 +860,6 @@ func (e *ExpectedGetAttachmentMeta) met(ex expectation) bool {
 	if exp.arg1 != "" && e.arg1 != exp.arg1 {
 		return false
 	}
-	if exp.options != nil && !reflect.DeepEqual(exp.options, e.options) {
-		return false
-	}
 	return true
 }
 
@@ -906,8 +892,7 @@ func (e *ExpectedLocalDocs) method(v bool) string {
 }
 
 func (e *ExpectedLocalDocs) met(ex expectation) bool {
-	exp := ex.(*ExpectedLocalDocs)
-	return reflect.DeepEqual(e.options, exp.options)
+	return true
 }
 
 func (e *ExpectedPurge) String() string {
@@ -1002,7 +987,7 @@ func (e *ExpectedPutAttachment) met(ex expectation) bool {
 	if exp.arg2 != nil && !reflect.DeepEqual(exp.arg2, e.arg2) {
 		return false
 	}
-	return exp.options == nil || reflect.DeepEqual(e.options, exp.options)
+	return true
 }
 
 // WithDocID sets the expectation for the docID passed to the DB.PutAttachment() call.
@@ -1064,7 +1049,7 @@ func (e *ExpectedQuery) met(ex expectation) bool {
 	if exp.arg1 != "" && exp.arg1 != e.arg1 {
 		return false
 	}
-	return reflect.DeepEqual(e.options, exp.options)
+	return true
 }
 
 // WithDDocID sets the expected ddocID value for the DB.Query() call.
