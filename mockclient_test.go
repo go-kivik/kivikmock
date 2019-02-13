@@ -257,7 +257,7 @@ func TestClusterStatus(t *testing.T) {
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			_, err := c.ClusterStatus(context.TODO())
-			testy.Error(t, "call to ClusterStatus(ctx, ?) was not expected", err)
+			testy.Error(t, "call to ClusterStatus(ctx, [?]) was not expected", err)
 		},
 	})
 	tests.Run(t, testMock)

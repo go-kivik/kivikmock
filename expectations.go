@@ -8,13 +8,6 @@ import (
 	"github.com/go-kivik/kivik"
 )
 
-func (e *ExpectedClose) method(v bool) string {
-	if v {
-		return "Close(ctx)"
-	}
-	return "Close()"
-}
-
 func (e *ExpectedClose) String() string {
 	extra := delayString(e.delay) + errorString(e.err)
 	msg := "call to Close()"
@@ -22,24 +15,6 @@ func (e *ExpectedClose) String() string {
 		msg += " which:" + extra
 	}
 	return msg
-}
-
-// // ExpectedAllDBs is used to manage *kivik.Client.AllDBs expectation returned
-// // by Mock.ExpectAllDBs.
-// type ExpectedAllDBs struct {
-// 	commonExpectation
-// 	options map[string]interface{}
-// 	results []string
-// }
-
-func (e *ExpectedAllDBs) method(v bool) string {
-	if v {
-		if e.options == nil {
-			return "AllDBs(ctx, nil)"
-		}
-		return fmt.Sprintf("AllDBs(ctx, %v)", e.options)
-	}
-	return "AllDBs()"
 }
 
 // String satisfies the fmt.Stringer interface.
@@ -71,13 +46,13 @@ func (e *ExpectedAuthenticate) String() string {
 }
 
 func (e *ExpectedAuthenticate) method(v bool) string {
-	if v {
-		if e.authType == "" {
-			return "Authenticate(ctx, <T>)"
-		}
-		return fmt.Sprintf("Authenticate(ctx, <%s>)", e.authType)
+	if !v {
+		return "Authenticate()"
 	}
-	return "Authenticate()"
+	if e.authType == "" {
+		return "Authenticate(ctx, ?)"
+	}
+	return fmt.Sprintf("Authenticate(ctx, <%s>)", e.authType)
 }
 
 func (e *ExpectedAuthenticate) met(ex expectation) bool {
@@ -108,16 +83,6 @@ func (e *ExpectedAuthenticate) WillDelay(d time.Duration) *ExpectedAuthenticate 
 	return e
 }
 
-func (e *ExpectedClusterSetup) method(v bool) string {
-	if v {
-		if e.arg0 == nil {
-			return "ClusterSetup(ctx, <T>)"
-		}
-		return fmt.Sprintf("ClusterSetup(ctx, %v)", e.arg0)
-	}
-	return "ClusterSetup()"
-}
-
 func (e *ExpectedClusterSetup) String() string {
 	msg := "call to ClusterSetup() which:"
 	if e.arg0 == nil {
@@ -128,16 +93,6 @@ func (e *ExpectedClusterSetup) String() string {
 	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
-}
-
-func (e *ExpectedClusterStatus) method(v bool) string {
-	if v {
-		if e.options == nil {
-			return "ClusterStatus(ctx, ?)"
-		}
-		return fmt.Sprintf("ClusterStatus(ctx, %v)", e.options)
-	}
-	return "ClusterStatus()"
 }
 
 // String satisfies the fmt.Stringer interface
@@ -169,24 +124,6 @@ func (e *ExpectedDBExists) String() string {
 	return msg
 }
 
-func (e *ExpectedDBExists) method(v bool) string {
-	if !v {
-		return "DBExists()"
-	}
-	var name, options string
-	if e.arg0 == "" {
-		name = "?"
-	} else {
-		name = fmt.Sprintf("%q", e.arg0)
-	}
-	if e.options == nil {
-		options = "?"
-	} else {
-		options = fmt.Sprintf("%v", e.options)
-	}
-	return fmt.Sprintf("DBExists(ctx, %s, %s)", name, options)
-}
-
 // WithName sets the expectation that DBExists will be called with the provided
 // name.
 func (e *ExpectedDBExists) WithName(name string) *ExpectedDBExists {
@@ -208,24 +145,6 @@ func (e *ExpectedDestroyDB) String() string {
 		optionsString(e.options) +
 		delayString(e.delay) +
 		errorString(e.err)
-}
-
-func (e *ExpectedDestroyDB) method(v bool) string {
-	if !v {
-		return "DestroyDB()"
-	}
-	var name, options string
-	if e.arg0 == "" {
-		name = "?"
-	} else {
-		name = fmt.Sprintf("%q", e.arg0)
-	}
-	if e.options == nil {
-		options = "?"
-	} else {
-		options = fmt.Sprintf("%v", e.options)
-	}
-	return fmt.Sprintf("DestroyDB(ctx, %s, %s)", name, options)
 }
 
 // WithName sets the expectation that DestroyDB will be called with this name.
@@ -301,13 +220,6 @@ func (e *ExpectedPing) String() string {
 		msg += " which:" + extra
 	}
 	return msg
-}
-
-func (e *ExpectedPing) method(v bool) string {
-	if v {
-		return "Ping(ctx)"
-	}
-	return "Ping()"
 }
 
 // ExpectedSession is used to manage *kivik.Client.Session expectation returned

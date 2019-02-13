@@ -38,3 +38,10 @@ func (e *Expected{{.Name}}) met({{$len := len .Accepts}}{{if eq $len 0}}_{{else}
 {{- .MetExpectations }}
 	return true
 }
+
+func (e *Expected{{.Name}}) method(v bool) string {
+	if !v {
+		return "{{if .DBMethod}}DB.{{end}}{{.Name}}()"
+	}
+{{ .MethodArgs }}
+}
