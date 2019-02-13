@@ -12,7 +12,9 @@ var _ = &driver.Attachment{}
 
 func (c *driverClient) AllDBs(ctx context.Context, options map[string]interface{}) ([]string, error) {
 	expected := &ExpectedAllDBs{
-		commonExpectation: commonExpectation{options: options},
+		commonExpectation: commonExpectation{
+			options: options,
+		},
 	}
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
@@ -40,7 +42,9 @@ func (c *driverClient) ClusterSetup(ctx context.Context, arg0 interface{}) error
 
 func (c *driverClient) ClusterStatus(ctx context.Context, options map[string]interface{}) (string, error) {
 	expected := &ExpectedClusterStatus{
-		commonExpectation: commonExpectation{options: options},
+		commonExpectation: commonExpectation{
+			options: options,
+		},
 	}
 	if err := c.nextExpectation(expected); err != nil {
 		return "", err
@@ -50,8 +54,10 @@ func (c *driverClient) ClusterStatus(ctx context.Context, options map[string]int
 
 func (c *driverClient) DBExists(ctx context.Context, arg0 string, options map[string]interface{}) (bool, error) {
 	expected := &ExpectedDBExists{
-		arg0:              arg0,
-		commonExpectation: commonExpectation{options: options},
+		arg0: arg0,
+		commonExpectation: commonExpectation{
+			options: options,
+		},
 	}
 	if err := c.nextExpectation(expected); err != nil {
 		return false, err
@@ -61,8 +67,10 @@ func (c *driverClient) DBExists(ctx context.Context, arg0 string, options map[st
 
 func (c *driverClient) DestroyDB(ctx context.Context, arg0 string, options map[string]interface{}) error {
 	expected := &ExpectedDestroyDB{
-		arg0:              arg0,
-		commonExpectation: commonExpectation{options: options},
+		arg0: arg0,
+		commonExpectation: commonExpectation{
+			options: options,
+		},
 	}
 	if err := c.nextExpectation(expected); err != nil {
 		return err

@@ -13,7 +13,6 @@ var _ = &driver.Attachment{}
 // ExpectedCompact represents an expectation for a call to DB.Compact().
 type ExpectedCompact struct {
 	commonExpectation
-	db *MockDB
 }
 
 // WillReturnError sets the error value that will be returned by the call to DB.Compact().
@@ -31,7 +30,6 @@ func (e *ExpectedCompact) WillDelay(delay time.Duration) *ExpectedCompact {
 // ExpectedCompactView represents an expectation for a call to DB.CompactView().
 type ExpectedCompactView struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 }
 
@@ -50,7 +48,6 @@ func (e *ExpectedCompactView) WillDelay(delay time.Duration) *ExpectedCompactVie
 // ExpectedCopy represents an expectation for a call to DB.Copy().
 type ExpectedCopy struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 	arg1 string
 	ret0 string
@@ -83,7 +80,6 @@ func (e *ExpectedCopy) WillDelay(delay time.Duration) *ExpectedCopy {
 // ExpectedCreateDoc represents an expectation for a call to DB.CreateDoc().
 type ExpectedCreateDoc struct {
 	commonExpectation
-	db   *MockDB
 	arg0 interface{}
 	ret0 string
 	ret1 string
@@ -117,7 +113,6 @@ func (e *ExpectedCreateDoc) WillDelay(delay time.Duration) *ExpectedCreateDoc {
 // ExpectedCreateIndex represents an expectation for a call to DB.CreateIndex().
 type ExpectedCreateIndex struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 	arg1 string
 	arg2 interface{}
@@ -138,7 +133,6 @@ func (e *ExpectedCreateIndex) WillDelay(delay time.Duration) *ExpectedCreateInde
 // ExpectedDelete represents an expectation for a call to DB.Delete().
 type ExpectedDelete struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 	arg1 string
 	ret0 string
@@ -171,7 +165,6 @@ func (e *ExpectedDelete) WillDelay(delay time.Duration) *ExpectedDelete {
 // ExpectedDeleteAttachment represents an expectation for a call to DB.DeleteAttachment().
 type ExpectedDeleteAttachment struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 	arg1 string
 	arg2 string
@@ -205,7 +198,6 @@ func (e *ExpectedDeleteAttachment) WillDelay(delay time.Duration) *ExpectedDelet
 // ExpectedDeleteIndex represents an expectation for a call to DB.DeleteIndex().
 type ExpectedDeleteIndex struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 	arg1 string
 }
@@ -225,7 +217,6 @@ func (e *ExpectedDeleteIndex) WillDelay(delay time.Duration) *ExpectedDeleteInde
 // ExpectedFlush represents an expectation for a call to DB.Flush().
 type ExpectedFlush struct {
 	commonExpectation
-	db *MockDB
 }
 
 // WillReturnError sets the error value that will be returned by the call to DB.Flush().
@@ -243,7 +234,6 @@ func (e *ExpectedFlush) WillDelay(delay time.Duration) *ExpectedFlush {
 // ExpectedGetMeta represents an expectation for a call to DB.GetMeta().
 type ExpectedGetMeta struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 	ret0 int64
 	ret1 string
@@ -277,7 +267,6 @@ func (e *ExpectedGetMeta) WillDelay(delay time.Duration) *ExpectedGetMeta {
 // ExpectedPut represents an expectation for a call to DB.Put().
 type ExpectedPut struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 	arg1 interface{}
 	ret0 string
@@ -310,7 +299,6 @@ func (e *ExpectedPut) WillDelay(delay time.Duration) *ExpectedPut {
 // ExpectedViewCleanup represents an expectation for a call to DB.ViewCleanup().
 type ExpectedViewCleanup struct {
 	commonExpectation
-	db *MockDB
 }
 
 // WillReturnError sets the error value that will be returned by the call to DB.ViewCleanup().
@@ -328,7 +316,6 @@ func (e *ExpectedViewCleanup) WillDelay(delay time.Duration) *ExpectedViewCleanu
 // ExpectedAllDocs represents an expectation for a call to DB.AllDocs().
 type ExpectedAllDocs struct {
 	commonExpectation
-	db   *MockDB
 	ret0 *Rows
 }
 
@@ -359,7 +346,6 @@ func (e *ExpectedAllDocs) WillDelay(delay time.Duration) *ExpectedAllDocs {
 // ExpectedBulkDocs represents an expectation for a call to DB.BulkDocs().
 type ExpectedBulkDocs struct {
 	commonExpectation
-	db   *MockDB
 	arg0 []interface{}
 	ret0 driver.BulkResults
 }
@@ -391,7 +377,6 @@ func (e *ExpectedBulkDocs) WillDelay(delay time.Duration) *ExpectedBulkDocs {
 // ExpectedBulkGet represents an expectation for a call to DB.BulkGet().
 type ExpectedBulkGet struct {
 	commonExpectation
-	db   *MockDB
 	arg0 []driver.BulkGetReference
 	ret0 *Rows
 }
@@ -423,7 +408,6 @@ func (e *ExpectedBulkGet) WillDelay(delay time.Duration) *ExpectedBulkGet {
 // ExpectedChanges represents an expectation for a call to DB.Changes().
 type ExpectedChanges struct {
 	commonExpectation
-	db   *MockDB
 	ret0 driver.Changes
 }
 
@@ -454,7 +438,6 @@ func (e *ExpectedChanges) WillDelay(delay time.Duration) *ExpectedChanges {
 // ExpectedDesignDocs represents an expectation for a call to DB.DesignDocs().
 type ExpectedDesignDocs struct {
 	commonExpectation
-	db   *MockDB
 	ret0 *Rows
 }
 
@@ -485,7 +468,6 @@ func (e *ExpectedDesignDocs) WillDelay(delay time.Duration) *ExpectedDesignDocs 
 // ExpectedExplain represents an expectation for a call to DB.Explain().
 type ExpectedExplain struct {
 	commonExpectation
-	db   *MockDB
 	arg0 interface{}
 	ret0 *driver.QueryPlan
 }
@@ -511,7 +493,6 @@ func (e *ExpectedExplain) WillDelay(delay time.Duration) *ExpectedExplain {
 // ExpectedFind represents an expectation for a call to DB.Find().
 type ExpectedFind struct {
 	commonExpectation
-	db   *MockDB
 	arg0 interface{}
 	ret0 *Rows
 }
@@ -537,7 +518,6 @@ func (e *ExpectedFind) WillDelay(delay time.Duration) *ExpectedFind {
 // ExpectedGet represents an expectation for a call to DB.Get().
 type ExpectedGet struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 	ret0 *driver.Document
 }
@@ -569,7 +549,6 @@ func (e *ExpectedGet) WillDelay(delay time.Duration) *ExpectedGet {
 // ExpectedGetAttachment represents an expectation for a call to DB.GetAttachment().
 type ExpectedGetAttachment struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 	arg1 string
 	ret0 *driver.Attachment
@@ -602,7 +581,6 @@ func (e *ExpectedGetAttachment) WillDelay(delay time.Duration) *ExpectedGetAttac
 // ExpectedGetAttachmentMeta represents an expectation for a call to DB.GetAttachmentMeta().
 type ExpectedGetAttachmentMeta struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 	arg1 string
 	ret0 *driver.Attachment
@@ -635,7 +613,6 @@ func (e *ExpectedGetAttachmentMeta) WillDelay(delay time.Duration) *ExpectedGetA
 // ExpectedGetIndexes represents an expectation for a call to DB.GetIndexes().
 type ExpectedGetIndexes struct {
 	commonExpectation
-	db   *MockDB
 	ret0 []driver.Index
 }
 
@@ -660,7 +637,6 @@ func (e *ExpectedGetIndexes) WillDelay(delay time.Duration) *ExpectedGetIndexes 
 // ExpectedLocalDocs represents an expectation for a call to DB.LocalDocs().
 type ExpectedLocalDocs struct {
 	commonExpectation
-	db   *MockDB
 	ret0 *Rows
 }
 
@@ -691,7 +667,6 @@ func (e *ExpectedLocalDocs) WillDelay(delay time.Duration) *ExpectedLocalDocs {
 // ExpectedPurge represents an expectation for a call to DB.Purge().
 type ExpectedPurge struct {
 	commonExpectation
-	db   *MockDB
 	arg0 map[string][]string
 	ret0 *driver.PurgeResult
 }
@@ -717,7 +692,6 @@ func (e *ExpectedPurge) WillDelay(delay time.Duration) *ExpectedPurge {
 // ExpectedPutAttachment represents an expectation for a call to DB.PutAttachment().
 type ExpectedPutAttachment struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 	arg1 string
 	arg2 *driver.Attachment
@@ -751,7 +725,6 @@ func (e *ExpectedPutAttachment) WillDelay(delay time.Duration) *ExpectedPutAttac
 // ExpectedQuery represents an expectation for a call to DB.Query().
 type ExpectedQuery struct {
 	commonExpectation
-	db   *MockDB
 	arg0 string
 	arg1 string
 	ret0 *Rows
@@ -784,7 +757,6 @@ func (e *ExpectedQuery) WillDelay(delay time.Duration) *ExpectedQuery {
 // ExpectedSecurity represents an expectation for a call to DB.Security().
 type ExpectedSecurity struct {
 	commonExpectation
-	db   *MockDB
 	ret0 *driver.Security
 }
 
@@ -809,7 +781,6 @@ func (e *ExpectedSecurity) WillDelay(delay time.Duration) *ExpectedSecurity {
 // ExpectedSetSecurity represents an expectation for a call to DB.SetSecurity().
 type ExpectedSetSecurity struct {
 	commonExpectation
-	db   *MockDB
 	arg0 *driver.Security
 }
 
@@ -828,7 +799,6 @@ func (e *ExpectedSetSecurity) WillDelay(delay time.Duration) *ExpectedSetSecurit
 // ExpectedStats represents an expectation for a call to DB.Stats().
 type ExpectedStats struct {
 	commonExpectation
-	db   *MockDB
 	ret0 *driver.DBStats
 }
 

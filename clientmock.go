@@ -69,13 +69,6 @@ func (c *MockClient) nextExpectation(actual expectation) error {
 	return nil
 }
 
-func meets(a, e expectation) bool {
-	if reflect.TypeOf(a).Elem().Name() != reflect.TypeOf(e).Elem().Name() {
-		return false
-	}
-	return a.met(e)
-}
-
 func (c *MockClient) open() (*kivik.Client, *MockClient, error) {
 	client, err := kivik.New("kivikmock", c.dsn)
 	return client, c, err

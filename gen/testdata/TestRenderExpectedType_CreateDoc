@@ -1,7 +1,6 @@
 // ExpectedCreateDoc represents an expectation for a call to DB.CreateDoc().
 type ExpectedCreateDoc struct {
 	commonExpectation
-	db *MockDB
 	arg0 interface{}
 	ret0 string
 	ret1 string
