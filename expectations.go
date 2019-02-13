@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/flimzy/diff"
 	"github.com/go-kivik/kivik"
 )
 
@@ -15,8 +14,6 @@ func (e *ExpectedClose) method(v bool) string {
 	}
 	return "Close()"
 }
-
-func (e *ExpectedClose) met(_ expectation) bool { return true }
 
 func (e *ExpectedClose) String() string {
 	extra := delayString(e.delay) + errorString(e.err)
@@ -43,14 +40,6 @@ func (e *ExpectedAllDBs) method(v bool) string {
 		return fmt.Sprintf("AllDBs(ctx, %v)", e.options)
 	}
 	return "AllDBs()"
-}
-
-func (e *ExpectedAllDBs) met(ex expectation) bool {
-	exp := ex.(*ExpectedAllDBs)
-	if exp.options == nil {
-		return true
-	}
-	return reflect.DeepEqual(e.options, exp.options)
 }
 
 // String satisfies the fmt.Stringer interface.
@@ -129,14 +118,6 @@ func (e *ExpectedClusterSetup) method(v bool) string {
 	return "ClusterSetup()"
 }
 
-func (e *ExpectedClusterSetup) met(ex expectation) bool {
-	exp := ex.(*ExpectedClusterSetup)
-	if exp.arg0 == nil {
-		return true
-	}
-	return diff.AsJSON(e.arg0, exp.arg0) == nil
-}
-
 func (e *ExpectedClusterSetup) String() string {
 	msg := "call to ClusterSetup() which:"
 	if e.arg0 == nil {
@@ -147,14 +128,6 @@ func (e *ExpectedClusterSetup) String() string {
 	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
-}
-
-func (e *ExpectedClusterStatus) met(ex expectation) bool {
-	exp := ex.(*ExpectedClusterStatus)
-	if exp.options == nil {
-		return true
-	}
-	return reflect.DeepEqual(e.options, exp.options)
 }
 
 func (e *ExpectedClusterStatus) method(v bool) string {
@@ -214,16 +187,6 @@ func (e *ExpectedDBExists) method(v bool) string {
 	return fmt.Sprintf("DBExists(ctx, %s, %s)", name, options)
 }
 
-func (e *ExpectedDBExists) met(ex expectation) bool {
-	exp := ex.(*ExpectedDBExists)
-	if exp.options == nil && exp.arg0 == "" {
-		return true
-	}
-	nameOK := exp.arg0 == "" || exp.arg0 == e.arg0
-	optionsOK := exp.options == nil || reflect.DeepEqual(exp.options, e.options)
-	return nameOK && optionsOK
-}
-
 // WithName sets the expectation that DBExists will be called with the provided
 // name.
 func (e *ExpectedDBExists) WithName(name string) *ExpectedDBExists {
@@ -263,13 +226,6 @@ func (e *ExpectedDestroyDB) method(v bool) string {
 		options = fmt.Sprintf("%v", e.options)
 	}
 	return fmt.Sprintf("DestroyDB(ctx, %s, %s)", name, options)
-}
-
-func (e *ExpectedDestroyDB) met(ex expectation) bool {
-	exp := ex.(*ExpectedDestroyDB)
-	nameOK := exp.arg0 == "" || exp.arg0 == e.arg0
-	optionsOK := exp.options == nil || reflect.DeepEqual(exp.options, e.options)
-	return nameOK && optionsOK
 }
 
 // WithName sets the expectation that DestroyDB will be called with this name.
@@ -353,8 +309,6 @@ func (e *ExpectedPing) method(v bool) string {
 	}
 	return "Ping()"
 }
-
-func (e *ExpectedPing) met(_ expectation) bool { return true }
 
 // ExpectedSession is used to manage *kivik.Client.Session expectation returned
 // by Mock.ExpectSession.

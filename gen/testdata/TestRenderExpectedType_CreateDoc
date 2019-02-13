@@ -32,3 +32,10 @@ func (e *ExpectedCreateDoc) WillDelay(delay time.Duration) *ExpectedCreateDoc {
 	return e
 }
 
+
+func (e *ExpectedCreateDoc) met(ex expectation) bool {	exp := ex.(*ExpectedCreateDoc)
+if exp.arg0 != nil && !jsonMeets(exp.arg0, e.arg0) {
+		return false
+	}
+	return true
+}

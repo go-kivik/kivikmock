@@ -1,6 +1,7 @@
 package kivikmock
 
 import (
+	"encoding/json"
 	"reflect"
 
 	"github.com/go-kivik/kivik"
@@ -31,4 +32,13 @@ func optionsMeetExpectation(a, e kivik.Options) bool {
 		return true
 	}
 	return reflect.DeepEqual(e, a)
+}
+
+func jsonMeets(e, a interface{}) bool {
+	eJSON, _ := json.Marshal(e)
+	aJSON, _ := json.Marshal(a)
+	var eI, aI interface{}
+	_ = json.Unmarshal(eJSON, &eI)
+	_ = json.Unmarshal(aJSON, &aI)
+	return reflect.DeepEqual(eI, aI)
 }
