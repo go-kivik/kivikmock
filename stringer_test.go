@@ -421,12 +421,14 @@ func TestFindString(t *testing.T) {
 		input: &ExpectedFind{db: &MockDB{name: "foo"}},
 		expected: `call to DB(foo#0).Find() which:
 	- has any query
+	- has any options
 	- should return: 0 results`,
 	})
 	tests.Add("query", stringerTest{
 		input: &ExpectedFind{db: &MockDB{name: "foo"}, arg0: map[string]string{"foo": "bar"}},
 		expected: `call to DB(foo#0).Find() which:
 	- has query: map[foo:bar]
+	- has any options
 	- should return: 0 results`,
 	})
 	tests.Add("results", stringerTest{
@@ -438,11 +440,11 @@ func TestFindString(t *testing.T) {
 				{delay: 15},
 				{Row: &driver.Row{}},
 				{Row: &driver.Row{}},
-			},
-			},
+			}},
 		},
 		expected: `call to DB(foo#0).Find() which:
 	- has any query
+	- has any options
 	- should return: 4 results`,
 	})
 	tests.Run(t, testStringer)
@@ -1042,6 +1044,52 @@ func TestPutAttachmentString(t *testing.T) {
 	- has any attachment
 	- has any options
 	- should return rev: 2-bar`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestQueryString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedQuery{db: &MockDB{name: "foo"}},
+		expected: `call to DB(foo#0).Query() which:
+	- has any ddocID
+	- has any view
+	- has any options
+	- should return: 0 results`,
+	})
+	tests.Add("docID", stringerTest{
+		input: &ExpectedQuery{db: &MockDB{name: "foo"}, arg0: "foo"},
+		expected: `call to DB(foo#0).Query() which:
+	- has ddocID: foo
+	- has any view
+	- has any options
+	- should return: 0 results`,
+	})
+	tests.Add("view", stringerTest{
+		input: &ExpectedQuery{db: &MockDB{name: "foo"}, arg1: "1-foo"},
+		expected: `call to DB(foo#0).Query() which:
+	- has any ddocID
+	- has view: 1-foo
+	- has any options
+	- should return: 0 results`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedQuery{
+			db: &MockDB{name: "foo"},
+			ret0: &Rows{results: []*delayedRow{
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+				{delay: 15},
+				{Row: &driver.Row{}},
+				{Row: &driver.Row{}},
+			}},
+		},
+		expected: `call to DB(foo#0).Query() which:
+	- has any ddocID
+	- has any view
+	- has any options
+	- should return: 4 results`,
 	})
 	tests.Run(t, testStringer)
 }
