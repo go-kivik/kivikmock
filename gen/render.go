@@ -189,6 +189,8 @@ func (m *Method) ExpectedReturns() string {
 			args = append(args, fmt.Sprintf("&driverRows{Context: ctx, Rows: expected.ret%d}", i))
 		case "driver.BulkResults":
 			args = append(args, fmt.Sprintf("&driverBulkResults{Context: ctx, BulkResults: expected.ret%d}", i))
+		case "driver.Changes":
+			args = append(args, fmt.Sprintf("&driverChanges{Context: ctx, Changes: expected.ret%d}", i))
 		default:
 			args = append(args, fmt.Sprintf("expected.ret%d", i))
 		}
@@ -218,6 +220,8 @@ func typeName(t reflect.Type) string {
 		return "*Rows"
 	case "driver.BulkResults":
 		return "*BulkResults"
+	case "driver.Changes":
+		return "*Changes"
 	}
 	return name
 }

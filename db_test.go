@@ -215,8 +215,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectAllDocs().WithOptions(map[string]interface{}{"foo": 123}).
-				WillReturn(db.NewRows())
+			db.ExpectAllDocs().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -228,8 +227,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectAllDocs().WillDelay(time.Second).
-				WillReturn(db.NewRows())
+			db.ExpectAllDocs().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -335,8 +333,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectBulkGet().WithOptions(map[string]interface{}{"foo": 123}).
-				WillReturn(db.NewRows())
+			db.ExpectBulkGet().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -348,8 +345,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectBulkGet().WillDelay(time.Second).
-				WillReturn(db.NewRows())
+			db.ExpectBulkGet().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -430,8 +426,7 @@ func TestFind(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectFind().WithQuery(map[string]interface{}{"foo": "123"}).
-				WillReturn(db.NewRows())
+			db.ExpectFind().WithQuery(map[string]interface{}{"foo": "123"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -443,8 +438,7 @@ func TestFind(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectFind().WillDelay(time.Second).
-				WillReturn(db.NewRows())
+			db.ExpectFind().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -1738,8 +1732,7 @@ func TestLocalDocs(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectLocalDocs().WillDelay(time.Second).
-				WillReturn(db.NewRows())
+			db.ExpectLocalDocs().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -1983,8 +1976,7 @@ func TestQuery(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectQuery().WillDelay(time.Second).
-				WillReturn(db.NewRows())
+			db.ExpectQuery().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -2486,8 +2478,7 @@ func TestDesignDocs(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectDesignDocs().WillDelay(time.Second).
-				WillReturn(db.NewRows())
+			db.ExpectDesignDocs().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -2508,6 +2499,160 @@ func TestDesignDocs(t *testing.T) {
 			foo := c.DB(context.TODO(), "foo")
 			_ = c.DB(context.TODO(), "bar")
 			_, err := foo.DesignDocs(context.TODO())
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
+	tests.Run(t, testMock)
+}
+
+func TestChanges(t *testing.T) { // nolint: gocyclo
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectChanges().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.Changes(context.TODO())
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.Changes(context.TODO())
+			testy.Error(t, "call to DB.Changes() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("close error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectChanges().WillReturn(db.NewChanges().CloseError(errors.New("bar err")))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			rows, err := db.Changes(context.TODO())
+			testy.Error(t, "", err)
+			testy.Error(t, "bar err", rows.Close())
+		},
+	})
+	tests.Add("changes", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectChanges().WillReturn(db.NewChanges().
+				AddChange(&driver.Change{ID: "foo"}).
+				AddChange(&driver.Change{ID: "bar"}).
+				AddChange(&driver.Change{ID: "baz"}))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			rows, err := db.Changes(context.TODO())
+			testy.Error(t, "", err)
+			ids := []string{}
+			for rows.Next() {
+				ids = append(ids, rows.ID())
+			}
+			expected := []string{"foo", "bar", "baz"}
+			if d := diff.Interface(expected, ids); d != nil {
+				t.Error(d)
+			}
+		},
+	})
+	tests.Add("row error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectChanges().WillReturn(db.NewChanges().
+				AddChange(&driver.Change{ID: "foo"}).
+				AddChangeError(errors.New("foo err")))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			rows, err := db.Changes(context.TODO())
+			testy.Error(t, "", err)
+			ids := []string{}
+			for rows.Next() {
+				ids = append(ids, rows.ID())
+			}
+			expected := []string{"foo"}
+			if d := diff.Interface(expected, ids); d != nil {
+				t.Error(d)
+			}
+			testy.Error(t, "foo err", rows.Err())
+		},
+	})
+	tests.Add("options", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectChanges().WithOptions(map[string]interface{}{"foo": 123})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.Changes(context.TODO())
+			testy.ErrorRE(t, `map\[foo:123]`, err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectChanges().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.Changes(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("change delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectChanges().WillReturn(db.NewChanges().
+				AddDelay(time.Millisecond).
+				AddChange(&driver.Change{ID: "foo"}).
+				AddDelay(time.Second).
+				AddChange(&driver.Change{ID: "bar"}))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+			defer cancel()
+			rows, err := c.DB(ctx, "foo").Changes(ctx)
+			testy.Error(t, "", err)
+			ids := []string{}
+			for rows.Next() {
+				ids = append(ids, rows.ID())
+			}
+			expected := []string{"foo"}
+			if d := diff.Interface(expected, ids); d != nil {
+				t.Error(d)
+			}
+			testy.Error(t, "context deadline exceeded", rows.Err())
+		},
+	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectChanges()
+			foo.ExpectChanges()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			_, err := foo.Changes(context.TODO())
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
 		err: "there is a remaining unmet expectation: call to DB().Close()",

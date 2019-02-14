@@ -228,7 +228,7 @@ func (db *driverDB) Changes(ctx context.Context, options map[string]interface{})
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
-	return expected.ret0, expected.wait(ctx)
+	return &driverChanges{Context: ctx, Changes: expected.ret0}, expected.wait(ctx)
 }
 
 func (db *driverDB) DesignDocs(ctx context.Context, options map[string]interface{}) (driver.Rows, error) {

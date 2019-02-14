@@ -740,7 +740,7 @@ func (e *ExpectedBulkGet) method(v bool) string {
 // ExpectedChanges represents an expectation for a call to DB.Changes().
 type ExpectedChanges struct {
 	commonExpectation
-	ret0 driver.Changes
+	ret0 *Changes
 }
 
 // WithOptions sets the expected options for the call to DB.Changes().
@@ -750,7 +750,7 @@ func (e *ExpectedChanges) WithOptions(options map[string]interface{}) *ExpectedC
 }
 
 // WillReturn sets the values that will be returned by the call to DB.Changes().
-func (e *ExpectedChanges) WillReturn(ret0 driver.Changes) *ExpectedChanges {
+func (e *ExpectedChanges) WillReturn(ret0 *Changes) *ExpectedChanges {
 	e.ret0 = ret0
 	return e
 }

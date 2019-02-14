@@ -38,3 +38,11 @@ func (db *MockDB) NewBulkResults() *BulkResults {
 		results: make([]*delayedBulkResult, 0),
 	}
 }
+
+// NewChanges returns a new, empty changes set, which can be returned by the
+// Changes() expectation.
+func (db *MockDB) NewChanges() *Changes {
+	return &Changes{
+		results: make([]*delayedChange, 0),
+	}
+}

@@ -1195,27 +1195,26 @@ func TestBulkDocsString(t *testing.T) {
 	tests.Run(t, testStringer)
 }
 
-func TestDesignDocsString(t *testing.T) {
+func TestChangesString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", stringerTest{
-		input: &ExpectedDesignDocs{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
-		expected: `call to DB(foo#0).DesignDocs() which:
+		input: &ExpectedChanges{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
+		expected: `call to DB(foo#0).Changes() which:
 	- has any options
 	- should return: 0 results`,
 	})
 	tests.Add("results", stringerTest{
-		input: &ExpectedDesignDocs{
+		input: &ExpectedChanges{
 			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
-			ret0: &Rows{results: []*delayedRow{
-				{Row: &driver.Row{}},
-				{Row: &driver.Row{}},
+			ret0: &Changes{results: []*delayedChange{
+				{Change: &driver.Change{}},
+				{Change: &driver.Change{}},
 				{delay: 15},
-				{Row: &driver.Row{}},
-				{Row: &driver.Row{}},
-			},
-			},
+				{Change: &driver.Change{}},
+				{Change: &driver.Change{}},
+			}},
 		},
-		expected: `call to DB(foo#0).DesignDocs() which:
+		expected: `call to DB(foo#0).Changes() which:
 	- has any options
 	- should return: 4 results`,
 	})

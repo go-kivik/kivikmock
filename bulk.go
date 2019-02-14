@@ -58,11 +58,11 @@ func (r *BulkResults) CloseError(err error) *BulkResults {
 
 // AddResult adds a bulk result to be returned by the iterator. If
 // AddResultError has been set, this method will panic.
-func (r *BulkResults) AddResult(row *driver.BulkResult) *BulkResults {
+func (r *BulkResults) AddResult(result *driver.BulkResult) *BulkResults {
 	if r.resultErr != nil {
-		panic("It is invalid to set more rows after AddRowError is defined.")
+		panic("It is invalid to set more results after AddResultError is defined.")
 	}
-	r.results = append(r.results, &delayedBulkResult{BulkResult: row})
+	r.results = append(r.results, &delayedBulkResult{BulkResult: result})
 	return r
 }
 
