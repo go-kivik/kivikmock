@@ -601,6 +601,29 @@ func (e *ExpectedBulkDocs) String() string {
 	return dbStringer("BulkDocs", &e.commonExpectation, withOptions, opts, rets)
 }
 
-func (e *ExpectedGetAttachment) String() string { panic("x") }
-func (e *ExpectedDesignDocs) String() string    { panic("x") }
-func (e *ExpectedChanges) String() string       { panic("x") }
+func (e *ExpectedGetAttachment) String() string {
+	var opts, rets []string
+	if e.arg0 == "" {
+		opts = append(opts, "has any docID")
+	} else {
+		opts = append(opts, "has docID: "+e.arg0)
+	}
+	if e.arg1 == "" {
+		opts = append(opts, "has any filename")
+	} else {
+		opts = append(opts, "has filename: "+e.arg1)
+	}
+	if e.ret0 != nil {
+		rets = append(rets, "should return attachment: "+e.ret0.Filename)
+	}
+	return dbStringer("GetAttachment", &e.commonExpectation, withOptions, opts, rets)
+}
+
+// WithDocID sets the expectation for the docID passed to the DB.GetAttachment() call.
+func (e *ExpectedGetAttachment) WithDocID(docID string) *ExpectedGetAttachment {
+	e.arg0 = docID
+	return e
+}
+
+func (e *ExpectedDesignDocs) String() string { panic("x") }
+func (e *ExpectedChanges) String() string    { panic("x") }

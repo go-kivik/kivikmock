@@ -4,5 +4,4 @@
 
 - db.Changes https://godoc.org/github.com/go-kivik/kivik#DB.Changes
 - db.DesignDocs https://godoc.org/github.com/go-kivik/kivik#DB.DesignDocs
-- db.GetAttachment https://godoc.org/github.com/go-kivik/kivik#DB.GetAttachment
 - db.GetIndexes https://godoc.org/github.com/go-kivik/kivik#DB.GetIndexes

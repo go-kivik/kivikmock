@@ -2375,3 +2375,72 @@ func TestBulkDocs(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestGetAttachment(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetAttachment().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").GetAttachment(context.TODO(), "foo", "bar")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetAttachment().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").GetAttachment(newCanceledContext(), "foo", "bar")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("wrong db", mockTest{
+		setup: func(m *MockClient) {
+			foo := m.NewDB()
+			bar := m.NewDB()
+			m.ExpectDB().WithName("foo").WillReturn(foo)
+			m.ExpectDB().WithName("bar").WillReturn(bar)
+			bar.ExpectGetAttachment()
+			foo.ExpectGetAttachment()
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			foo := c.DB(context.TODO(), "foo")
+			_ = c.DB(context.TODO(), "bar")
+			_, err := foo.GetAttachment(context.TODO(), "foo", "bar")
+			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
+		},
+		err: "there is a remaining unmet expectation: call to DB().Close()",
+	})
+	tests.Add("wrong docID", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetAttachment().WithDocID("bar")
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DB(context.TODO(), "foo").GetAttachment(context.TODO(), "foo", "bar")
+			testy.ErrorRE(t, "has docID: bar", err)
+		},
+	})
+	tests.Add("success", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectGetAttachment().WillReturn(&driver.Attachment{Filename: "foo.txt"})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			att, err := c.DB(context.TODO(), "foo").GetAttachment(context.TODO(), "foo", "bar")
+			testy.Error(t, "", err)
+			if name := att.Filename; name != "foo.txt" {
+				t.Errorf("Unexpected filename: %s", name)
+			}
+		},
+	})
+	tests.Run(t, testMock)
+}
