@@ -184,9 +184,12 @@ func zeroValue(t reflect.Type) string {
 func (m *Method) ExpectedReturns() string {
 	args := make([]string, 0, len(m.Returns))
 	for i, arg := range m.Returns {
-		if arg.String() == "driver.Rows" {
+		switch arg.String() {
+		case "driver.Rows":
 			args = append(args, fmt.Sprintf("&driverRows{Context: ctx, Rows: expected.ret%d}", i))
-		} else {
+		case "driver.BulkResults":
+			args = append(args, fmt.Sprintf("&driverBulkResults{Context: ctx, BulkResults: expected.ret%d}", i))
+		default:
 			args = append(args, fmt.Sprintf("expected.ret%d", i))
 		}
 	}
@@ -213,6 +216,8 @@ func typeName(t reflect.Type) string {
 		return "interface{}"
 	case "driver.Rows":
 		return "*Rows"
+	case "driver.BulkResults":
+		return "*BulkResults"
 	}
 	return name
 }

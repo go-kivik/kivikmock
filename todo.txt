@@ -2,11 +2,7 @@
 - client.GetReplications https://godoc.org/github.com/go-kivik/kivik#Client.GetReplications
 - client.Replicate https://godoc.org/github.com/go-kivik/kivik#Client.Replicate
 
-- db.BulkDocs https://godoc.org/github.com/go-kivik/kivik#DB.BulkDocs
 - db.Changes https://godoc.org/github.com/go-kivik/kivik#DB.Changes
 - db.DesignDocs https://godoc.org/github.com/go-kivik/kivik#DB.DesignDocs
 - db.GetAttachment https://godoc.org/github.com/go-kivik/kivik#DB.GetAttachment
 - db.GetIndexes https://godoc.org/github.com/go-kivik/kivik#DB.GetIndexes
-- db.Security https://godoc.org/github.com/go-kivik/kivik#DB.Security
-- db.SetSecurity https://godoc.org/github.com/go-kivik/kivik#DB.SetSecurity
-- db.Stats https://godoc.org/github.com/go-kivik/kivik#DB.Stats

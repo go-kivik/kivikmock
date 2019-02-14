@@ -962,8 +962,7 @@ func TestLocalDocsString(t *testing.T) {
 				{delay: 15},
 				{Row: &driver.Row{}},
 				{Row: &driver.Row{}},
-			},
-			},
+			}},
 		},
 		expected: `call to DB(foo#0).LocalDocs() which:
 	- has any options
@@ -1088,6 +1087,112 @@ func TestQueryString(t *testing.T) {
 		expected: `call to DB(foo#0).Query() which:
 	- has any ddocID
 	- has any view
+	- has any options
+	- should return: 4 results`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestSecurityString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input:    &ExpectedSecurity{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
+		expected: `call to DB(foo#0).Security()`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedSecurity{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).Security() which:
+	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedSecurity{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, delay: time.Second}},
+		expected: `call to DB(foo#0).Security() which:
+	- should delay for: 1s`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestSetSecurityString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedSetSecurity{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
+		expected: `call to DB(foo#0).SetSecurity() which:
+	- has any security object`,
+	})
+	tests.Add("security object", stringerTest{
+		input: &ExpectedSetSecurity{arg0: &driver.Security{Admins: driver.Members{Names: []string{"bob"}}}, commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
+		expected: `call to DB(foo#0).SetSecurity() which:
+	- has security object: &{{[bob] []} {[] []}}`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedSetSecurity{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).SetSecurity() which:
+	- has any security object
+	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedSetSecurity{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, delay: time.Second}},
+		expected: `call to DB(foo#0).SetSecurity() which:
+	- has any security object
+	- should delay for: 1s`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestStatsString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input:    &ExpectedStats{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
+		expected: `call to DB(foo#0).Stats()`,
+	})
+	tests.Add("stats", stringerTest{
+		input: &ExpectedStats{ret0: &driver.DBStats{Name: "foo"}, commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
+		expected: `call to DB(foo#0).Stats() which:
+	- should return stats: &{foo false 0 0  0 0 0 <nil> []}`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedStats{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).Stats() which:
+	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedStats{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, delay: time.Second}},
+		expected: `call to DB(foo#0).Stats() which:
+	- should delay for: 1s`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestBulkDocsString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedBulkDocs{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
+		expected: `call to DB(foo#0).BulkDocs() which:
+	- has any docs
+	- has any options`,
+	})
+	tests.Add("docs", stringerTest{
+		input: &ExpectedBulkDocs{
+			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
+			arg0:              []interface{}{1, 2, 3},
+		},
+		expected: `call to DB(foo#0).BulkDocs() which:
+	- has: 3 docs
+	- has any options`,
+	})
+	tests.Add("return value", stringerTest{
+		input: &ExpectedBulkDocs{
+			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
+			ret0: &BulkResults{results: []*delayedBulkResult{
+				{BulkResult: &driver.BulkResult{}},
+				{BulkResult: &driver.BulkResult{}},
+				{delay: 15},
+				{BulkResult: &driver.BulkResult{}},
+				{BulkResult: &driver.BulkResult{}},
+			}},
+		},
+		expected: `call to DB(foo#0).BulkDocs() which:
+	- has any docs
 	- has any options
 	- should return: 4 results`,
 	})

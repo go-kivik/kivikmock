@@ -30,3 +30,11 @@ func (db *MockDB) NewRows() *Rows {
 		results: make([]*delayedRow, 0),
 	}
 }
+
+// NewBulkResults returns a new, empty set of bulk results, which can be
+// returned by the BulkDocs() expectation.
+func (db *MockDB) NewBulkResults() *BulkResults {
+	return &BulkResults{
+		results: make([]*delayedBulkResult, 0),
+	}
+}
