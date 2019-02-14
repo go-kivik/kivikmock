@@ -635,7 +635,7 @@ func (e *ExpectedAllDocs) method(v bool) string {
 type ExpectedBulkDocs struct {
 	commonExpectation
 	arg0 []interface{}
-	ret0 driver.BulkResults
+	ret0 *BulkResults
 }
 
 // WithOptions sets the expected options for the call to DB.BulkDocs().
@@ -645,7 +645,7 @@ func (e *ExpectedBulkDocs) WithOptions(options map[string]interface{}) *Expected
 }
 
 // WillReturn sets the values that will be returned by the call to DB.BulkDocs().
-func (e *ExpectedBulkDocs) WillReturn(ret0 driver.BulkResults) *ExpectedBulkDocs {
+func (e *ExpectedBulkDocs) WillReturn(ret0 *BulkResults) *ExpectedBulkDocs {
 	e.ret0 = ret0
 	return e
 }

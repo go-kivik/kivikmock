@@ -201,7 +201,7 @@ func (db *driverDB) BulkDocs(ctx context.Context, arg0 []interface{}, options ma
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
-	return expected.ret0, expected.wait(ctx)
+	return &driverBulkResults{Context: ctx, BulkResults: expected.ret0}, expected.wait(ctx)
 }
 
 func (db *driverDB) BulkGet(ctx context.Context, arg0 []driver.BulkGetReference, options map[string]interface{}) (driver.Rows, error) {

@@ -48,7 +48,7 @@ func (e *ExpectedDBClose) WillDelay(d time.Duration) *ExpectedDBClose {
 
 func (e *ExpectedAllDocs) String() string {
 	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
-	return dbStringer("AllDocs", e.db, &e.commonExpectation, withOptions, nil, rets)
+	return dbStringer("AllDocs", &e.commonExpectation, withOptions, nil, rets)
 }
 
 func (e *ExpectedBulkGet) String() string {
@@ -81,7 +81,7 @@ func (e *ExpectedFind) String() string {
 		opts = append(opts, fmt.Sprintf("has query: %v", e.arg0))
 	}
 	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
-	return dbStringer("Find", e.db, &e.commonExpectation, withOptions, opts, rets)
+	return dbStringer("Find", &e.commonExpectation, withOptions, opts, rets)
 }
 
 // WithQuery sets the expected query for the Find() call.
@@ -219,8 +219,8 @@ const (
 	withOptions = 1 << iota
 )
 
-func dbStringer(methodName string, db *MockDB, e *commonExpectation, flags int, opts []string, rets []string) string {
-	msg := fmt.Sprintf("call to DB(%s#%d).%s()", db.name, db.id, methodName)
+func dbStringer(methodName string, e *commonExpectation, flags int, opts []string, rets []string) string {
+	msg := fmt.Sprintf("call to DB(%s#%d).%s()", e.db.name, e.db.id, methodName)
 	var extra string
 	for _, c := range opts {
 		extra += "\n\t- " + c
@@ -240,11 +240,11 @@ func dbStringer(methodName string, db *MockDB, e *commonExpectation, flags int, 
 }
 
 func (e *ExpectedCompact) String() string {
-	return dbStringer("Compact", e.db, &e.commonExpectation, 0, nil, nil)
+	return dbStringer("Compact", &e.commonExpectation, 0, nil, nil)
 }
 
 func (e *ExpectedViewCleanup) String() string {
-	return dbStringer("ViewCleanup", e.db, &e.commonExpectation, 0, nil, nil)
+	return dbStringer("ViewCleanup", &e.commonExpectation, 0, nil, nil)
 }
 
 func (e *ExpectedPut) String() string {
@@ -259,7 +259,7 @@ func (e *ExpectedPut) String() string {
 	} else {
 		custom = append(custom, fmt.Sprintf("has doc: %v", e.arg1))
 	}
-	return dbStringer("Put", e.db, &e.commonExpectation, withOptions, custom, nil)
+	return dbStringer("Put", &e.commonExpectation, withOptions, custom, nil)
 }
 
 // WithDocID sets the expectation for the docID passed to the DB.Put() call.
@@ -288,7 +288,7 @@ func (e *ExpectedGetMeta) String() string {
 	if e.ret1 != "" {
 		rets = append(rets, "should return rev: "+e.ret1)
 	}
-	return dbStringer("GetMeta", e.db, &e.commonExpectation, withOptions, opts, rets)
+	return dbStringer("GetMeta", &e.commonExpectation, withOptions, opts, rets)
 }
 
 // WithDocID sets the expectation for the docID passed to the DB.GetMeta() call.
@@ -298,7 +298,7 @@ func (e *ExpectedGetMeta) WithDocID(docID string) *ExpectedGetMeta {
 }
 
 func (e *ExpectedFlush) String() string {
-	return dbStringer("Flush", e.db, &e.commonExpectation, 0, nil, nil)
+	return dbStringer("Flush", &e.commonExpectation, 0, nil, nil)
 }
 
 func (e *ExpectedDeleteAttachment) String() string {
@@ -321,7 +321,7 @@ func (e *ExpectedDeleteAttachment) String() string {
 	if e.ret0 != "" {
 		rets = append(rets, "should return rev: "+e.ret0)
 	}
-	return dbStringer("DeleteAttachment", e.db, &e.commonExpectation, withOptions, opts, rets)
+	return dbStringer("DeleteAttachment", &e.commonExpectation, withOptions, opts, rets)
 }
 
 // WithDocID sets the expectation for the docID passed to the DB.DeleteAttachment() call.
@@ -357,7 +357,7 @@ func (e *ExpectedDelete) String() string {
 	if e.ret0 != "" {
 		rets = append(rets, "should return rev: "+e.ret0)
 	}
-	return dbStringer("Delete", e.db, &e.commonExpectation, withOptions, opts, rets)
+	return dbStringer("Delete", &e.commonExpectation, withOptions, opts, rets)
 }
 
 // WithDocID sets the expectation for the docID passed to the DB.Delete() call.
@@ -387,7 +387,7 @@ func (e *ExpectedCopy) String() string {
 	if e.ret0 != "" {
 		rets = append(rets, "should return rev: "+e.ret0)
 	}
-	return dbStringer("Copy", e.db, &e.commonExpectation, withOptions, opts, rets)
+	return dbStringer("Copy", &e.commonExpectation, withOptions, opts, rets)
 }
 
 // WithTargetID sets the expectation for the docID passed to the DB.Copy() call.
@@ -409,7 +409,7 @@ func (e *ExpectedCompactView) String() string {
 	} else {
 		opts = []string{"has ddocID: " + e.arg0}
 	}
-	return dbStringer("CompactView", e.db, &e.commonExpectation, 0, opts, nil)
+	return dbStringer("CompactView", &e.commonExpectation, 0, opts, nil)
 }
 
 // WithDDoc sets the expected design doc name for the call to DB.CompactView().
@@ -428,7 +428,7 @@ func (e *ExpectedGet) String() string {
 	if e.ret0 != nil {
 		rets = []string{fmt.Sprintf("should return document with rev: %s", e.ret0.Rev)}
 	}
-	return dbStringer("Get", e.db, &e.commonExpectation, withOptions, opts, rets)
+	return dbStringer("Get", &e.commonExpectation, withOptions, opts, rets)
 }
 
 // WithDocID sets the expected docID for the DB.Get() call.
@@ -452,7 +452,7 @@ func (e *ExpectedGetAttachmentMeta) String() string {
 	if e.ret0 != nil {
 		rets = []string{fmt.Sprintf("should return attachment: %s", e.ret0.Filename)}
 	}
-	return dbStringer("GetAttachmentMeta", e.db, &e.commonExpectation, withOptions, opts, rets)
+	return dbStringer("GetAttachmentMeta", &e.commonExpectation, withOptions, opts, rets)
 }
 
 // WithDocID sets the expectation for the docID passed to the DB.GetAttachmentMeta() call.
@@ -469,7 +469,7 @@ func (e *ExpectedGetAttachmentMeta) WithFilename(filename string) *ExpectedGetAt
 
 func (e *ExpectedLocalDocs) String() string {
 	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
-	return dbStringer("LocalDocs", e.db, &e.commonExpectation, withOptions, nil, rets)
+	return dbStringer("LocalDocs", &e.commonExpectation, withOptions, nil, rets)
 }
 
 func (e *ExpectedPurge) String() string {
@@ -482,7 +482,7 @@ func (e *ExpectedPurge) String() string {
 	if e.ret0 != nil {
 		rets = []string{fmt.Sprintf("should return result: %v", e.ret0)}
 	}
-	return dbStringer("Purge", e.db, &e.commonExpectation, 0, opts, rets)
+	return dbStringer("Purge", &e.commonExpectation, 0, opts, rets)
 }
 
 // WithDocRevMap sets the expected docRevMap for the call to DB.Purge().
@@ -511,7 +511,7 @@ func (e *ExpectedPutAttachment) String() string {
 	if e.ret0 != "" {
 		rets = append(rets, "should return rev: "+e.ret0)
 	}
-	return dbStringer("PutAttachment", e.db, &e.commonExpectation, withOptions, opts, rets)
+	return dbStringer("PutAttachment", &e.commonExpectation, withOptions, opts, rets)
 }
 
 // WithDocID sets the expectation for the docID passed to the DB.PutAttachment() call.
@@ -545,7 +545,7 @@ func (e *ExpectedQuery) String() string {
 		opts = append(opts, "has view: "+e.arg1)
 	}
 	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
-	return dbStringer("Query", e.db, &e.commonExpectation, withOptions, opts, rets)
+	return dbStringer("Query", &e.commonExpectation, withOptions, opts, rets)
 }
 
 // WithDDocID sets the expected ddocID value for the DB.Query() call.
@@ -560,10 +560,47 @@ func (e *ExpectedQuery) WithView(view string) *ExpectedQuery {
 	return e
 }
 
-func (e *ExpectedSecurity) String() string      { panic("x") }
-func (e *ExpectedSetSecurity) String() string   { panic("x") }
-func (e *ExpectedStats) String() string         { panic("x") }
-func (e *ExpectedBulkDocs) String() string      { panic("x") }
+func (e *ExpectedSecurity) String() string {
+	return dbStringer("Security", &e.commonExpectation, 0, nil, nil)
+}
+
+func (e *ExpectedSetSecurity) String() string {
+	var opts []string
+	if e.arg0 == nil {
+		opts = append(opts, "has any security object")
+	} else {
+		opts = append(opts, fmt.Sprintf("has security object: %v", e.arg0))
+	}
+	return dbStringer("SetSecurity", &e.commonExpectation, 0, opts, nil)
+}
+
+// WithSecurity sets the expected security object for the DB.SetSecurity() call.
+func (e *ExpectedSetSecurity) WithSecurity(sec *driver.Security) *ExpectedSetSecurity {
+	e.arg0 = sec
+	return e
+}
+
+func (e *ExpectedStats) String() string {
+	var rets []string
+	if e.ret0 != nil {
+		rets = append(rets, fmt.Sprintf("should return stats: %v", e.ret0))
+	}
+	return dbStringer("Stats", &e.commonExpectation, 0, nil, rets)
+}
+
+func (e *ExpectedBulkDocs) String() string {
+	var opts, rets []string
+	if e.arg0 == nil {
+		opts = append(opts, "has any docs")
+	} else {
+		opts = append(opts, fmt.Sprintf("has: %d docs", len(e.arg0)))
+	}
+	if e.ret0 != nil {
+		rets = append(rets, fmt.Sprintf("should return: %d results", e.ret0.rowCount()))
+	}
+	return dbStringer("BulkDocs", &e.commonExpectation, withOptions, opts, rets)
+}
+
 func (e *ExpectedGetAttachment) String() string { panic("x") }
 func (e *ExpectedDesignDocs) String() string    { panic("x") }
 func (e *ExpectedChanges) String() string       { panic("x") }
