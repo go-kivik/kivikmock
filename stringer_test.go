@@ -962,7 +962,8 @@ func TestLocalDocsString(t *testing.T) {
 				{delay: 15},
 				{Row: &driver.Row{}},
 				{Row: &driver.Row{}},
-			}},
+			},
+			},
 		},
 		expected: `call to DB(foo#0).LocalDocs() which:
 	- has any options
@@ -1092,49 +1093,36 @@ func TestQueryString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
-
-func TestSecurityString(t *testing.T) {
+func TestGetAttachmentString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", stringerTest{
-		input:    &ExpectedSecurity{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
-		expected: `call to DB(foo#0).Security()`,
+		input: &ExpectedGetAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
+		expected: `call to DB(foo#0).GetAttachment() which:
+	- has any docID
+	- has any filename
+	- has any options`,
 	})
-	tests.Add("error", stringerTest{
-		input: &ExpectedSecurity{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, err: errors.New("foo err")}},
-		expected: `call to DB(foo#0).Security() which:
-	- should return error: foo err`,
+	tests.Add("docID", stringerTest{
+		input: &ExpectedGetAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg0: "foo"},
+		expected: `call to DB(foo#0).GetAttachment() which:
+	- has docID: foo
+	- has any filename
+	- has any options`,
 	})
-	tests.Add("delay", stringerTest{
-		input: &ExpectedSecurity{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, delay: time.Second}},
-		expected: `call to DB(foo#0).Security() which:
-	- should delay for: 1s`,
+	tests.Add("filename", stringerTest{
+		input: &ExpectedGetAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, arg1: "foo.txt"},
+		expected: `call to DB(foo#0).GetAttachment() which:
+	- has any docID
+	- has filename: foo.txt
+	- has any options`,
 	})
-	tests.Run(t, testStringer)
-}
-
-func TestSetSecurityString(t *testing.T) {
-	tests := testy.NewTable()
-	tests.Add("empty", stringerTest{
-		input: &ExpectedSetSecurity{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
-		expected: `call to DB(foo#0).SetSecurity() which:
-	- has any security object`,
-	})
-	tests.Add("security object", stringerTest{
-		input: &ExpectedSetSecurity{arg0: &driver.Security{Admins: driver.Members{Names: []string{"bob"}}}, commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
-		expected: `call to DB(foo#0).SetSecurity() which:
-	- has security object: &{{[bob] []} {[] []}}`,
-	})
-	tests.Add("error", stringerTest{
-		input: &ExpectedSetSecurity{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, err: errors.New("foo err")}},
-		expected: `call to DB(foo#0).SetSecurity() which:
-	- has any security object
-	- should return error: foo err`,
-	})
-	tests.Add("delay", stringerTest{
-		input: &ExpectedSetSecurity{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, delay: time.Second}},
-		expected: `call to DB(foo#0).SetSecurity() which:
-	- has any security object
-	- should delay for: 1s`,
+	tests.Add("return value", stringerTest{
+		input: &ExpectedGetAttachment{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}, ret0: &driver.Attachment{Filename: "foo.txt"}},
+		expected: `call to DB(foo#0).GetAttachment() which:
+	- has any docID
+	- has any filename
+	- has any options
+	- should return attachment: foo.txt`,
 	})
 	tests.Run(t, testStringer)
 }
@@ -1145,7 +1133,12 @@ func TestStatsString(t *testing.T) {
 		input:    &ExpectedStats{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		expected: `call to DB(foo#0).Stats()`,
 	})
-	tests.Add("stats", stringerTest{
+	tests.Add("delay", stringerTest{
+		input: &ExpectedStats{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, delay: time.Second}},
+		expected: `call to DB(foo#0).Stats() which:
+	- should delay for: 1s`,
+	})
+	tests.Add("return value", stringerTest{
 		input: &ExpectedStats{ret0: &driver.DBStats{Name: "foo"}, commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		expected: `call to DB(foo#0).Stats() which:
 	- should return stats: &{foo false 0 0  0 0 0 <nil> []}`,
@@ -1154,11 +1147,6 @@ func TestStatsString(t *testing.T) {
 		input: &ExpectedStats{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, err: errors.New("foo err")}},
 		expected: `call to DB(foo#0).Stats() which:
 	- should return error: foo err`,
-	})
-	tests.Add("delay", stringerTest{
-		input: &ExpectedStats{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, delay: time.Second}},
-		expected: `call to DB(foo#0).Stats() which:
-	- should delay for: 1s`,
 	})
 	tests.Run(t, testStringer)
 }
@@ -1172,29 +1160,37 @@ func TestBulkDocsString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("docs", stringerTest{
-		input: &ExpectedBulkDocs{
-			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
-			arg0:              []interface{}{1, 2, 3},
-		},
+		input: &ExpectedBulkDocs{arg0: []interface{}{1, 2, 3}, commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
 		expected: `call to DB(foo#0).BulkDocs() which:
 	- has: 3 docs
 	- has any options`,
 	})
-	tests.Add("return value", stringerTest{
-		input: &ExpectedBulkDocs{
-			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
-			ret0: &BulkResults{results: []*delayedBulkResult{
-				{BulkResult: &driver.BulkResult{}},
-				{BulkResult: &driver.BulkResult{}},
-				{delay: 15},
-				{BulkResult: &driver.BulkResult{}},
-				{BulkResult: &driver.BulkResult{}},
-			}},
-		},
+	tests.Add("delay", stringerTest{
+		input: &ExpectedBulkDocs{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, delay: time.Second}},
 		expected: `call to DB(foo#0).BulkDocs() which:
 	- has any docs
 	- has any options
-	- should return: 4 results`,
+	- should delay for: 1s`,
+	})
+	tests.Add("return value", stringerTest{
+		input: &ExpectedBulkDocs{ret0: &BulkResults{
+			results: []*delayedBulkResult{
+				{BulkResult: &driver.BulkResult{}},
+				{BulkResult: &driver.BulkResult{}},
+				{BulkResult: &driver.BulkResult{}},
+			},
+		}, commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
+		expected: `call to DB(foo#0).BulkDocs() which:
+	- has any docs
+	- has any options
+	- should return: 3 results`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedBulkDocs{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}, err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).BulkDocs() which:
+	- has any docs
+	- has any options
+	- should return error: foo err`,
 	})
 	tests.Run(t, testStringer)
 }
