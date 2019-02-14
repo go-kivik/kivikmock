@@ -625,5 +625,9 @@ func (e *ExpectedGetAttachment) WithDocID(docID string) *ExpectedGetAttachment {
 	return e
 }
 
-func (e *ExpectedDesignDocs) String() string { panic("x") }
-func (e *ExpectedChanges) String() string    { panic("x") }
+func (e *ExpectedDesignDocs) String() string {
+	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	return dbStringer("DesignDocs", &e.commonExpectation, withOptions, nil, rets)
+}
+
+func (e *ExpectedChanges) String() string { panic("x") }
