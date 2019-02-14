@@ -50,6 +50,34 @@ func (r *driverBulkResults) Next(res *driver.BulkResult) error {
 	return nil
 }
 
+// CloseError sets an error to be returned when the iterator is closed.
+func (r *BulkResults) CloseError(err error) *BulkResults {
+	r.closeErr = err
+	return r
+}
+
+// AddResult adds a bulk result to be returned by the iterator. If
+// AddResultError has been set, this method will panic.
+func (r *BulkResults) AddResult(row *driver.BulkResult) *BulkResults {
+	if r.resultErr != nil {
+		panic("It is invalid to set more rows after AddRowError is defined.")
+	}
+	r.results = append(r.results, &delayedBulkResult{BulkResult: row})
+	return r
+}
+
+// AddResultError adds an error to be returned during iteration.
+func (r *BulkResults) AddResultError(err error) *BulkResults {
+	r.resultErr = err
+	return r
+}
+
+// AddDelay adds a delay before the next iteration will complete.
+func (r *BulkResults) AddDelay(delay time.Duration) *BulkResults {
+	r.results = append(r.results, &delayedBulkResult{delay: delay})
+	return r
+}
+
 // rowCount calculates the rows remaining in this iterator
 func (r *BulkResults) rowCount() int {
 	if r == nil || r.results == nil {
