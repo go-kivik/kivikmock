@@ -630,4 +630,7 @@ func (e *ExpectedDesignDocs) String() string {
 	return dbStringer("DesignDocs", &e.commonExpectation, withOptions, nil, rets)
 }
 
-func (e *ExpectedChanges) String() string { panic("x") }
+func (e *ExpectedChanges) String() string {
+	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	return dbStringer("Changes", &e.commonExpectation, withOptions, nil, rets)
+}
