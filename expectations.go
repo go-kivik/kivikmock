@@ -274,7 +274,7 @@ func (e *ExpectedCreateDB) WithName(name string) *ExpectedCreateDB {
 
 // WillReturn sets the return value for the DB() call.
 func (e *ExpectedCreateDB) WillReturn(db *MockDB) *ExpectedCreateDB {
-	e.expectedDB.db = db
+	e.expectedDB.ret0 = db
 	return e
 }
 

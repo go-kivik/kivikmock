@@ -667,6 +667,26 @@ func TestCreateDB(t *testing.T) {
 			testy.Error(t, "context canceled", err)
 		},
 	})
+	tests.Add("name confusion", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectCreateDB().WithName("bundle-foo").WillReturn(db)
+			db.ExpectSetSecurity().WithSecurity(&driver.Security{
+				Admins: driver.Members{Names: []string{"bob"}},
+			}).WillReturnError(errors.New("security fail"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			ctx := context.Background()
+			db := c.CreateDB(ctx, "bundle-foo")
+			security := &kivik.Security{
+				Admins: kivik.Members{
+					Names: []string{"bob"},
+				},
+			}
+			err := db.SetSecurity(ctx, security)
+			testy.Error(t, "security fail", err)
+		},
+	})
 	tests.Run(t, testMock)
 }
 
