@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"testing"
 
 	"github.com/go-kivik/kivik"
 	"github.com/go-kivik/kivik/driver"
@@ -49,4 +50,13 @@ func New() (*kivik.Client, *MockClient, error) {
 	pool.Unlock()
 
 	return kmock.open()
+}
+
+// NewT works exactly as New, except that any error will be passed to t.Fatal.
+func NewT(t *testing.T) (*kivik.Client, *MockClient) {
+	client, mock, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return client, mock
 }
