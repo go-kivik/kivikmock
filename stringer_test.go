@@ -1219,3 +1219,27 @@ func TestChangesString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestDBUpdatesString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedDBUpdates{commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
+		expected: `call to DBUpdates() which:
+	- should return: 0 results`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedDBUpdates{
+			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
+			ret0: &Updates{results: []*delayedUpdate{
+				{DBUpdate: &driver.DBUpdate{}},
+				{DBUpdate: &driver.DBUpdate{}},
+				{delay: 15},
+				{DBUpdate: &driver.DBUpdate{}},
+				{DBUpdate: &driver.DBUpdate{}},
+			}},
+		},
+		expected: `call to DBUpdates() which:
+	- should return: 4 results`,
+	})
+	tests.Run(t, testStringer)
+}

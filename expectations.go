@@ -232,6 +232,7 @@ func (e *ExpectedCreateDB) String() string {
 		msg += fmt.Sprintf("\n\t- should return database with %d expectations", e.db.expectations())
 	}
 	msg += delayString(e.delay)
+	msg += errorString(e.err)
 	return msg
 }
 
@@ -290,5 +291,9 @@ func (e *ExpectedCreateDB) WillDelay(delay time.Duration) *ExpectedCreateDB {
 }
 
 func (e *ExpectedDBUpdates) String() string {
-	panic("x")
+	msg := "call to DBUpdates() which:"
+	msg += fmt.Sprintf("\n\t- should return: %d results", e.ret0.count())
+	msg += delayString(e.delay)
+	msg += errorString(e.err)
+	return msg
 }

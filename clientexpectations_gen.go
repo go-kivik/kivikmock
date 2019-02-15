@@ -358,11 +358,11 @@ func (e *ExpectedDB) method(v bool) string {
 // ExpectedDBUpdates represents an expectation for a call to DBUpdates().
 type ExpectedDBUpdates struct {
 	commonExpectation
-	ret0 driver.DBUpdates
+	ret0 *Updates
 }
 
 // WillReturn sets the values that will be returned by the call to DBUpdates().
-func (e *ExpectedDBUpdates) WillReturn(ret0 driver.DBUpdates) *ExpectedDBUpdates {
+func (e *ExpectedDBUpdates) WillReturn(ret0 *Updates) *ExpectedDBUpdates {
 	e.ret0 = ret0
 	return e
 }
@@ -370,6 +370,12 @@ func (e *ExpectedDBUpdates) WillReturn(ret0 driver.DBUpdates) *ExpectedDBUpdates
 // WillReturnError sets the error value that will be returned by the call to DBUpdates().
 func (e *ExpectedDBUpdates) WillReturnError(err error) *ExpectedDBUpdates {
 	e.err = err
+	return e
+}
+
+// WillDelay causes the call to DBUpdates() to delay.
+func (e *ExpectedDBUpdates) WillDelay(delay time.Duration) *ExpectedDBUpdates {
+	e.delay = delay
 	return e
 }
 
@@ -381,7 +387,7 @@ func (e *ExpectedDBUpdates) method(v bool) string {
 	if !v {
 		return "DBUpdates()"
 	}
-	return fmt.Sprintf("DBUpdates()")
+	return fmt.Sprintf("DBUpdates(ctx)")
 }
 
 // ExpectedDBsStats represents an expectation for a call to DBsStats().

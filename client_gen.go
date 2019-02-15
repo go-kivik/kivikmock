@@ -100,12 +100,12 @@ func (c *driverClient) DB(ctx context.Context, arg0 string, options map[string]i
 	return &driverDB{MockDB: expected.ret0}, expected.wait(ctx)
 }
 
-func (c *driverClient) DBUpdates() (driver.DBUpdates, error) {
+func (c *driverClient) DBUpdates(ctx context.Context) (driver.DBUpdates, error) {
 	expected := &ExpectedDBUpdates{}
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
 	}
-	return expected.ret0, expected.err
+	return &driverDBUpdates{Updates: expected.ret0}, expected.wait(ctx)
 }
 
 func (c *driverClient) DBsStats(ctx context.Context, arg0 []string) ([]*driver.DBStats, error) {

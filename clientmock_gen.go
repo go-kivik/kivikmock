@@ -70,7 +70,9 @@ func (c *MockClient) ExpectDB() *ExpectedDB {
 
 // ExpectDBUpdates queues an expectation that DBUpdates will be called.
 func (c *MockClient) ExpectDBUpdates() *ExpectedDBUpdates {
-	e := &ExpectedDBUpdates{}
+	e := &ExpectedDBUpdates{
+		ret0: &Updates{},
+	}
 	c.expected = append(c.expected, e)
 	return e
 }

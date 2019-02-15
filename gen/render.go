@@ -198,6 +198,8 @@ func (m *Method) ExpectedReturns() string {
 			args = append(args, fmt.Sprintf("&driverChanges{Context: ctx, Changes: expected.ret%d}", i))
 		case "driver.DB":
 			args = append(args, fmt.Sprintf("&driverDB{MockDB: expected.ret%d}", i))
+		case "driver.DBUpdates":
+			args = append(args, fmt.Sprintf("&driverDBUpdates{Updates: expected.ret%d}", i))
 		default:
 			args = append(args, fmt.Sprintf("expected.ret%d", i))
 		}
@@ -234,6 +236,8 @@ func typeName(t reflect.Type) string {
 		return "*BulkResults"
 	case "driver.Changes":
 		return "*Changes"
+	case "driver.DBUpdates":
+		return "*Updates"
 	}
 	return name
 }
@@ -255,6 +259,8 @@ func (m *Method) SetExpectations() string {
 			zero = "&driver.QueryPlan{}"
 		case "*kivik.PurgeResult":
 			zero = "&driver.PurgeResult{}"
+		case "*kivik.DBUpdates":
+			zero = "&Updates{}"
 		}
 		if zero != "" {
 			args = append(args, fmt.Sprintf("ret%d: %s,\n", i, zero))
