@@ -198,7 +198,6 @@ func (e *ExpectedVersion) String() string {
 type ExpectedDB struct {
 	commonExpectation
 	arg0 string
-	db   *MockDB
 }
 
 func (e *ExpectedDB) String() string {
@@ -276,7 +275,6 @@ func (e *ExpectedDB) WillDelay(delay time.Duration) *ExpectedDB {
 type ExpectedCreateDB struct {
 	commonExpectation
 	arg0       string
-	db         *MockDB
 	expectedDB *ExpectedDB
 }
 

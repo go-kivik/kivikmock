@@ -104,7 +104,7 @@ func (c *MockClient) ExpectAuthenticate() *ExpectedAuthenticate {
 
 // ExpectCreateDB queues an expectation for a CreateDB() call.
 func (c *MockClient) ExpectCreateDB() *ExpectedCreateDB {
-	e2 := &ExpectedDB{db: c.NewDB()}
+	e2 := &ExpectedDB{commonExpectation: commonExpectation{db: &MockDB{}}}
 	e := &ExpectedCreateDB{
 		expectedDB: e2,
 	}
@@ -114,7 +114,7 @@ func (c *MockClient) ExpectCreateDB() *ExpectedCreateDB {
 
 // ExpectDB queues an expectation for a DB() call.
 func (c *MockClient) ExpectDB() *ExpectedDB {
-	e := &ExpectedDB{db: &MockDB{}}
+	e := &ExpectedDB{commonExpectation: commonExpectation{db: &MockDB{}}}
 	c.expected = append(c.expected, e)
 	return e
 }
