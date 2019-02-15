@@ -1161,13 +1161,14 @@ func TestBulkDocsString(t *testing.T) {
 	- should delay for: 1s`,
 	})
 	tests.Add("return value", stringerTest{
-		input: &ExpectedBulkDocs{ret0: &BulkResults{
-			results: []*delayedBulkResult{
-				{BulkResult: &driver.BulkResult{}},
-				{BulkResult: &driver.BulkResult{}},
-				{BulkResult: &driver.BulkResult{}},
-			},
-		}, commonExpectation: commonExpectation{db: &MockDB{name: "foo"}}},
+		input: &ExpectedBulkDocs{
+			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
+			ret0: &BulkResults{iter: iter{items: []*item{
+				{item: &driver.BulkResult{}},
+				{item: &driver.BulkResult{}},
+				{item: &driver.BulkResult{}},
+			}}},
+		},
 		expected: `call to DB(foo#0).BulkDocs() which:
 	- has any docs
 	- has any options
@@ -1193,13 +1194,13 @@ func TestChangesString(t *testing.T) {
 	tests.Add("results", stringerTest{
 		input: &ExpectedChanges{
 			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
-			ret0: &Changes{results: []*delayedChange{
-				{Change: &driver.Change{}},
-				{Change: &driver.Change{}},
+			ret0: &Changes{iter: iter{items: []*item{
+				{item: &driver.Change{}},
+				{item: &driver.Change{}},
 				{delay: 15},
-				{Change: &driver.Change{}},
-				{Change: &driver.Change{}},
-			}},
+				{item: &driver.Change{}},
+				{item: &driver.Change{}},
+			}}},
 		},
 		expected: `call to DB(foo#0).Changes() which:
 	- has any options

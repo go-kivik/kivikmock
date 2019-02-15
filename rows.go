@@ -34,7 +34,7 @@ func (r *driverRows) Next(row *driver.Row) error {
 	if err != nil {
 		return err
 	}
-	*row = *result.item.(*driver.Row)
+	*row = *result.(*driver.Row)
 	return nil
 }
 

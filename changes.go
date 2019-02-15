@@ -2,22 +2,14 @@ package kivikmock
 
 import (
 	"context"
-	"io"
 	"time"
 
 	"github.com/go-kivik/kivik/driver"
 )
 
-type delayedChange struct {
-	delay time.Duration
-	*driver.Change
-}
-
 // Changes is a mocked collection of Changes results.
 type Changes struct {
-	closeErr  error
-	results   []*delayedChange
-	resultErr error
+	iter
 }
 
 type driverChanges struct {
@@ -27,26 +19,12 @@ type driverChanges struct {
 
 var _ driver.Changes = &driverChanges{}
 
-func (r *driverChanges) Close() error {
-	return r.closeErr
-}
-
 func (r *driverChanges) Next(res *driver.Change) error {
-	if len(r.results) == 0 {
-		if r.resultErr != nil {
-			return r.resultErr
-		}
-		return io.EOF
+	result, err := r.unshift(r.Context)
+	if err != nil {
+		return err
 	}
-	var result *delayedChange
-	result, r.results = r.results[0], r.results[1:]
-	if result.delay > 0 {
-		if err := pause(r.Context, result.delay); err != nil {
-			return err
-		}
-		return r.Next(res)
-	}
-	*res = *result.Change
+	*res = *result.(*driver.Change)
 	return nil
 }
 
@@ -62,7 +40,7 @@ func (r *Changes) AddChange(change *driver.Change) *Changes {
 	if r.resultErr != nil {
 		panic("It is invalid to set more changes after AddChangeError is defined.")
 	}
-	r.results = append(r.results, &delayedChange{Change: change})
+	r.push(&item{item: change})
 	return r
 }
 
@@ -74,21 +52,6 @@ func (r *Changes) AddChangeError(err error) *Changes {
 
 // AddDelay adds a delay before the next iteration will complete.
 func (r *Changes) AddDelay(delay time.Duration) *Changes {
-	r.results = append(r.results, &delayedChange{delay: delay})
+	r.push(&item{delay: delay})
 	return r
-}
-
-// rowCount calculates the rows remaining in this iterator
-func (r *Changes) rowCount() int {
-	if r == nil || r.results == nil {
-		return 0
-	}
-	var count int
-	for _, result := range r.results {
-		if result != nil && result.Change != nil {
-			count++
-		}
-	}
-
-	return count
 }

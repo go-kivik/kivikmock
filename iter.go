@@ -23,7 +23,7 @@ func (i *iter) push(item *item) {
 	i.items = append(i.items, item)
 }
 
-func (i *iter) unshift(ctx context.Context) (*item, error) {
+func (i *iter) unshift(ctx context.Context) (interface{}, error) {
 	if len(i.items) == 0 {
 		if i.resultErr != nil {
 			return nil, i.resultErr
@@ -33,7 +33,7 @@ func (i *iter) unshift(ctx context.Context) (*item, error) {
 	var item *item
 	item, i.items = i.items[0], i.items[1:]
 	if item.delay == 0 {
-		return item, nil
+		return item.item, nil
 	}
 	if err := pause(ctx, item.delay); err != nil {
 		return nil, err

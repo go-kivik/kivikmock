@@ -23,7 +23,7 @@ func (u *driverDBUpdates) Next(update *driver.DBUpdate) error {
 	if err != nil {
 		return err
 	}
-	*update = *result.item.(*driver.DBUpdate)
+	*update = *result.(*driver.DBUpdate)
 	return nil
 }
 

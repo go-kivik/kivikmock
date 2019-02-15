@@ -600,7 +600,7 @@ func (e *ExpectedBulkDocs) String() string {
 		opts = append(opts, fmt.Sprintf("has: %d docs", len(e.arg0)))
 	}
 	if e.ret0 != nil {
-		rets = append(rets, fmt.Sprintf("should return: %d results", e.ret0.rowCount()))
+		rets = append(rets, fmt.Sprintf("should return: %d results", e.ret0.count()))
 	}
 	return dbStringer("BulkDocs", &e.commonExpectation, withOptions, opts, rets)
 }
@@ -640,7 +640,7 @@ func (e *ExpectedDesignDocs) String() string {
 func (e *ExpectedChanges) String() string {
 	var rets []string
 	if e.ret0 != nil {
-		rets = []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+		rets = []string{fmt.Sprintf("should return: %d results", e.ret0.count())}
 	}
 	return dbStringer("Changes", &e.commonExpectation, withOptions, nil, rets)
 }
