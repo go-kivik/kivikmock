@@ -254,9 +254,7 @@ func (e *ExpectedCreateDB) method(v bool) string {
 
 func (e *ExpectedCreateDB) met(ex expectation) bool {
 	exp := ex.(*ExpectedCreateDB)
-	nameOK := exp.arg0 == "" || exp.arg0 == e.arg0
-	optionsOK := exp.options == nil || reflect.DeepEqual(exp.options, e.options)
-	return nameOK && optionsOK
+	return exp.arg0 == "" || exp.arg0 == e.arg0
 }
 
 // WithOptions set the expectation that DB() will be called with these options.
