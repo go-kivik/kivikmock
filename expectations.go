@@ -278,6 +278,7 @@ func (e *ExpectedCreateDB) WillReturn(db *MockDB) *ExpectedCreateDB {
 
 // WillReturnError sets the return value for the DB() call.
 func (e *ExpectedCreateDB) WillReturnError(err error) *ExpectedCreateDB {
+	e.expectedDB.triggered = true
 	e.err = err
 	return e
 }
