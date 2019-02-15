@@ -26,9 +26,7 @@ func (db *MockDB) ExpectClose() *ExpectedDBClose {
 // NewRows returns a new, empty set of rows, which can be returned by any of
 // the row-returning expectations.
 func (db *MockDB) NewRows() *Rows {
-	return &Rows{
-		results: make([]*delayedRow, 0),
-	}
+	return &Rows{}
 }
 
 // NewBulkResults returns a new, empty set of bulk results, which can be
