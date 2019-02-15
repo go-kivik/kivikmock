@@ -687,6 +687,17 @@ func TestCreateDB(t *testing.T) {
 			testy.Error(t, "security fail", err)
 		},
 	})
+	tests.Add("cleanup expectations", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectCreateDB().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.CreateDB(context.TODO(), "foo").Err()
+			if err == nil {
+				t.Fatal("expected error")
+			}
+		},
+	})
 	tests.Run(t, testMock)
 }
 
