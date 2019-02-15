@@ -6,7 +6,35 @@ Package **kivikmock** is a mock library implementing a Kivik driver.
 
 This package is heavily influenced by [github.com/DATA-DOG/go-sqlmock](https://github.com/DATA-DOG/go-sqlmock), the SQL mock driver from [Datadog](https://www.datadoghq.com/).
 
-This is a work in progress. Do not assume a stable, or even working, API.
+# Usage
+
+To use this package, in your `*_test.go` file, create a mock Kivik connection:
+
+    client, mock, err := kivikmock.New()
+    if err != nil {
+        panic(err)
+    }
+
+The returned `client` object is a `*kivik.Client`, and can be passed to your
+methods to be tested.   `mock` is used to control the execution of the mock
+driver, by setting expectations.  To test a function which fetches a user,
+for example, you might do something like this:
+
+    func TestGetUser(t *testing.T) {
+        client, mock, err := kivikmock.New()
+        if err != nil {
+            t.Fatal(err)
+        }
+
+        mock.ExpectDB().WithName("_users").WillReturn(mock.NewDB().
+            ExpectGet().WithDocID("bob"). WillReturn(kivikmock.ToDocument(`{"_id":"org.couchdb.user:bob"}`)),
+        )
+        user, err := GetUser(client, "bob")
+        if err != nil {
+            t.Error(err)
+        }
+        // other validation
+    }
 
 # Versions
 
