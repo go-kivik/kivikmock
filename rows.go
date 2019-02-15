@@ -10,9 +10,7 @@ import (
 
 // Rows is a mocked collection of rows.
 type Rows struct {
-	items
-	closeErr  error
-	resultErr error
+	iter
 	offset    int64
 	updateSeq string
 	totalRows int64
@@ -27,7 +25,6 @@ type driverRows struct {
 var _ driver.Rows = &driverRows{}
 var _ driver.RowsWarner = &driverRows{}
 
-func (r *driverRows) Close() error      { return r.closeErr }
 func (r *driverRows) Offset() int64     { return r.offset }
 func (r *driverRows) UpdateSeq() string { return r.updateSeq }
 func (r *driverRows) TotalRows() int64  { return r.totalRows }
@@ -87,7 +84,7 @@ func (r *Rows) AddRow(row *driver.Row) *Rows {
 	if r.resultErr != nil {
 		panic("It is invalid to set more rows after AddRowError is defined.")
 	}
-	r.push(&delayedItem{item: row})
+	r.push(&item{item: row})
 	return r
 }
 
@@ -99,6 +96,6 @@ func (r *Rows) AddRowError(err error) *Rows {
 
 // AddDelay adds a delay before the next iteration will complete.
 func (r *Rows) AddDelay(delay time.Duration) *Rows {
-	r.push(&delayedItem{delay: delay})
+	r.push(&item{delay: delay})
 	return r
 }

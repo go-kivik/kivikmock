@@ -2,29 +2,37 @@ package kivikmock
 
 import "time"
 
-type delayedItem struct {
+type item struct {
 	delay time.Duration
 	item  interface{}
 }
 
-type items []*delayedItem
-
-func (i *items) push(item *delayedItem) {
-	*i = append(*i, item)
+type iter struct {
+	items     []*item
+	closeErr  error
+	resultErr error
 }
 
-func (i *items) unshift() (item *delayedItem) {
-	itemsAry := *i
-	item, *i = itemsAry[0], itemsAry[1:]
+func (i *iter) Close() error { return i.closeErr }
+
+func (i *iter) push(item *item) {
+	i.items = append(i.items, item)
+}
+
+func (i *iter) unshift() (item *item) {
+	if len(i.items) == 0 {
+		return nil
+	}
+	item, i.items = i.items[0], i.items[1:]
 	return item
 }
 
-func (i items) count() int {
-	if len(i) == 0 {
+func (i *iter) count() int {
+	if len(i.items) == 0 {
 		return 0
 	}
 	var count int
-	for _, result := range i {
+	for _, result := range i.items {
 		if result != nil && result.item != nil {
 			count++
 		}

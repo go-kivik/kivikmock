@@ -9,9 +9,7 @@ import (
 
 // Updates is a mocked collection of database updates.
 type Updates struct {
-	items
-	closeErr  error
-	resultErr error
+	iter
 }
 
 type driverDBUpdates struct {
@@ -20,8 +18,6 @@ type driverDBUpdates struct {
 }
 
 var _ driver.DBUpdates = &driverDBUpdates{}
-
-func (u *driverDBUpdates) Close() error { return u.closeErr }
 
 func (u *driverDBUpdates) Next(update *driver.DBUpdate) error {
 	if u.count() == 0 {

@@ -358,14 +358,13 @@ func TestAllDocsString(t *testing.T) {
 	tests.Add("results", stringerTest{
 		input: &ExpectedAllDocs{
 			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
-			ret0: &Rows{items: items{
+			ret0: &Rows{iter: iter{items: []*item{
 				{item: &driver.Row{}},
 				{item: &driver.Row{}},
 				{delay: 15},
 				{item: &driver.Row{}},
 				{item: &driver.Row{}},
-			},
-			},
+			}}},
 		},
 		expected: `call to DB(foo#0).AllDocs() which:
 	- has any options
@@ -394,14 +393,13 @@ func TestBulkGetString(t *testing.T) {
 	tests.Add("results", stringerTest{
 		input: &ExpectedBulkGet{
 			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
-			ret0: &Rows{items: items{
+			ret0: &Rows{iter: iter{items: []*item{
 				{item: &driver.Row{}},
 				{item: &driver.Row{}},
 				{delay: 15},
 				{item: &driver.Row{}},
 				{item: &driver.Row{}},
-			},
-			},
+			}}},
 		},
 		expected: `call to DB(foo#0).BulkGet() which:
 	- has any doc references
@@ -428,13 +426,13 @@ func TestFindString(t *testing.T) {
 	tests.Add("results", stringerTest{
 		input: &ExpectedFind{
 			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
-			ret0: &Rows{items: items{
+			ret0: &Rows{iter: iter{items: []*item{
 				{item: &driver.Row{}},
 				{item: &driver.Row{}},
 				{delay: 15},
 				{item: &driver.Row{}},
 				{item: &driver.Row{}},
-			}},
+			}}},
 		},
 		expected: `call to DB(foo#0).Find() which:
 	- has any query
@@ -949,14 +947,13 @@ func TestLocalDocsString(t *testing.T) {
 	tests.Add("results", stringerTest{
 		input: &ExpectedLocalDocs{
 			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
-			ret0: &Rows{items: items{
+			ret0: &Rows{iter: iter{items: []*item{
 				{item: &driver.Row{}},
 				{item: &driver.Row{}},
 				{delay: 15},
 				{item: &driver.Row{}},
 				{item: &driver.Row{}},
-			},
-			},
+			}}},
 		},
 		expected: `call to DB(foo#0).LocalDocs() which:
 	- has any options
@@ -1067,13 +1064,13 @@ func TestQueryString(t *testing.T) {
 	tests.Add("results", stringerTest{
 		input: &ExpectedQuery{
 			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
-			ret0: &Rows{items: items{
+			ret0: &Rows{iter: iter{items: []*item{
 				{item: &driver.Row{}},
 				{item: &driver.Row{}},
 				{delay: 15},
 				{item: &driver.Row{}},
 				{item: &driver.Row{}},
-			}},
+			}}},
 		},
 		expected: `call to DB(foo#0).Query() which:
 	- has any ddocID
@@ -1220,13 +1217,13 @@ func TestDBUpdatesString(t *testing.T) {
 	tests.Add("results", stringerTest{
 		input: &ExpectedDBUpdates{
 			commonExpectation: commonExpectation{db: &MockDB{name: "foo"}},
-			ret0: &Updates{items: items{
+			ret0: &Updates{iter: iter{items: []*item{
 				{item: &driver.DBUpdate{}},
 				{item: &driver.DBUpdate{}},
 				{delay: 15},
 				{item: &driver.DBUpdate{}},
 				{item: &driver.DBUpdate{}},
-			}},
+			}}},
 		},
 		expected: `call to DBUpdates() which:
 	- should return: 4 results`,
