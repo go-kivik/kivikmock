@@ -1,3 +1,5 @@
+// Package kivikmock provides a full Kivik driver implementation, for mocking
+// unit tests.
 package kivikmock
 
 //go:generate go run ./gen ./gen/templates
