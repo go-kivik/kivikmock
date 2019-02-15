@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/flimzy/testy"
-	"github.com/go-kivik/kivik"
 	"github.com/go-kivik/kivik/driver"
 )
 
@@ -216,7 +215,7 @@ func TestDBsStatsString(t *testing.T) {
 	- has any names`,
 	})
 	tests.Add("names", stringerTest{
-		input: &ExpectedDBsStats{names: []string{"a", "b"}},
+		input: &ExpectedDBsStats{arg0: []string{"a", "b"}},
 		expected: `call to DBsStats() which:
 	- has names: [a b]`,
 	})
@@ -261,7 +260,7 @@ func TestSessionString(t *testing.T) {
 		expected: `call to Session()`,
 	})
 	tests.Add("session", stringerTest{
-		input: &ExpectedSession{session: &kivik.Session{Name: "bob"}},
+		input: &ExpectedSession{ret0: &driver.Session{Name: "bob"}},
 		expected: `call to Session() which:
 	- should return: &{bob []   [] []}`,
 	})
@@ -275,7 +274,7 @@ func TestVersionString(t *testing.T) {
 		expected: `call to Version()`,
 	})
 	tests.Add("session", stringerTest{
-		input: &ExpectedVersion{version: &kivik.Version{Version: "1.2"}},
+		input: &ExpectedVersion{ret0: &driver.Version{Version: "1.2"}},
 		expected: `call to Version() which:
 	- should return: &{1.2  [] []}`,
 	})

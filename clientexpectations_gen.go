@@ -301,3 +301,251 @@ func (e *ExpectedPing) method(v bool) string {
 	}
 	return fmt.Sprintf("Ping(ctx)")
 }
+
+// ExpectedDBUpdates represents an expectation for a call to DBUpdates().
+type ExpectedDBUpdates struct {
+	commonExpectation
+	ret0 driver.DBUpdates
+}
+
+// WillReturn sets the values that will be returned by the call to DBUpdates().
+func (e *ExpectedDBUpdates) WillReturn(ret0 driver.DBUpdates) *ExpectedDBUpdates {
+	e.ret0 = ret0
+	return e
+}
+
+// WillReturnError sets the error value that will be returned by the call to DBUpdates().
+func (e *ExpectedDBUpdates) WillReturnError(err error) *ExpectedDBUpdates {
+	e.err = err
+	return e
+}
+
+func (e *ExpectedDBUpdates) met(_ expectation) bool {
+	return true
+}
+
+func (e *ExpectedDBUpdates) method(v bool) string {
+	if !v {
+		return "DBUpdates()"
+	}
+	return fmt.Sprintf("DBUpdates()")
+}
+
+// ExpectedDBsStats represents an expectation for a call to DBsStats().
+type ExpectedDBsStats struct {
+	commonExpectation
+	arg0 []string
+	ret0 []*driver.DBStats
+}
+
+// WillReturn sets the values that will be returned by the call to DBsStats().
+func (e *ExpectedDBsStats) WillReturn(ret0 []*driver.DBStats) *ExpectedDBsStats {
+	e.ret0 = ret0
+	return e
+}
+
+// WillReturnError sets the error value that will be returned by the call to DBsStats().
+func (e *ExpectedDBsStats) WillReturnError(err error) *ExpectedDBsStats {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to DBsStats() to delay.
+func (e *ExpectedDBsStats) WillDelay(delay time.Duration) *ExpectedDBsStats {
+	e.delay = delay
+	return e
+}
+
+func (e *ExpectedDBsStats) met(ex expectation) bool {
+	exp := ex.(*ExpectedDBsStats)
+	if exp.arg0 != nil && !reflect.DeepEqual(exp.arg0, e.arg0) {
+		return false
+	}
+	return true
+}
+
+func (e *ExpectedDBsStats) method(v bool) string {
+	if !v {
+		return "DBsStats()"
+	}
+	arg0 := "?"
+	if e.arg0 != nil {
+		arg0 = fmt.Sprintf("%v", e.arg0)
+	}
+	return fmt.Sprintf("DBsStats(ctx, %s)", arg0)
+}
+
+// ExpectedGetReplications represents an expectation for a call to GetReplications().
+type ExpectedGetReplications struct {
+	commonExpectation
+	ret0 []driver.Replication
+}
+
+// WithOptions sets the expected options for the call to GetReplications().
+func (e *ExpectedGetReplications) WithOptions(options map[string]interface{}) *ExpectedGetReplications {
+	e.options = options
+	return e
+}
+
+// WillReturn sets the values that will be returned by the call to GetReplications().
+func (e *ExpectedGetReplications) WillReturn(ret0 []driver.Replication) *ExpectedGetReplications {
+	e.ret0 = ret0
+	return e
+}
+
+// WillReturnError sets the error value that will be returned by the call to GetReplications().
+func (e *ExpectedGetReplications) WillReturnError(err error) *ExpectedGetReplications {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to GetReplications() to delay.
+func (e *ExpectedGetReplications) WillDelay(delay time.Duration) *ExpectedGetReplications {
+	e.delay = delay
+	return e
+}
+
+func (e *ExpectedGetReplications) met(_ expectation) bool {
+	return true
+}
+
+func (e *ExpectedGetReplications) method(v bool) string {
+	if !v {
+		return "GetReplications()"
+	}
+	options := defaultOptionPlaceholder
+	if e.options != nil {
+		options = fmt.Sprintf("%v", e.options)
+	}
+	return fmt.Sprintf("GetReplications(ctx, %s)", options)
+}
+
+// ExpectedReplicate represents an expectation for a call to Replicate().
+type ExpectedReplicate struct {
+	commonExpectation
+	arg0 string
+	arg1 string
+	ret0 driver.Replication
+}
+
+// WithOptions sets the expected options for the call to Replicate().
+func (e *ExpectedReplicate) WithOptions(options map[string]interface{}) *ExpectedReplicate {
+	e.options = options
+	return e
+}
+
+// WillReturn sets the values that will be returned by the call to Replicate().
+func (e *ExpectedReplicate) WillReturn(ret0 driver.Replication) *ExpectedReplicate {
+	e.ret0 = ret0
+	return e
+}
+
+// WillReturnError sets the error value that will be returned by the call to Replicate().
+func (e *ExpectedReplicate) WillReturnError(err error) *ExpectedReplicate {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to Replicate() to delay.
+func (e *ExpectedReplicate) WillDelay(delay time.Duration) *ExpectedReplicate {
+	e.delay = delay
+	return e
+}
+
+func (e *ExpectedReplicate) met(ex expectation) bool {
+	exp := ex.(*ExpectedReplicate)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	if exp.arg1 != "" && exp.arg1 != e.arg1 {
+		return false
+	}
+	return true
+}
+
+func (e *ExpectedReplicate) method(v bool) string {
+	if !v {
+		return "Replicate()"
+	}
+	arg0, arg1, options := "?", "?", defaultOptionPlaceholder
+	if e.arg0 != "" {
+		arg0 = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.arg1 != "" {
+		arg1 = fmt.Sprintf("%q", e.arg1)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf("%v", e.options)
+	}
+	return fmt.Sprintf("Replicate(ctx, %s, %s, %s)", arg0, arg1, options)
+}
+
+// ExpectedSession represents an expectation for a call to Session().
+type ExpectedSession struct {
+	commonExpectation
+	ret0 *driver.Session
+}
+
+// WillReturn sets the values that will be returned by the call to Session().
+func (e *ExpectedSession) WillReturn(ret0 *driver.Session) *ExpectedSession {
+	e.ret0 = ret0
+	return e
+}
+
+// WillReturnError sets the error value that will be returned by the call to Session().
+func (e *ExpectedSession) WillReturnError(err error) *ExpectedSession {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to Session() to delay.
+func (e *ExpectedSession) WillDelay(delay time.Duration) *ExpectedSession {
+	e.delay = delay
+	return e
+}
+
+func (e *ExpectedSession) met(_ expectation) bool {
+	return true
+}
+
+func (e *ExpectedSession) method(v bool) string {
+	if !v {
+		return "Session()"
+	}
+	return fmt.Sprintf("Session(ctx)")
+}
+
+// ExpectedVersion represents an expectation for a call to Version().
+type ExpectedVersion struct {
+	commonExpectation
+	ret0 *driver.Version
+}
+
+// WillReturn sets the values that will be returned by the call to Version().
+func (e *ExpectedVersion) WillReturn(ret0 *driver.Version) *ExpectedVersion {
+	e.ret0 = ret0
+	return e
+}
+
+// WillReturnError sets the error value that will be returned by the call to Version().
+func (e *ExpectedVersion) WillReturnError(err error) *ExpectedVersion {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to Version() to delay.
+func (e *ExpectedVersion) WillDelay(delay time.Duration) *ExpectedVersion {
+	e.delay = delay
+	return e
+}
+
+func (e *ExpectedVersion) met(_ expectation) bool {
+	return true
+}
+
+func (e *ExpectedVersion) method(v bool) string {
+	if !v {
+		return "Version()"
+	}
+	return fmt.Sprintf("Version(ctx)")
+}

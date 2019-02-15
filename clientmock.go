@@ -102,27 +102,6 @@ func (c *MockClient) ExpectAuthenticate() *ExpectedAuthenticate {
 	return e
 }
 
-// ExpectDBsStats queues an expectation for a DBsStats() call.
-func (c *MockClient) ExpectDBsStats() *ExpectedDBsStats {
-	e := &ExpectedDBsStats{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
-// ExpectSession queues an expectation for a Session() call.
-func (c *MockClient) ExpectSession() *ExpectedSession {
-	e := &ExpectedSession{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
-// ExpectVersion queues an expectation for a Version() call.
-func (c *MockClient) ExpectVersion() *ExpectedVersion {
-	e := &ExpectedVersion{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
 // ExpectCreateDB queues an expectation for a CreateDB() call.
 func (c *MockClient) ExpectCreateDB() *ExpectedCreateDB {
 	e2 := &ExpectedDB{db: c.NewDB()}

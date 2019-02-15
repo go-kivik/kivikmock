@@ -85,3 +85,63 @@ func (c *driverClient) Ping(ctx context.Context) (bool, error) {
 	}
 	return expected.ret0, expected.wait(ctx)
 }
+
+func (c *driverClient) DBUpdates() (driver.DBUpdates, error) {
+	expected := &ExpectedDBUpdates{}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	return expected.ret0, expected.err
+}
+
+func (c *driverClient) DBsStats(ctx context.Context, arg0 []string) ([]*driver.DBStats, error) {
+	expected := &ExpectedDBsStats{
+		arg0: arg0,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	return expected.ret0, expected.wait(ctx)
+}
+
+func (c *driverClient) GetReplications(ctx context.Context, options map[string]interface{}) ([]driver.Replication, error) {
+	expected := &ExpectedGetReplications{
+		commonExpectation: commonExpectation{
+			options: options,
+		},
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	return expected.ret0, expected.wait(ctx)
+}
+
+func (c *driverClient) Replicate(ctx context.Context, arg0 string, arg1 string, options map[string]interface{}) (driver.Replication, error) {
+	expected := &ExpectedReplicate{
+		arg0: arg0,
+		arg1: arg1,
+		commonExpectation: commonExpectation{
+			options: options,
+		},
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	return expected.ret0, expected.wait(ctx)
+}
+
+func (c *driverClient) Session(ctx context.Context) (*driver.Session, error) {
+	expected := &ExpectedSession{}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	return expected.ret0, expected.wait(ctx)
+}
+
+func (c *driverClient) Version(ctx context.Context) (*driver.Version, error) {
+	expected := &ExpectedVersion{}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	return expected.ret0, expected.wait(ctx)
+}

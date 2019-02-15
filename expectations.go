@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"reflect"
 	"time"
-
-	"github.com/go-kivik/kivik"
 )
 
 func (e *ExpectedClose) String() string {
@@ -153,63 +151,19 @@ func (e *ExpectedDestroyDB) WithName(name string) *ExpectedDestroyDB {
 	return e
 }
 
-// ExpectedDBsStats is used to manage *kivik.Client.DBsStats expectation
-// returned by Mock.ExpectDBsStats.
-type ExpectedDBsStats struct {
-	commonExpectation
-	names []string
-	stats []*kivik.DBStats
-}
-
 func (e *ExpectedDBsStats) String() string {
 	msg := "call to DBsStats() which:"
-	if e.names == nil {
+	if e.arg0 == nil {
 		msg += "\n\t- has any names"
 	} else {
-		msg += fmt.Sprintf("\n\t- has names: %s", e.names)
+		msg += fmt.Sprintf("\n\t- has names: %s", e.arg0)
 	}
 	return msg + delayString(e.delay) + errorString(e.err)
 }
 
-func (e *ExpectedDBsStats) method(v bool) string {
-	if !v {
-		return "DBsStats()"
-	}
-	if e.names == nil {
-		return "DBsStats(ctx, ?)"
-	}
-	return fmt.Sprintf("DBsStats(ctx, %v)", e.names)
-}
-
-func (e *ExpectedDBsStats) met(ex expectation) bool {
-	exp := ex.(*ExpectedDBsStats)
-	if exp.names == nil {
-		return true
-	}
-	return reflect.DeepEqual(e.names, exp.names)
-}
-
 // WithNames sets the expectation that DBsStats will be called with these names.
 func (e *ExpectedDBsStats) WithNames(names []string) *ExpectedDBsStats {
-	e.names = names
-	return e
-}
-
-// WillReturn sets the value to be returned by the call to DBsStats.
-func (e *ExpectedDBsStats) WillReturn(stats []*kivik.DBStats) *ExpectedDBsStats {
-	e.stats = stats
-	return e
-}
-
-// WillReturnError sets the error to be returned by the call to DBsStats.
-func (e *ExpectedDBsStats) WillReturnError(err error) *ExpectedDBsStats {
-	e.err = err
-	return e
-}
-
-// WillDelay will cause execution of DBsStats to delay by duration d.
-func (e *ExpectedDBsStats) WillDelay(delay time.Duration) *ExpectedDBsStats {
-	e.delay = delay
+	e.arg0 = names
 	return e
 }
 
@@ -222,98 +176,30 @@ func (e *ExpectedPing) String() string {
 	return msg
 }
 
-// ExpectedSession is used to manage *kivik.Client.Session expectation returned
-// by Mock.ExpectSession.
-type ExpectedSession struct {
-	commonExpectation
-	session *kivik.Session
-}
-
 func (e *ExpectedSession) String() string {
 	msg := "call to Session()"
 	extra := ""
-	if e.session != nil {
-		extra += fmt.Sprintf("\n\t- should return: %v", e.session)
+	if e.ret0 != nil {
+		extra += fmt.Sprintf("\n\t- should return: %v", e.ret0)
 	}
 	extra += delayString(e.delay) + errorString(e.err)
 	if extra != "" {
 		msg += " which:" + extra
 	}
 	return msg
-}
-
-func (e *ExpectedSession) method(v bool) string {
-	if v {
-		return "Session(ctx)"
-	}
-	return "Session()"
-}
-
-func (e *ExpectedSession) met(_ expectation) bool { return true }
-
-// WillReturnError sets the error to be returned by the call to Session().
-func (e *ExpectedSession) WillReturnError(err error) *ExpectedSession {
-	e.err = err
-	return e
-}
-
-// WillReturn sets the session to be returned by the call to Session().
-func (e *ExpectedSession) WillReturn(session *kivik.Session) *ExpectedSession {
-	e.session = session
-	return e
-}
-
-// WillDelay will cause execution of Session() to delay by duration d.
-func (e *ExpectedSession) WillDelay(delay time.Duration) *ExpectedSession {
-	e.delay = delay
-	return e
-}
-
-// ExpectedVersion is used to manage *kivik.Client.Version expectation returned
-// by Mock.ExpectVersion.
-type ExpectedVersion struct {
-	commonExpectation
-	version *kivik.Version
 }
 
 func (e *ExpectedVersion) String() string {
 	msg := "call to Version()"
 	extra := ""
-	if e.version != nil {
-		extra += fmt.Sprintf("\n\t- should return: %v", e.version)
+	if e.ret0 != nil {
+		extra += fmt.Sprintf("\n\t- should return: %v", e.ret0)
 	}
 	extra += delayString(e.delay) + errorString(e.err)
 	if extra != "" {
 		msg += " which:" + extra
 	}
 	return msg
-}
-
-func (e *ExpectedVersion) method(v bool) string {
-	if v {
-		return "Version(ctx)"
-	}
-	return "Version()"
-}
-
-func (e *ExpectedVersion) met(_ expectation) bool { return true }
-
-// WillReturnError sets the error to be returned by the call to Version().
-func (e *ExpectedVersion) WillReturnError(err error) *ExpectedVersion {
-	e.err = err
-	return e
-}
-
-// WillReturn sets the session to be returned by the call to Version().
-func (e *ExpectedVersion) WillReturn(version *kivik.Version) *ExpectedVersion {
-	e.version = version
-	return e
-}
-
-// WillDelay will cause execution of Version() to delay by duration d.
-func (e *ExpectedVersion) WillDelay(delay time.Duration) *ExpectedVersion {
-	e.delay = delay
-	return e
 }
 
 // ExpectedDB represents an expectation to call the DB() method.
@@ -467,4 +353,16 @@ func (e *ExpectedCreateDB) WillReturnError(err error) *ExpectedCreateDB {
 func (e *ExpectedCreateDB) WillDelay(delay time.Duration) *ExpectedCreateDB {
 	e.delay = delay
 	return e
+}
+
+func (e *ExpectedGetReplications) String() string {
+	panic("x")
+}
+
+func (e *ExpectedReplicate) String() string {
+	panic("x")
+}
+
+func (e *ExpectedDBUpdates) String() string {
+	panic("x")
 }

@@ -198,7 +198,7 @@ func (m *Method) ExpectedReturns() string {
 	if m.AcceptsContext {
 		args = append(args, "expected.wait(ctx)")
 	} else {
-		args = append(args, "err")
+		args = append(args, "expected.err")
 	}
 	return strings.Join(args, ", ")
 }
