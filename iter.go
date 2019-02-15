@@ -1,6 +1,10 @@
 package kivikmock
 
-import "time"
+import (
+	"context"
+	"io"
+	"time"
+)
 
 type item struct {
 	delay time.Duration
@@ -19,12 +23,22 @@ func (i *iter) push(item *item) {
 	i.items = append(i.items, item)
 }
 
-func (i *iter) unshift() (item *item) {
+func (i *iter) unshift(ctx context.Context) (*item, error) {
 	if len(i.items) == 0 {
-		return nil
+		if i.resultErr != nil {
+			return nil, i.resultErr
+		}
+		return nil, io.EOF
 	}
+	var item *item
 	item, i.items = i.items[0], i.items[1:]
-	return item
+	if item.delay == 0 {
+		return item, nil
+	}
+	if err := pause(ctx, item.delay); err != nil {
+		return nil, err
+	}
+	return i.unshift(ctx)
 }
 
 func (i *iter) count() int {

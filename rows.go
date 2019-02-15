@@ -2,7 +2,6 @@ package kivikmock
 
 import (
 	"context"
-	"io"
 	"time"
 
 	"github.com/go-kivik/kivik/driver"
@@ -31,18 +30,9 @@ func (r *driverRows) TotalRows() int64  { return r.totalRows }
 func (r *driverRows) Warning() string   { return r.warning }
 
 func (r *driverRows) Next(row *driver.Row) error {
-	if r.count() == 0 {
-		if r.resultErr != nil {
-			return r.resultErr
-		}
-		return io.EOF
-	}
-	result := r.unshift()
-	if result.delay > 0 {
-		if err := pause(r.Context, result.delay); err != nil {
-			return err
-		}
-		return r.Next(row)
+	result, err := r.unshift(r.Context)
+	if err != nil {
+		return err
 	}
 	*row = *result.item.(*driver.Row)
 	return nil

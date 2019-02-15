@@ -2,7 +2,6 @@ package kivikmock
 
 import (
 	"context"
-	"io"
 
 	"github.com/go-kivik/kivik/driver"
 )
@@ -20,18 +19,9 @@ type driverDBUpdates struct {
 var _ driver.DBUpdates = &driverDBUpdates{}
 
 func (u *driverDBUpdates) Next(update *driver.DBUpdate) error {
-	if u.count() == 0 {
-		if u.resultErr != nil {
-			return u.resultErr
-		}
-		return io.EOF
-	}
-	result := u.unshift()
-	if result.delay > 0 {
-		if err := pause(u.Context, result.delay); err != nil {
-			return err
-		}
-		return u.Next(update)
+	result, err := u.unshift(u.Context)
+	if err != nil {
+		return err
 	}
 	*update = *result.item.(*driver.DBUpdate)
 	return nil
