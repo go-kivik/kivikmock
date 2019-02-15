@@ -669,3 +669,106 @@ func TestCreateDB(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestDBUpdates(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectDBUpdates().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBUpdates(context.TODO())
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBUpdates(context.TODO())
+			testy.Error(t, "call to DBUpdates() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("close error", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectDBUpdates().WillReturn(NewDBUpdates().CloseError(errors.New("bar err")))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			updates, err := c.DBUpdates(context.TODO())
+			testy.Error(t, "", err)
+			testy.Error(t, "bar err", updates.Close())
+		},
+	})
+	tests.Add("updates", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectDBUpdates().WillReturn(NewDBUpdates().
+				AddUpdate(&driver.DBUpdate{DBName: "foo"}).
+				AddUpdate(&driver.DBUpdate{DBName: "bar"}).
+				AddUpdate(&driver.DBUpdate{DBName: "baz"}))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			updates, err := c.DBUpdates(context.TODO())
+			testy.Error(t, "", err)
+			names := []string{}
+			for updates.Next() {
+				names = append(names, updates.DBName())
+			}
+			expected := []string{"foo", "bar", "baz"}
+			if d := diff.Interface(expected, names); d != nil {
+				t.Error(d)
+			}
+		},
+	})
+	tests.Add("iter error", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectDBUpdates().WillReturn(NewDBUpdates().
+				AddUpdate(&driver.DBUpdate{DBName: "foo"}).
+				AddUpdateError(errors.New("foo err")))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			updates, err := c.DBUpdates(context.TODO())
+			testy.Error(t, "", err)
+			names := []string{}
+			for updates.Next() {
+				names = append(names, updates.DBName())
+			}
+			expected := []string{"foo"}
+			if d := diff.Interface(expected, names); d != nil {
+				t.Error(d)
+			}
+			testy.Error(t, "foo err", updates.Err())
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectDBUpdates().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBUpdates(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("update delay", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectDBUpdates().WillReturn(NewDBUpdates().
+				AddDelay(time.Millisecond).
+				AddUpdate(&driver.DBUpdate{DBName: "foo"}).
+				AddDelay(time.Second).
+				AddUpdate(&driver.DBUpdate{DBName: "bar"}))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+			defer cancel()
+			updates, err := c.DBUpdates(ctx)
+			testy.Error(t, "", err)
+			names := []string{}
+			for updates.Next() {
+				names = append(names, updates.DBName())
+			}
+			expected := []string{"foo"}
+			if d := diff.Interface(expected, names); d != nil {
+				t.Error(d)
+			}
+			testy.Error(t, "context deadline exceeded", updates.Err())
+		},
+	})
+	tests.Run(t, testMock)
+}

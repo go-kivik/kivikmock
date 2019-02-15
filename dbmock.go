@@ -22,21 +22,3 @@ func (db *MockDB) ExpectClose() *ExpectedDBClose {
 	db.client.expected = append(db.client.expected, e)
 	return e
 }
-
-// NewRows returns a new, empty set of rows, which can be returned by any of
-// the row-returning expectations.
-func (db *MockDB) NewRows() *Rows {
-	return &Rows{}
-}
-
-// NewBulkResults returns a new, empty set of bulk results, which can be
-// returned by the BulkDocs() expectation.
-func (db *MockDB) NewBulkResults() *BulkResults {
-	return &BulkResults{}
-}
-
-// NewChanges returns a new, empty changes set, which can be returned by the
-// Changes() expectation.
-func (db *MockDB) NewChanges() *Changes {
-	return &Changes{}
-}

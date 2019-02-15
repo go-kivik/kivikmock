@@ -121,3 +121,27 @@ func (c *MockClient) NewDB() *MockDB {
 		id:     c.newdbcount,
 	}
 }
+
+// NewRows returns a new, empty set of rows, which can be returned by any of
+// the row-returning expectations.
+func NewRows() *Rows {
+	return &Rows{}
+}
+
+// NewBulkResults returns a new, empty set of bulk results, which can be
+// returned by the DB.BulkDocs() expectation.
+func NewBulkResults() *BulkResults {
+	return &BulkResults{}
+}
+
+// NewChanges returns a new, empty changes set, which can be returned by the
+// DB.Changes() expectation.
+func NewChanges() *Changes {
+	return &Changes{}
+}
+
+// NewDBUpdates returns a new, empty update set, which can be returned by the
+// DBUpdates() expectation.
+func NewDBUpdates() *Updates {
+	return &Updates{}
+}

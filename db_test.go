@@ -96,7 +96,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectAllDocs().WillReturn(db.NewRows().CloseError(errors.New("bar err")))
+			db.ExpectAllDocs().WillReturn(NewRows().CloseError(errors.New("bar err")))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -109,7 +109,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectAllDocs().WillReturn(db.NewRows().Offset(123))
+			db.ExpectAllDocs().WillReturn(NewRows().Offset(123))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -124,7 +124,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectAllDocs().WillReturn(db.NewRows().TotalRows(123))
+			db.ExpectAllDocs().WillReturn(NewRows().TotalRows(123))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -139,7 +139,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectAllDocs().WillReturn(db.NewRows().UpdateSeq("1-xxx"))
+			db.ExpectAllDocs().WillReturn(NewRows().UpdateSeq("1-xxx"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -154,7 +154,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectAllDocs().WillReturn(db.NewRows().Warning("Caution!"))
+			db.ExpectAllDocs().WillReturn(NewRows().Warning("Caution!"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -169,7 +169,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectAllDocs().WillReturn(db.NewRows().
+			db.ExpectAllDocs().WillReturn(NewRows().
 				AddRow(&driver.Row{ID: "foo"}).
 				AddRow(&driver.Row{ID: "bar"}).
 				AddRow(&driver.Row{ID: "baz"}))
@@ -192,7 +192,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectAllDocs().WillReturn(db.NewRows().
+			db.ExpectAllDocs().WillReturn(NewRows().
 				AddRow(&driver.Row{ID: "foo"}).
 				AddRowError(errors.New("foo err")))
 		},
@@ -239,7 +239,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectAllDocs().WillReturn(db.NewRows().
+			db.ExpectAllDocs().WillReturn(NewRows().
 				AddDelay(time.Millisecond).
 				AddRow(&driver.Row{ID: "foo"}).
 				AddDelay(time.Second).
@@ -310,7 +310,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectBulkGet().WillReturn(db.NewRows().
+			db.ExpectBulkGet().WillReturn(NewRows().
 				AddRow(&driver.Row{ID: "foo"}).
 				AddRow(&driver.Row{ID: "bar"}).
 				AddRow(&driver.Row{ID: "baz"}))
@@ -403,7 +403,7 @@ func TestFind(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectFind().WillReturn(db.NewRows().
+			db.ExpectFind().WillReturn(NewRows().
 				AddRow(&driver.Row{ID: "foo"}).
 				AddRow(&driver.Row{ID: "bar"}).
 				AddRow(&driver.Row{ID: "baz"}))
@@ -1709,7 +1709,7 @@ func TestLocalDocs(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectLocalDocs().WillReturn(db.NewRows().
+			db.ExpectLocalDocs().WillReturn(NewRows().
 				AddRow(&driver.Row{ID: "foo"}).
 				AddRow(&driver.Row{ID: "bar"}).
 				AddRow(&driver.Row{ID: "baz"}))
@@ -1953,7 +1953,7 @@ func TestQuery(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectQuery().WillReturn(db.NewRows().
+			db.ExpectQuery().WillReturn(NewRows().
 				AddRow(&driver.Row{ID: "foo"}).
 				AddRow(&driver.Row{ID: "bar"}).
 				AddRow(&driver.Row{ID: "baz"}))
@@ -2243,7 +2243,7 @@ func TestBulkDocs(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectBulkDocs().WillReturn(db.NewBulkResults().CloseError(errors.New("bar err")))
+			db.ExpectBulkDocs().WillReturn(NewBulkResults().CloseError(errors.New("bar err")))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -2256,7 +2256,7 @@ func TestBulkDocs(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectBulkDocs().WillReturn(db.NewBulkResults().
+			db.ExpectBulkDocs().WillReturn(NewBulkResults().
 				AddResult(&driver.BulkResult{ID: "foo"}).
 				AddResult(&driver.BulkResult{ID: "bar"}).
 				AddResult(&driver.BulkResult{ID: "baz"}))
@@ -2279,7 +2279,7 @@ func TestBulkDocs(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectBulkDocs().WillReturn(db.NewBulkResults().
+			db.ExpectBulkDocs().WillReturn(NewBulkResults().
 				AddResult(&driver.BulkResult{ID: "foo"}).
 				AddResultError(errors.New("foo err")))
 		},
@@ -2326,7 +2326,7 @@ func TestBulkDocs(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectBulkDocs().WillReturn(db.NewBulkResults().
+			db.ExpectBulkDocs().WillReturn(NewBulkResults().
 				AddDelay(time.Millisecond).
 				AddResult(&driver.BulkResult{ID: "foo"}).
 				AddDelay(time.Second).
@@ -2455,7 +2455,7 @@ func TestDesignDocs(t *testing.T) {
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectDesignDocs().WillReturn(db.NewRows().
+			db.ExpectDesignDocs().WillReturn(NewRows().
 				AddRow(&driver.Row{ID: "foo"}).
 				AddRow(&driver.Row{ID: "bar"}).
 				AddRow(&driver.Row{ID: "baz"}))
@@ -2506,7 +2506,7 @@ func TestDesignDocs(t *testing.T) {
 	tests.Run(t, testMock)
 }
 
-func TestChanges(t *testing.T) { // nolint: gocyclo
+func TestChanges(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
 		setup: func(m *MockClient) {
@@ -2535,7 +2535,7 @@ func TestChanges(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectChanges().WillReturn(db.NewChanges().CloseError(errors.New("bar err")))
+			db.ExpectChanges().WillReturn(NewChanges().CloseError(errors.New("bar err")))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB(context.TODO(), "foo")
@@ -2548,7 +2548,7 @@ func TestChanges(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectChanges().WillReturn(db.NewChanges().
+			db.ExpectChanges().WillReturn(NewChanges().
 				AddChange(&driver.Change{ID: "foo"}).
 				AddChange(&driver.Change{ID: "bar"}).
 				AddChange(&driver.Change{ID: "baz"}))
@@ -2571,7 +2571,7 @@ func TestChanges(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectChanges().WillReturn(db.NewChanges().
+			db.ExpectChanges().WillReturn(NewChanges().
 				AddChange(&driver.Change{ID: "foo"}).
 				AddChangeError(errors.New("foo err")))
 		},
@@ -2618,7 +2618,7 @@ func TestChanges(t *testing.T) { // nolint: gocyclo
 		setup: func(m *MockClient) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectChanges().WillReturn(db.NewChanges().
+			db.ExpectChanges().WillReturn(NewChanges().
 				AddDelay(time.Millisecond).
 				AddChange(&driver.Change{ID: "foo"}).
 				AddDelay(time.Second).

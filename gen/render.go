@@ -199,7 +199,7 @@ func (m *Method) ExpectedReturns() string {
 		case "driver.DB":
 			args = append(args, fmt.Sprintf("&driverDB{MockDB: expected.ret%d}", i))
 		case "driver.DBUpdates":
-			args = append(args, fmt.Sprintf("&driverDBUpdates{Updates: expected.ret%d}", i))
+			args = append(args, fmt.Sprintf("&driverDBUpdates{Context:ctx, Updates: expected.ret%d}", i))
 		default:
 			args = append(args, fmt.Sprintf("expected.ret%d", i))
 		}
