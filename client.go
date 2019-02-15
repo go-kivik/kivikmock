@@ -30,20 +30,6 @@ func (c *driverClient) Authenticate(ctx context.Context, authenticator interface
 	return expected.wait(ctx)
 }
 
-func (c *driverClient) DB(ctx context.Context, name string, options map[string]interface{}) (driver.DB, error) {
-	expected := &ExpectedDB{
-		arg0: name,
-		commonExpectation: commonExpectation{
-			options: options,
-		},
-	}
-	if err := c.nextExpectation(expected); err != nil {
-		return nil, err
-	}
-	expected.db.name = name
-	return &driverDB{MockDB: expected.db}, expected.wait(ctx)
-}
-
 func (c *driverClient) CreateDB(ctx context.Context, name string, options map[string]interface{}) error {
 	expected := &ExpectedCreateDB{
 		arg0: name,

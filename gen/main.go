@@ -11,7 +11,6 @@ import (
 
 var clientSkips = map[string]struct{}{
 	"Driver":       struct{}{},
-	"DB":           struct{}{},
 	"DSN":          struct{}{},
 	"CreateDB":     struct{}{},
 	"Authenticate": struct{}{},

@@ -86,6 +86,20 @@ func (c *driverClient) Ping(ctx context.Context) (bool, error) {
 	return expected.ret0, expected.wait(ctx)
 }
 
+func (c *driverClient) DB(ctx context.Context, arg0 string, options map[string]interface{}) (driver.DB, error) {
+	expected := &ExpectedDB{
+		arg0: arg0,
+		commonExpectation: commonExpectation{
+			options: options,
+		},
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	expected.ret0.name = arg0
+	return &driverDB{MockDB: expected.ret0}, expected.wait(ctx)
+}
+
 func (c *driverClient) DBUpdates() (driver.DBUpdates, error) {
 	expected := &ExpectedDBUpdates{}
 	if err := c.nextExpectation(expected); err != nil {

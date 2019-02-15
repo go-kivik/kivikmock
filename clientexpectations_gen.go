@@ -302,6 +302,59 @@ func (e *ExpectedPing) method(v bool) string {
 	return fmt.Sprintf("Ping(ctx)")
 }
 
+// ExpectedDB represents an expectation for a call to DB().
+type ExpectedDB struct {
+	commonExpectation
+	arg0 string
+	ret0 *MockDB
+}
+
+// WithOptions sets the expected options for the call to DB().
+func (e *ExpectedDB) WithOptions(options map[string]interface{}) *ExpectedDB {
+	e.options = options
+	return e
+}
+
+// WillReturn sets the values that will be returned by the call to DB().
+func (e *ExpectedDB) WillReturn(ret0 *MockDB) *ExpectedDB {
+	e.ret0 = ret0
+	return e
+}
+
+// WillReturnError sets the error value that will be returned by the call to DB().
+func (e *ExpectedDB) WillReturnError(err error) *ExpectedDB {
+	e.err = err
+	return e
+}
+
+// WillDelay causes the call to DB() to delay.
+func (e *ExpectedDB) WillDelay(delay time.Duration) *ExpectedDB {
+	e.delay = delay
+	return e
+}
+
+func (e *ExpectedDB) met(ex expectation) bool {
+	exp := ex.(*ExpectedDB)
+	if exp.arg0 != "" && exp.arg0 != e.arg0 {
+		return false
+	}
+	return true
+}
+
+func (e *ExpectedDB) method(v bool) string {
+	if !v {
+		return "DB()"
+	}
+	arg0, options := "?", defaultOptionPlaceholder
+	if e.arg0 != "" {
+		arg0 = fmt.Sprintf("%q", e.arg0)
+	}
+	if e.options != nil {
+		options = fmt.Sprintf("%v", e.options)
+	}
+	return fmt.Sprintf("DB(ctx, %s, %s)", arg0, options)
+}
+
 // ExpectedDBUpdates represents an expectation for a call to DBUpdates().
 type ExpectedDBUpdates struct {
 	commonExpectation

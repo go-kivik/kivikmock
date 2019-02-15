@@ -59,6 +59,15 @@ func (c *MockClient) ExpectPing() *ExpectedPing {
 	return e
 }
 
+// ExpectDB queues an expectation that DB will be called.
+func (c *MockClient) ExpectDB() *ExpectedDB {
+	e := &ExpectedDB{
+		ret0: &MockDB{},
+	}
+	c.expected = append(c.expected, e)
+	return e
+}
+
 // ExpectDBUpdates queues an expectation that DBUpdates will be called.
 func (c *MockClient) ExpectDBUpdates() *ExpectedDBUpdates {
 	e := &ExpectedDBUpdates{}
