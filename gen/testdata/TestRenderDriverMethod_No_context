@@ -8,5 +8,5 @@ func (c *driverClient) NoCtx(options map[string]interface{}) error {
 	if err := c.nextExpectation(expected); err != nil {
 		return err
 	}
-	return err
+	return expected.err
 }

@@ -2,22 +2,14 @@ package kivikmock
 
 import (
 	"context"
-	"io"
 	"time"
 
 	"github.com/go-kivik/kivik/driver"
 )
 
-type delayedRow struct {
-	delay time.Duration
-	*driver.Row
-}
-
 // Rows is a mocked collection of rows.
 type Rows struct {
-	closeErr  error
-	results   []*delayedRow
-	resultErr error
+	iter
 	offset    int64
 	updateSeq string
 	totalRows int64
@@ -32,28 +24,17 @@ type driverRows struct {
 var _ driver.Rows = &driverRows{}
 var _ driver.RowsWarner = &driverRows{}
 
-func (r *driverRows) Close() error      { return r.closeErr }
 func (r *driverRows) Offset() int64     { return r.offset }
 func (r *driverRows) UpdateSeq() string { return r.updateSeq }
 func (r *driverRows) TotalRows() int64  { return r.totalRows }
 func (r *driverRows) Warning() string   { return r.warning }
 
 func (r *driverRows) Next(row *driver.Row) error {
-	if len(r.results) == 0 {
-		if r.resultErr != nil {
-			return r.resultErr
-		}
-		return io.EOF
+	result, err := r.unshift(r.Context)
+	if err != nil {
+		return err
 	}
-	var result *delayedRow
-	result, r.results = r.results[0], r.results[1:]
-	if result.delay > 0 {
-		if err := pause(r.Context, result.delay); err != nil {
-			return err
-		}
-		return r.Next(row)
-	}
-	*row = *result.Row
+	*row = *result.(*driver.Row)
 	return nil
 }
 
@@ -93,7 +74,7 @@ func (r *Rows) AddRow(row *driver.Row) *Rows {
 	if r.resultErr != nil {
 		panic("It is invalid to set more rows after AddRowError is defined.")
 	}
-	r.results = append(r.results, &delayedRow{Row: row})
+	r.push(&item{item: row})
 	return r
 }
 
@@ -105,21 +86,6 @@ func (r *Rows) AddRowError(err error) *Rows {
 
 // AddDelay adds a delay before the next iteration will complete.
 func (r *Rows) AddDelay(delay time.Duration) *Rows {
-	r.results = append(r.results, &delayedRow{delay: delay})
+	r.push(&item{delay: delay})
 	return r
-}
-
-// rowCount calculates the rows remaining in this iterator
-func (r *Rows) rowCount() int {
-	if r == nil || r.results == nil {
-		return 0
-	}
-	var count int
-	for _, result := range r.results {
-		if result != nil && result.Row != nil {
-			count++
-		}
-	}
-
-	return count
 }

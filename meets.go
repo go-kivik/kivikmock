@@ -11,8 +11,11 @@ func meets(a, e expectation) bool {
 	if reflect.TypeOf(a).Elem().Name() != reflect.TypeOf(e).Elem().Name() {
 		return false
 	}
-	if !dbMeetsExpectation(a.DB(), e.DB()) {
-		return false
+	// Skip the DB test for the DB() method
+	if _, ok := e.(*ExpectedDB); !ok {
+		if !dbMeetsExpectation(a.DB(), e.DB()) {
+			return false
+		}
 	}
 	if !optionsMeetExpectation(a.opts(), e.opts()) {
 		return false

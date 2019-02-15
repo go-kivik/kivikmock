@@ -95,7 +95,12 @@ func (m *Method) VariableDefinitions() string {
 		result = append(result, fmt.Sprintf("\targ%d %s\n", i, typeName(arg)))
 	}
 	for i, ret := range m.Returns {
-		result = append(result, fmt.Sprintf("\tret%d %s\n", i, typeName(ret)))
+		name := typeName(ret)
+		switch name {
+		case "driver.DB":
+			name = "*MockDB"
+		}
+		result = append(result, fmt.Sprintf("\tret%d %s\n", i, name))
 	}
 	return strings.Join(result, "")
 }
@@ -191,6 +196,10 @@ func (m *Method) ExpectedReturns() string {
 			args = append(args, fmt.Sprintf("&driverBulkResults{Context: ctx, BulkResults: expected.ret%d}", i))
 		case "driver.Changes":
 			args = append(args, fmt.Sprintf("&driverChanges{Context: ctx, Changes: expected.ret%d}", i))
+		case "driver.DB":
+			args = append(args, fmt.Sprintf("&driverDB{MockDB: expected.ret%d}", i))
+		case "driver.DBUpdates":
+			args = append(args, fmt.Sprintf("&driverDBUpdates{Context:ctx, Updates: expected.ret%d}", i))
 		default:
 			args = append(args, fmt.Sprintf("expected.ret%d", i))
 		}
@@ -198,7 +207,7 @@ func (m *Method) ExpectedReturns() string {
 	if m.AcceptsContext {
 		args = append(args, "expected.wait(ctx)")
 	} else {
-		args = append(args, "err")
+		args = append(args, "expected.err")
 	}
 	return strings.Join(args, ", ")
 }
@@ -206,7 +215,12 @@ func (m *Method) ExpectedReturns() string {
 func (m *Method) ReturnTypes() string {
 	args := make([]string, len(m.Returns))
 	for i, ret := range m.Returns {
-		args[i] = fmt.Sprintf("ret%d %s", i, typeName(ret))
+		name := typeName(ret)
+		switch name {
+		case "driver.DB":
+			name = "*MockDB"
+		}
+		args[i] = fmt.Sprintf("ret%d %s", i, name)
 	}
 	return strings.Join(args, ", ")
 }
@@ -222,6 +236,8 @@ func typeName(t reflect.Type) string {
 		return "*BulkResults"
 	case "driver.Changes":
 		return "*Changes"
+	case "driver.DBUpdates":
+		return "*Updates"
 	}
 	return name
 }
@@ -230,6 +246,9 @@ func (m *Method) SetExpectations() string {
 	var args []string
 	if m.DBMethod {
 		args = append(args, "commonExpectation: commonExpectation{db: db},\n")
+	}
+	if m.Name == "DB" {
+		args = append(args, "ret0: &MockDB{},\n")
 	}
 	for i, ret := range m.Returns {
 		var zero string
@@ -240,6 +259,8 @@ func (m *Method) SetExpectations() string {
 			zero = "&driver.QueryPlan{}"
 		case "*kivik.PurgeResult":
 			zero = "&driver.PurgeResult{}"
+		case "*kivik.DBUpdates":
+			zero = "&Updates{}"
 		}
 		if zero != "" {
 			args = append(args, fmt.Sprintf("ret%d: %s,\n", i, zero))

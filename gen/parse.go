@@ -32,6 +32,7 @@ var (
 	typeDriverRows        = reflect.TypeOf((*driver.Rows)(nil)).Elem()
 	typeDriverBulkResults = reflect.TypeOf((*driver.BulkResults)(nil)).Elem()
 	typeDriverChanges     = reflect.TypeOf((*driver.Changes)(nil)).Elem()
+	typeDriverDBUpdates   = reflect.TypeOf((*driver.DBUpdates)(nil)).Elem()
 )
 
 func parseMethods(input interface{}, isClient bool, skip map[string]struct{}) ([]*Method, error) {

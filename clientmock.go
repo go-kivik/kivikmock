@@ -102,41 +102,13 @@ func (c *MockClient) ExpectAuthenticate() *ExpectedAuthenticate {
 	return e
 }
 
-// ExpectDBsStats queues an expectation for a DBsStats() call.
-func (c *MockClient) ExpectDBsStats() *ExpectedDBsStats {
-	e := &ExpectedDBsStats{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
-// ExpectSession queues an expectation for a Session() call.
-func (c *MockClient) ExpectSession() *ExpectedSession {
-	e := &ExpectedSession{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
-// ExpectVersion queues an expectation for a Version() call.
-func (c *MockClient) ExpectVersion() *ExpectedVersion {
-	e := &ExpectedVersion{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
 // ExpectCreateDB queues an expectation for a CreateDB() call.
 func (c *MockClient) ExpectCreateDB() *ExpectedCreateDB {
-	e2 := &ExpectedDB{db: c.NewDB()}
+	e2 := &ExpectedDB{ret0: &MockDB{}}
 	e := &ExpectedCreateDB{
 		expectedDB: e2,
 	}
 	c.expected = append(c.expected, e, e2)
-	return e
-}
-
-// ExpectDB queues an expectation for a DB() call.
-func (c *MockClient) ExpectDB() *ExpectedDB {
-	e := &ExpectedDB{db: &MockDB{}}
-	c.expected = append(c.expected, e)
 	return e
 }
 
@@ -148,4 +120,28 @@ func (c *MockClient) NewDB() *MockDB {
 		client: c,
 		id:     c.newdbcount,
 	}
+}
+
+// NewRows returns a new, empty set of rows, which can be returned by any of
+// the row-returning expectations.
+func NewRows() *Rows {
+	return &Rows{}
+}
+
+// NewBulkResults returns a new, empty set of bulk results, which can be
+// returned by the DB.BulkDocs() expectation.
+func NewBulkResults() *BulkResults {
+	return &BulkResults{}
+}
+
+// NewChanges returns a new, empty changes set, which can be returned by the
+// DB.Changes() expectation.
+func NewChanges() *Changes {
+	return &Changes{}
+}
+
+// NewDBUpdates returns a new, empty update set, which can be returned by the
+// DBUpdates() expectation.
+func NewDBUpdates() *Updates {
+	return &Updates{}
 }

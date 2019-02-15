@@ -10,8 +10,13 @@ import (
 )
 
 var clientSkips = map[string]struct{}{
+	"Driver":       struct{}{},
+	"DSN":          struct{}{},
 	"CreateDB":     struct{}{},
 	"Authenticate": struct{}{},
+	// to consider later
+	"GetReplications": struct{}{},
+	"Replicate":       struct{}{},
 }
 var dbSkips = map[string]struct{}{
 	"Close":  struct{}{},
@@ -55,15 +60,15 @@ func client() error {
 	if err != nil {
 		return err
 	}
-	same, _, _ := compareMethods(client, dMethods)
+	same, cm, dm := compareMethods(client, dMethods)
 
-	if err := RenderExpectationsGo("clientexpectations_gen.go", same); err != nil {
+	if err := RenderExpectationsGo("clientexpectations_gen.go", append(same, dm...)); err != nil {
 		return err
 	}
-	if err := RenderClientGo("client_gen.go", same); err != nil {
+	if err := RenderClientGo("client_gen.go", append(same, dm...)); err != nil {
 		return err
 	}
-	if err := RenderMockGo("clientmock_gen.go", same); err != nil {
+	if err := RenderMockGo("clientmock_gen.go", append(same, cm...)); err != nil {
 		return err
 	}
 	return nil

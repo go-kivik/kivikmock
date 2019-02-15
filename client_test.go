@@ -11,6 +11,7 @@ import (
 	"github.com/flimzy/testy"
 	"github.com/go-kivik/couchdb"
 	"github.com/go-kivik/kivik"
+	"github.com/go-kivik/kivik/driver"
 )
 
 type mockTest struct {
@@ -381,17 +382,20 @@ func TestDBsStats(t *testing.T) {
 		},
 	})
 	tests.Add("success", func() interface{} {
-		expected := []*kivik.DBStats{
-			{Name: "foo", Cluster: &kivik.ClusterConfig{Replicas: 5}},
-			{Name: "bar"},
-		}
 		return mockTest{
 			setup: func(m *MockClient) {
-				m.ExpectDBsStats().WillReturn(expected)
+				m.ExpectDBsStats().WillReturn([]*driver.DBStats{
+					{Name: "foo", Cluster: &driver.ClusterStats{Replicas: 5}},
+					{Name: "bar"},
+				})
 			},
 			test: func(t *testing.T, c *kivik.Client) {
 				result, err := c.DBsStats(context.TODO(), []string{"foo", "bar"})
 				testy.ErrorRE(t, "", err)
+				expected := []*kivik.DBStats{
+					{Name: "foo", Cluster: &kivik.ClusterConfig{Replicas: 5}},
+					{Name: "bar"},
+				}
 				if d := diff.Interface(expected, result); d != nil {
 					t.Error(d)
 				}
@@ -466,16 +470,18 @@ func TestPing(t *testing.T) {
 func TestSession(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("session", func() interface{} {
-		expected := &kivik.Session{
-			Name: "bob",
-		}
 		return mockTest{
 			setup: func(m *MockClient) {
-				m.ExpectSession().WillReturn(expected)
+				m.ExpectSession().WillReturn(&driver.Session{
+					Name: "bob",
+				})
 			},
 			test: func(t *testing.T, c *kivik.Client) {
 				session, err := c.Session(context.TODO())
 				testy.Error(t, "", err)
+				expected := &kivik.Session{
+					Name: "bob",
+				}
 				if d := diff.Interface(expected, session); d != nil {
 					t.Error(d)
 				}
@@ -512,16 +518,14 @@ func TestSession(t *testing.T) {
 func TestVersion(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("version", func() interface{} {
-		expected := &kivik.Version{
-			Version: "1.2",
-		}
 		return mockTest{
 			setup: func(m *MockClient) {
-				m.ExpectVersion().WillReturn(expected)
+				m.ExpectVersion().WillReturn(&driver.Version{Version: "1.2"})
 			},
 			test: func(t *testing.T, c *kivik.Client) {
 				session, err := c.Version(context.TODO())
 				testy.Error(t, "", err)
+				expected := &kivik.Version{Version: "1.2"}
 				if d := diff.Interface(expected, session); d != nil {
 					t.Error(d)
 				}
@@ -661,6 +665,109 @@ func TestCreateDB(t *testing.T) {
 		test: func(t *testing.T, c *kivik.Client) {
 			err := c.CreateDB(newCanceledContext(), "foo").Err()
 			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
+
+func TestDBUpdates(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectDBUpdates().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBUpdates(context.TODO())
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBUpdates(context.TODO())
+			testy.Error(t, "call to DBUpdates() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("close error", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectDBUpdates().WillReturn(NewDBUpdates().CloseError(errors.New("bar err")))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			updates, err := c.DBUpdates(context.TODO())
+			testy.Error(t, "", err)
+			testy.Error(t, "bar err", updates.Close())
+		},
+	})
+	tests.Add("updates", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectDBUpdates().WillReturn(NewDBUpdates().
+				AddUpdate(&driver.DBUpdate{DBName: "foo"}).
+				AddUpdate(&driver.DBUpdate{DBName: "bar"}).
+				AddUpdate(&driver.DBUpdate{DBName: "baz"}))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			updates, err := c.DBUpdates(context.TODO())
+			testy.Error(t, "", err)
+			names := []string{}
+			for updates.Next() {
+				names = append(names, updates.DBName())
+			}
+			expected := []string{"foo", "bar", "baz"}
+			if d := diff.Interface(expected, names); d != nil {
+				t.Error(d)
+			}
+		},
+	})
+	tests.Add("iter error", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectDBUpdates().WillReturn(NewDBUpdates().
+				AddUpdate(&driver.DBUpdate{DBName: "foo"}).
+				AddUpdateError(errors.New("foo err")))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			updates, err := c.DBUpdates(context.TODO())
+			testy.Error(t, "", err)
+			names := []string{}
+			for updates.Next() {
+				names = append(names, updates.DBName())
+			}
+			expected := []string{"foo"}
+			if d := diff.Interface(expected, names); d != nil {
+				t.Error(d)
+			}
+			testy.Error(t, "foo err", updates.Err())
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectDBUpdates().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DBUpdates(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("update delay", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectDBUpdates().WillReturn(NewDBUpdates().
+				AddDelay(time.Millisecond).
+				AddUpdate(&driver.DBUpdate{DBName: "foo"}).
+				AddDelay(time.Second).
+				AddUpdate(&driver.DBUpdate{DBName: "bar"}))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+			defer cancel()
+			updates, err := c.DBUpdates(ctx)
+			testy.Error(t, "", err)
+			names := []string{}
+			for updates.Next() {
+				names = append(names, updates.DBName())
+			}
+			expected := []string{"foo"}
+			if d := diff.Interface(expected, names); d != nil {
+				t.Error(d)
+			}
+			testy.Error(t, "context deadline exceeded", updates.Err())
 		},
 	})
 	tests.Run(t, testMock)

@@ -47,7 +47,10 @@ func (e *ExpectedDBClose) WillDelay(d time.Duration) *ExpectedDBClose {
 }
 
 func (e *ExpectedAllDocs) String() string {
-	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	var rets []string
+	if e.ret0 != nil {
+		rets = []string{fmt.Sprintf("should return: %d results", e.ret0.count())}
+	}
 	return dbStringer("AllDocs", &e.commonExpectation, withOptions, nil, rets)
 }
 
@@ -59,28 +62,24 @@ func (e *ExpectedBulkGet) String() string {
 		msg += fmt.Sprintf("\n\t- has doc references: %v", e.arg0)
 	}
 	msg += optionsString(e.options)
-	var count int
 	if e.ret0 != nil {
-		for _, r := range e.ret0.results {
-			if r != nil && r.Row != nil {
-				count++
-			}
-		}
+		msg += fmt.Sprintf("\n\t- should return: %d results", e.ret0.count())
 	}
-	msg += fmt.Sprintf("\n\t- should return: %d results", count)
 	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg
 }
 
 func (e *ExpectedFind) String() string {
-	var opts []string
+	var opts, rets []string
 	if e.arg0 == nil {
 		opts = append(opts, "has any query")
 	} else {
 		opts = append(opts, fmt.Sprintf("has query: %v", e.arg0))
 	}
-	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	if e.ret0 != nil {
+		rets = []string{fmt.Sprintf("should return: %d results", e.ret0.count())}
+	}
 	return dbStringer("Find", &e.commonExpectation, withOptions, opts, rets)
 }
 
@@ -468,7 +467,10 @@ func (e *ExpectedGetAttachmentMeta) WithFilename(filename string) *ExpectedGetAt
 }
 
 func (e *ExpectedLocalDocs) String() string {
-	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	var rets []string
+	if e.ret0 != nil {
+		rets = []string{fmt.Sprintf("should return: %d results", e.ret0.count())}
+	}
 	return dbStringer("LocalDocs", &e.commonExpectation, withOptions, nil, rets)
 }
 
@@ -533,7 +535,7 @@ func (e *ExpectedPutAttachment) WithAttachment(att *driver.Attachment) *Expected
 }
 
 func (e *ExpectedQuery) String() string {
-	var opts []string
+	var opts, rets []string
 	if e.arg0 == "" {
 		opts = append(opts, "has any ddocID")
 	} else {
@@ -544,7 +546,9 @@ func (e *ExpectedQuery) String() string {
 	} else {
 		opts = append(opts, "has view: "+e.arg1)
 	}
-	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	if e.ret0 != nil {
+		rets = []string{fmt.Sprintf("should return: %d results", e.ret0.count())}
+	}
 	return dbStringer("Query", &e.commonExpectation, withOptions, opts, rets)
 }
 
@@ -596,7 +600,7 @@ func (e *ExpectedBulkDocs) String() string {
 		opts = append(opts, fmt.Sprintf("has: %d docs", len(e.arg0)))
 	}
 	if e.ret0 != nil {
-		rets = append(rets, fmt.Sprintf("should return: %d results", e.ret0.rowCount()))
+		rets = append(rets, fmt.Sprintf("should return: %d results", e.ret0.count()))
 	}
 	return dbStringer("BulkDocs", &e.commonExpectation, withOptions, opts, rets)
 }
@@ -626,11 +630,17 @@ func (e *ExpectedGetAttachment) WithDocID(docID string) *ExpectedGetAttachment {
 }
 
 func (e *ExpectedDesignDocs) String() string {
-	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	var rets []string
+	if e.ret0 != nil {
+		rets = []string{fmt.Sprintf("should return: %d results", e.ret0.count())}
+	}
 	return dbStringer("DesignDocs", &e.commonExpectation, withOptions, nil, rets)
 }
 
 func (e *ExpectedChanges) String() string {
-	rets := []string{fmt.Sprintf("should return: %d results", e.ret0.rowCount())}
+	var rets []string
+	if e.ret0 != nil {
+		rets = []string{fmt.Sprintf("should return: %d results", e.ret0.count())}
+	}
 	return dbStringer("Changes", &e.commonExpectation, withOptions, nil, rets)
 }

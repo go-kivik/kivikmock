@@ -58,3 +58,42 @@ func (c *MockClient) ExpectPing() *ExpectedPing {
 	c.expected = append(c.expected, e)
 	return e
 }
+
+// ExpectDB queues an expectation that DB will be called.
+func (c *MockClient) ExpectDB() *ExpectedDB {
+	e := &ExpectedDB{
+		ret0: &MockDB{},
+	}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+// ExpectDBUpdates queues an expectation that DBUpdates will be called.
+func (c *MockClient) ExpectDBUpdates() *ExpectedDBUpdates {
+	e := &ExpectedDBUpdates{
+		ret0: &Updates{},
+	}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+// ExpectDBsStats queues an expectation that DBsStats will be called.
+func (c *MockClient) ExpectDBsStats() *ExpectedDBsStats {
+	e := &ExpectedDBsStats{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+// ExpectSession queues an expectation that Session will be called.
+func (c *MockClient) ExpectSession() *ExpectedSession {
+	e := &ExpectedSession{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+// ExpectVersion queues an expectation that Version will be called.
+func (c *MockClient) ExpectVersion() *ExpectedVersion {
+	e := &ExpectedVersion{}
+	c.expected = append(c.expected, e)
+	return e
+}

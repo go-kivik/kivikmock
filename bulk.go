@@ -2,22 +2,14 @@ package kivikmock
 
 import (
 	"context"
-	"io"
 	"time"
 
 	"github.com/go-kivik/kivik/driver"
 )
 
-type delayedBulkResult struct {
-	delay time.Duration
-	*driver.BulkResult
-}
-
 // BulkResults is a mocked collection of BulkDoc results.
 type BulkResults struct {
-	closeErr  error
-	results   []*delayedBulkResult
-	resultErr error
+	iter
 }
 
 type driverBulkResults struct {
@@ -27,26 +19,12 @@ type driverBulkResults struct {
 
 var _ driver.BulkResults = &driverBulkResults{}
 
-func (r *driverBulkResults) Close() error {
-	return r.closeErr
-}
-
 func (r *driverBulkResults) Next(res *driver.BulkResult) error {
-	if len(r.results) == 0 {
-		if r.resultErr != nil {
-			return r.resultErr
-		}
-		return io.EOF
+	result, err := r.unshift(r.Context)
+	if err != nil {
+		return err
 	}
-	var result *delayedBulkResult
-	result, r.results = r.results[0], r.results[1:]
-	if result.delay > 0 {
-		if err := pause(r.Context, result.delay); err != nil {
-			return err
-		}
-		return r.Next(res)
-	}
-	*res = *result.BulkResult
+	*res = *result.(*driver.BulkResult)
 	return nil
 }
 
@@ -62,7 +40,7 @@ func (r *BulkResults) AddResult(result *driver.BulkResult) *BulkResults {
 	if r.resultErr != nil {
 		panic("It is invalid to set more results after AddResultError is defined.")
 	}
-	r.results = append(r.results, &delayedBulkResult{BulkResult: result})
+	r.push(&item{item: result})
 	return r
 }
 
@@ -74,21 +52,6 @@ func (r *BulkResults) AddResultError(err error) *BulkResults {
 
 // AddDelay adds a delay before the next iteration will complete.
 func (r *BulkResults) AddDelay(delay time.Duration) *BulkResults {
-	r.results = append(r.results, &delayedBulkResult{delay: delay})
+	r.push(&item{delay: delay})
 	return r
-}
-
-// rowCount calculates the rows remaining in this iterator
-func (r *BulkResults) rowCount() int {
-	if r == nil || r.results == nil {
-		return 0
-	}
-	var count int
-	for _, result := range r.results {
-		if result != nil && result.BulkResult != nil {
-			count++
-		}
-	}
-
-	return count
 }
