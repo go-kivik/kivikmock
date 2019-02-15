@@ -129,14 +129,6 @@ func (e *ExpectedDBExists) WithName(name string) *ExpectedDBExists {
 	return e
 }
 
-// // ExpectedDestroyDB is used to manage *kivik.Client.DestroyDB expectation
-// // returned by Mock.DestroyDB.
-// type ExpectedDestroyDB struct {
-// 	commonExpectation
-// 	name    string
-// 	options map[string]interface{}
-// }
-
 func (e *ExpectedDestroyDB) String() string {
 	return "call to DestroyDB() which:" +
 		nameString(e.arg0) +
@@ -205,9 +197,8 @@ func (e *ExpectedVersion) String() string {
 // ExpectedDB represents an expectation to call the DB() method.
 type ExpectedDB struct {
 	commonExpectation
-	arg0    string
-	options map[string]interface{}
-	db      *MockDB
+	arg0 string
+	db   *MockDB
 }
 
 func (e *ExpectedDB) String() string {
@@ -285,7 +276,6 @@ func (e *ExpectedDB) WillDelay(delay time.Duration) *ExpectedDB {
 type ExpectedCreateDB struct {
 	commonExpectation
 	arg0       string
-	options    map[string]interface{}
 	db         *MockDB
 	expectedDB *ExpectedDB
 }
