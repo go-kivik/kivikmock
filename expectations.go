@@ -291,9 +291,15 @@ func (e *ExpectedCreateDB) WillDelay(delay time.Duration) *ExpectedCreateDB {
 }
 
 func (e *ExpectedDBUpdates) String() string {
-	msg := "call to DBUpdates() which:"
-	msg += fmt.Sprintf("\n\t- should return: %d results", e.ret0.count())
-	msg += delayString(e.delay)
-	msg += errorString(e.err)
+	msg := "call to DBUpdates()"
+	var extra string
+	if e.ret0 != nil {
+		extra += fmt.Sprintf("\n\t- should return: %d results", e.ret0.count())
+	}
+	extra += delayString(e.delay)
+	extra += errorString(e.err)
+	if extra != "" {
+		msg += " which:" + extra
+	}
 	return msg
 }
