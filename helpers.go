@@ -4,9 +4,19 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"testing"
 
 	"github.com/go-kivik/kivik/driver"
 )
+
+// ToDocumentT calls ToDocument, and passes any error to t.Fatal.
+func ToDocumentT(t *testing.T, i interface{}) *driver.Document {
+	doc, err := ToDocument(i)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return doc
+}
 
 // ToDocument converts i, which should be of a supported type (see below), into
 // a document which can be passed to ExpectedGet.WillReturn().
