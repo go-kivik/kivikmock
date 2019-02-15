@@ -82,20 +82,6 @@ func (c *MockClient) ExpectDBsStats() *ExpectedDBsStats {
 	return e
 }
 
-// ExpectGetReplications queues an expectation that GetReplications will be called.
-func (c *MockClient) ExpectGetReplications() *ExpectedGetReplications {
-	e := &ExpectedGetReplications{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
-// ExpectReplicate queues an expectation that Replicate will be called.
-func (c *MockClient) ExpectReplicate() *ExpectedReplicate {
-	e := &ExpectedReplicate{}
-	c.expected = append(c.expected, e)
-	return e
-}
-
 // ExpectSession queues an expectation that Session will be called.
 func (c *MockClient) ExpectSession() *ExpectedSession {
 	e := &ExpectedSession{}

@@ -289,14 +289,6 @@ func (e *ExpectedCreateDB) WillDelay(delay time.Duration) *ExpectedCreateDB {
 	return e
 }
 
-func (e *ExpectedGetReplications) String() string {
-	panic("x")
-}
-
-func (e *ExpectedReplicate) String() string {
-	panic("x")
-}
-
 func (e *ExpectedDBUpdates) String() string {
 	panic("x")
 }
