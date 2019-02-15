@@ -1,2 +1,0 @@
-- client.GetReplications https://godoc.org/github.com/go-kivik/kivik#Client.GetReplications
-- client.Replicate https://godoc.org/github.com/go-kivik/kivik#Client.Replicate
