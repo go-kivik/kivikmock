@@ -8,5 +8,8 @@ func ({{if .DBMethod}}db *driverDB{{else}}c *driverClient{{end}}) {{ .Name }}({{
 {{- if eq .Name "DB" }}
 expected.ret0.name = arg0
 {{- end }}
+    if expected.callback != nil {
+		return expected.callback({{.CallbackArgs}})
+	}
 	return {{ .ExpectedReturns }}
 }

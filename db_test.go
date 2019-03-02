@@ -64,6 +64,19 @@ func TestCloseDB(t *testing.T) {
 		},
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
+	tests.Add("callback", mockTest{
+		setup: func(m *MockClient) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectClose().WillExecute(func(_ context.Context) error {
+				return errors.New("custom error")
+			})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.DB(context.TODO(), "foo").Close(context.TODO())
+			testy.Error(t, "custom error", err)
+		},
+	})
 	tests.Run(t, testMock)
 }
 

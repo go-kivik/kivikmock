@@ -29,12 +29,12 @@ func TestCloseString(t *testing.T) {
 		expected: "call to Close()",
 	})
 	tests.Add("error", stringerTest{
-		input: &ExpectedClose{commonExpectation{err: errors.New("foo error")}},
+		input: &ExpectedClose{commonExpectation: commonExpectation{err: errors.New("foo error")}},
 		expected: `call to Close() which:
 	- should return error: foo error`,
 	})
 	tests.Add("delay", stringerTest{
-		input: &ExpectedClose{commonExpectation{delay: time.Second}},
+		input: &ExpectedClose{commonExpectation: commonExpectation{delay: time.Second}},
 		expected: `call to Close() which:
 	- should delay for: 1s`,
 	})
