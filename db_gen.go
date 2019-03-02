@@ -19,6 +19,9 @@ func (db *driverDB) Compact(ctx context.Context) error {
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
 	}
+	if e.callback != nil {
+		return e.callback(ctx)
+	}
 	return expected.wait(ctx)
 }
 
@@ -31,6 +34,9 @@ func (db *driverDB) CompactView(ctx context.Context, arg0 string) error {
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
+	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0)
 	}
 	return expected.wait(ctx)
 }
@@ -47,6 +53,9 @@ func (db *driverDB) Copy(ctx context.Context, arg0 string, arg1 string, options 
 	if err := db.client.nextExpectation(expected); err != nil {
 		return "", err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, arg1, options)
+	}
 	return expected.ret0, expected.wait(ctx)
 }
 
@@ -60,6 +69,9 @@ func (db *driverDB) CreateDoc(ctx context.Context, arg0 interface{}, options map
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return "", "", err
+	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, options)
 	}
 	return expected.ret0, expected.ret1, expected.wait(ctx)
 }
@@ -76,6 +88,9 @@ func (db *driverDB) CreateIndex(ctx context.Context, arg0 string, arg1 string, a
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, arg1, arg2)
+	}
 	return expected.wait(ctx)
 }
 
@@ -90,6 +105,9 @@ func (db *driverDB) Delete(ctx context.Context, arg0 string, arg1 string, option
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return "", err
+	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, arg1, options)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -107,6 +125,9 @@ func (db *driverDB) DeleteAttachment(ctx context.Context, arg0 string, arg1 stri
 	if err := db.client.nextExpectation(expected); err != nil {
 		return "", err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, arg1, arg2, options)
+	}
 	return expected.ret0, expected.wait(ctx)
 }
 
@@ -121,6 +142,9 @@ func (db *driverDB) DeleteIndex(ctx context.Context, arg0 string, arg1 string) e
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, arg1)
+	}
 	return expected.wait(ctx)
 }
 
@@ -132,6 +156,9 @@ func (db *driverDB) Flush(ctx context.Context) error {
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
+	}
+	if e.callback != nil {
+		return e.callback(ctx)
 	}
 	return expected.wait(ctx)
 }
@@ -146,6 +173,9 @@ func (db *driverDB) GetMeta(ctx context.Context, arg0 string, options map[string
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return 0, "", err
+	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, options)
 	}
 	return expected.ret0, expected.ret1, expected.wait(ctx)
 }
@@ -162,6 +192,9 @@ func (db *driverDB) Put(ctx context.Context, arg0 string, arg1 interface{}, opti
 	if err := db.client.nextExpectation(expected); err != nil {
 		return "", err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, arg1, options)
+	}
 	return expected.ret0, expected.wait(ctx)
 }
 
@@ -173,6 +206,9 @@ func (db *driverDB) ViewCleanup(ctx context.Context) error {
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
+	}
+	if e.callback != nil {
+		return e.callback(ctx)
 	}
 	return expected.wait(ctx)
 }
@@ -186,6 +222,9 @@ func (db *driverDB) AllDocs(ctx context.Context, options map[string]interface{})
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
+	}
+	if e.callback != nil {
+		return e.callback(ctx, options)
 	}
 	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
 }
@@ -201,6 +240,9 @@ func (db *driverDB) BulkDocs(ctx context.Context, arg0 []interface{}, options ma
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, options)
+	}
 	return &driverBulkResults{Context: ctx, BulkResults: expected.ret0}, expected.wait(ctx)
 }
 
@@ -215,6 +257,9 @@ func (db *driverDB) BulkGet(ctx context.Context, arg0 []driver.BulkGetReference,
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, options)
+	}
 	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
 }
 
@@ -227,6 +272,9 @@ func (db *driverDB) Changes(ctx context.Context, options map[string]interface{})
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
+	}
+	if e.callback != nil {
+		return e.callback(ctx, options)
 	}
 	return &driverChanges{Context: ctx, Changes: expected.ret0}, expected.wait(ctx)
 }
@@ -241,6 +289,9 @@ func (db *driverDB) DesignDocs(ctx context.Context, options map[string]interface
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, options)
+	}
 	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
 }
 
@@ -253,6 +304,9 @@ func (db *driverDB) Explain(ctx context.Context, arg0 interface{}) (*driver.Quer
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
+	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -267,6 +321,9 @@ func (db *driverDB) Find(ctx context.Context, arg0 interface{}) (driver.Rows, er
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0)
+	}
 	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
 }
 
@@ -280,6 +337,9 @@ func (db *driverDB) Get(ctx context.Context, arg0 string, options map[string]int
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
+	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, options)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -296,6 +356,9 @@ func (db *driverDB) GetAttachment(ctx context.Context, arg0 string, arg1 string,
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, arg1, options)
+	}
 	return expected.ret0, expected.wait(ctx)
 }
 
@@ -311,6 +374,9 @@ func (db *driverDB) GetAttachmentMeta(ctx context.Context, arg0 string, arg1 str
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, arg1, options)
+	}
 	return expected.ret0, expected.wait(ctx)
 }
 
@@ -322,6 +388,9 @@ func (db *driverDB) GetIndexes(ctx context.Context) ([]driver.Index, error) {
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
+	}
+	if e.callback != nil {
+		return e.callback(ctx)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -336,6 +405,9 @@ func (db *driverDB) LocalDocs(ctx context.Context, options map[string]interface{
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, options)
+	}
 	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
 }
 
@@ -348,6 +420,9 @@ func (db *driverDB) Purge(ctx context.Context, arg0 map[string][]string) (*drive
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
+	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -365,6 +440,9 @@ func (db *driverDB) PutAttachment(ctx context.Context, arg0 string, arg1 string,
 	if err := db.client.nextExpectation(expected); err != nil {
 		return "", err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, arg1, arg2, options)
+	}
 	return expected.ret0, expected.wait(ctx)
 }
 
@@ -380,6 +458,9 @@ func (db *driverDB) Query(ctx context.Context, arg0 string, arg1 string, options
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0, arg1, options)
+	}
 	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
 }
 
@@ -391,6 +472,9 @@ func (db *driverDB) Security(ctx context.Context) (*driver.Security, error) {
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
+	}
+	if e.callback != nil {
+		return e.callback(ctx)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -405,6 +489,9 @@ func (db *driverDB) SetSecurity(ctx context.Context, arg0 *driver.Security) erro
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
 	}
+	if e.callback != nil {
+		return e.callback(ctx, arg0)
+	}
 	return expected.wait(ctx)
 }
 
@@ -416,6 +503,9 @@ func (db *driverDB) Stats(ctx context.Context) (*driver.DBStats, error) {
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
+	}
+	if e.callback != nil {
+		return e.callback(ctx)
 	}
 	return expected.ret0, expected.wait(ctx)
 }

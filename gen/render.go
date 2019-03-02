@@ -329,3 +329,48 @@ func (m *Method) MethodArgs() string {
 	lines = append(lines, fmt.Sprintf("\treturn fmt.Sprintf(\"%s%s(%s)\", %s)", prefix, m.Name, strings.Join(vars, ", "), strings.Join(append(args, str...), ", ")))
 	return strings.Join(lines, "\n")
 }
+
+// CallbackType returns the type definition for a callback for this method.
+func (m *Method) CallbackTypes() string {
+	inputs := make([]string, 0, len(m.Accepts)+2)
+	if m.AcceptsContext {
+		inputs = append(inputs, "context.Context")
+	}
+	for _, arg := range m.Accepts {
+		inputs = append(inputs, fmt.Sprintf("%s", typeName(arg)))
+	}
+	if m.AcceptsOptions {
+		inputs = append(inputs, "map[string]interface{}")
+	}
+	return strings.Join(inputs, ", ")
+}
+
+// CallbackArgs returns the list of arguments to be passed to the callback
+func (m *Method) CallbackArgs() string {
+	args := make([]string, 0, len(m.Accepts)+2)
+	if m.AcceptsContext {
+		args = append(args, "ctx")
+	}
+	for i := range m.Accepts {
+		args = append(args, fmt.Sprintf("arg%d", i))
+	}
+	if m.AcceptsOptions {
+		args = append(args, "options")
+	}
+	return strings.Join(args, ", ")
+}
+
+func (m *Method) CallbackReturns() string {
+	args := make([]string, 0, len(m.Returns)+1)
+	for _, ret := range m.Returns {
+		name := typeName(ret)
+		args = append(args, fmt.Sprintf("%s", name))
+	}
+	if m.ReturnsError {
+		args = append(args, "error")
+	}
+	if len(args) > 1 {
+		return "(" + strings.Join(args, ", ") + ")"
+	}
+	return strings.Join(args, ", ")
+}

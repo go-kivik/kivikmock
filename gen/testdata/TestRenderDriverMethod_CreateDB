@@ -9,5 +9,8 @@ func (c *driverClient) CreateDB(ctx context.Context, arg0 string, options map[st
 	if err := c.nextExpectation(expected); err != nil {
 		return err
 	}
+    if e.callback != nil {
+		return e.callback(ctx, arg0, options)
+	}
 	return expected.wait(ctx)
 }
