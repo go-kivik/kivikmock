@@ -21,6 +21,8 @@ func (db *driverDB) Close(ctx context.Context) error {
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
 	}
-
+	if expected.callback != nil {
+		return expected.callback(ctx)
+	}
 	return expected.wait(ctx)
 }

@@ -19,8 +19,8 @@ func (c *driverClient) AllDBs(ctx context.Context, options map[string]interface{
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
 	}
-	if e.callback != nil {
-		return e.callback(ctx, options)
+	if expected.callback != nil {
+		return expected.callback(ctx, options)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -30,8 +30,8 @@ func (c *driverClient) Close(ctx context.Context) error {
 	if err := c.nextExpectation(expected); err != nil {
 		return err
 	}
-	if e.callback != nil {
-		return e.callback(ctx)
+	if expected.callback != nil {
+		return expected.callback(ctx)
 	}
 	return expected.wait(ctx)
 }
@@ -43,8 +43,8 @@ func (c *driverClient) ClusterSetup(ctx context.Context, arg0 interface{}) error
 	if err := c.nextExpectation(expected); err != nil {
 		return err
 	}
-	if e.callback != nil {
-		return e.callback(ctx, arg0)
+	if expected.callback != nil {
+		return expected.callback(ctx, arg0)
 	}
 	return expected.wait(ctx)
 }
@@ -58,8 +58,8 @@ func (c *driverClient) ClusterStatus(ctx context.Context, options map[string]int
 	if err := c.nextExpectation(expected); err != nil {
 		return "", err
 	}
-	if e.callback != nil {
-		return e.callback(ctx, options)
+	if expected.callback != nil {
+		return expected.callback(ctx, options)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -74,8 +74,8 @@ func (c *driverClient) DBExists(ctx context.Context, arg0 string, options map[st
 	if err := c.nextExpectation(expected); err != nil {
 		return false, err
 	}
-	if e.callback != nil {
-		return e.callback(ctx, arg0, options)
+	if expected.callback != nil {
+		return expected.callback(ctx, arg0, options)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -90,8 +90,8 @@ func (c *driverClient) DestroyDB(ctx context.Context, arg0 string, options map[s
 	if err := c.nextExpectation(expected); err != nil {
 		return err
 	}
-	if e.callback != nil {
-		return e.callback(ctx, arg0, options)
+	if expected.callback != nil {
+		return expected.callback(ctx, arg0, options)
 	}
 	return expected.wait(ctx)
 }
@@ -101,8 +101,8 @@ func (c *driverClient) Ping(ctx context.Context) (bool, error) {
 	if err := c.nextExpectation(expected); err != nil {
 		return false, err
 	}
-	if e.callback != nil {
-		return e.callback(ctx)
+	if expected.callback != nil {
+		return expected.callback(ctx)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -118,8 +118,8 @@ func (c *driverClient) DB(ctx context.Context, arg0 string, options map[string]i
 		return nil, err
 	}
 	expected.ret0.name = arg0
-	if e.callback != nil {
-		return e.callback(ctx, arg0, options)
+	if expected.callback != nil {
+		return expected.callback(ctx, arg0, options)
 	}
 	return &driverDB{MockDB: expected.ret0}, expected.wait(ctx)
 }
@@ -129,8 +129,8 @@ func (c *driverClient) DBUpdates(ctx context.Context) (driver.DBUpdates, error) 
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
 	}
-	if e.callback != nil {
-		return e.callback(ctx)
+	if expected.callback != nil {
+		return expected.callback(ctx)
 	}
 	return &driverDBUpdates{Context: ctx, Updates: expected.ret0}, expected.wait(ctx)
 }
@@ -142,8 +142,8 @@ func (c *driverClient) DBsStats(ctx context.Context, arg0 []string) ([]*driver.D
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
 	}
-	if e.callback != nil {
-		return e.callback(ctx, arg0)
+	if expected.callback != nil {
+		return expected.callback(ctx, arg0)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -153,8 +153,8 @@ func (c *driverClient) Session(ctx context.Context) (*driver.Session, error) {
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
 	}
-	if e.callback != nil {
-		return e.callback(ctx)
+	if expected.callback != nil {
+		return expected.callback(ctx)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -164,8 +164,8 @@ func (c *driverClient) Version(ctx context.Context) (*driver.Version, error) {
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
 	}
-	if e.callback != nil {
-		return e.callback(ctx)
+	if expected.callback != nil {
+		return expected.callback(ctx)
 	}
 	return expected.ret0, expected.wait(ctx)
 }

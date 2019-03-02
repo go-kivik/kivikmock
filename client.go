@@ -26,7 +26,9 @@ func (c *driverClient) Authenticate(ctx context.Context, authenticator interface
 	if err := c.nextExpectation(expected); err != nil {
 		return err
 	}
-
+	if expected.callback != nil {
+		return expected.callback(ctx, authenticator)
+	}
 	return expected.wait(ctx)
 }
 
@@ -39,6 +41,9 @@ func (c *driverClient) CreateDB(ctx context.Context, name string, options map[st
 	}
 	if err := c.nextExpectation(expected); err != nil {
 		return err
+	}
+	if expected.callback != nil {
+		return expected.callback(ctx, name, options)
 	}
 	return expected.wait(ctx)
 }

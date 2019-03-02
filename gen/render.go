@@ -363,8 +363,7 @@ func (m *Method) CallbackArgs() string {
 func (m *Method) CallbackReturns() string {
 	args := make([]string, 0, len(m.Returns)+1)
 	for _, ret := range m.Returns {
-		name := typeName(ret)
-		args = append(args, fmt.Sprintf("%s", name))
+		args = append(args, fmt.Sprintf("%s", ret))
 	}
 	if m.ReturnsError {
 		args = append(args, "error")

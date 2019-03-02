@@ -63,7 +63,17 @@ func TestCloseClient(t *testing.T) {
 			testy.Error(t, "context canceled", err)
 		},
 	})
-
+	tests.Add("callback", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectClose().WillExecute(func(_ context.Context) error {
+				return errors.New("custom error")
+			})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.Close(context.TODO())
+			testy.Error(t, "custom error", err)
+		},
+	})
 	tests.Run(t, testMock)
 }
 
@@ -117,6 +127,17 @@ func TestAllDBs(t *testing.T) {
 			testy.Error(t, "", err)
 		},
 	})
+	tests.Add("callback", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectAllDBs().WillExecute(func(_ context.Context, _ map[string]interface{}) ([]string, error) {
+				return nil, errors.New("custom error")
+			})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.AllDBs(context.TODO())
+			testy.Error(t, "custom error", err)
+		},
+	})
 	tests.Run(t, testMock)
 }
 
@@ -152,6 +173,17 @@ Expected: call to Authenticate() which:
 		test: func(t *testing.T, c *kivik.Client) {
 			err := c.Authenticate(newCanceledContext(), int(1))
 			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("callback", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectAuthenticate().WillExecute(func(_ context.Context, _ interface{}) error {
+				return errors.New("custom error")
+			})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.Authenticate(context.TODO(), int(1))
+			testy.Error(t, "custom error", err)
 		},
 	})
 	tests.Run(t, testMock)
@@ -190,6 +222,17 @@ func TestClusterSetup(t *testing.T) {
 		test: func(t *testing.T, c *kivik.Client) {
 			err := c.ClusterSetup(context.TODO(), 123)
 			testy.Error(t, "call to ClusterSetup() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("callback", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectClusterSetup().WillExecute(func(_ context.Context, _ interface{}) error {
+				return errors.New("custom error")
+			})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.ClusterSetup(context.TODO(), 123)
+			testy.Error(t, "custom error", err)
 		},
 	})
 	tests.Run(t, testMock)
@@ -259,6 +302,17 @@ func TestClusterStatus(t *testing.T) {
 		test: func(t *testing.T, c *kivik.Client) {
 			_, err := c.ClusterStatus(context.TODO())
 			testy.Error(t, "call to ClusterStatus(ctx, [?]) was not expected", err)
+		},
+	})
+	tests.Add("callback", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectClusterStatus().WillExecute(func(_ context.Context, _ map[string]interface{}) (string, error) {
+				return "", errors.New("custom error")
+			})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ClusterStatus(newCanceledContext())
+			testy.Error(t, "custom error", err)
 		},
 	})
 	tests.Run(t, testMock)
@@ -696,6 +750,17 @@ func TestCreateDB(t *testing.T) {
 			if err == nil {
 				t.Fatal("expected error")
 			}
+		},
+	})
+	tests.Add("callback", mockTest{
+		setup: func(m *MockClient) {
+			m.ExpectCreateDB().WillExecute(func(_ context.Context, _ string, _ map[string]interface{}) error {
+				return errors.New("custom error")
+			})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			err := c.CreateDB(context.TODO(), "foo").Err()
+			testy.Error(t, "custom error", err)
 		},
 	})
 	tests.Run(t, testMock)
