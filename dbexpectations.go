@@ -639,6 +639,12 @@ func (e *ExpectedGetAttachment) WithDocID(docID string) *ExpectedGetAttachment {
 	return e
 }
 
+// WithFilename sets the expectation for the filename passed to the DB.GetAttachment() call.
+func (e *ExpectedGetAttachment) WithFilename(docID string) *ExpectedGetAttachment {
+	e.arg1 = docID
+	return e
+}
+
 func (e *ExpectedDesignDocs) String() string {
 	var rets []string
 	if e.ret0 != nil {
