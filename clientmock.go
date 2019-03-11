@@ -107,7 +107,7 @@ func (c *Client) ExpectAuthenticate() *ExpectedAuthenticate {
 
 // ExpectCreateDB queues an expectation for a CreateDB() call.
 func (c *Client) ExpectCreateDB() *ExpectedCreateDB {
-	e2 := &ExpectedDB{ret0: &MockDB{}}
+	e2 := &ExpectedDB{ret0: &DB{}}
 	e := &ExpectedCreateDB{
 		expectedDB: e2,
 	}
@@ -117,9 +117,9 @@ func (c *Client) ExpectCreateDB() *ExpectedCreateDB {
 
 // NewDB creates a new mock DB object, which can be used along with ExpectDB()
 // or ExpectCreateDB() calls to mock database actions.
-func (c *Client) NewDB() *MockDB {
+func (c *Client) NewDB() *DB {
 	c.newdbcount++
-	return &MockDB{
+	return &DB{
 		client: c,
 		id:     c.newdbcount,
 	}

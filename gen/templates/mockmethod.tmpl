@@ -1,5 +1,5 @@
 // Expect{{.Name}} queues an expectation that {{if .DBMethod}}DB.{{end}}{{.Name}} will be called.
-func ({{if .DBMethod}}db *MockDB{{else}}c *Client{{end}}) Expect{{.Name}}() *Expected{{.Name}} {
+func ({{if .DBMethod}}db *DB{{else}}c *Client{{end}}) Expect{{.Name}}() *Expected{{.Name}} {
 	e := &Expected{{.Name}}{
 {{ .SetExpectations }}
 	}

@@ -1,20 +1,23 @@
 package kivikmock
 
-// MockDB serves to create expectations for database actions to
-// mock and test real database behavior.
-type MockDB struct {
+// MockDB is deprecated
+type MockDB = DB
+
+// DB serves to create expectations for database actions to mock and test real
+// database behavior.
+type DB struct {
 	name   string
 	id     int
 	client *Client
 	count  int
 }
 
-func (db *MockDB) expectations() int {
+func (db *DB) expectations() int {
 	return db.count
 }
 
 // ExpectClose queues an expectation for DB.Close() to be called.
-func (db *MockDB) ExpectClose() *ExpectedDBClose {
+func (db *DB) ExpectClose() *ExpectedDBClose {
 	e := &ExpectedDBClose{
 		commonExpectation: commonExpectation{db: db},
 	}

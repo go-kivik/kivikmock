@@ -7,7 +7,7 @@ import (
 )
 
 type driverDB struct {
-	*MockDB
+	*DB
 }
 
 var _ driver.DB = &driverDB{}
@@ -16,7 +16,7 @@ var _ driver.Finder = &driverDB{}
 
 func (db *driverDB) Close(ctx context.Context) error {
 	expected := &ExpectedDBClose{
-		commonExpectation: commonExpectation{db: db.MockDB},
+		commonExpectation: commonExpectation{db: db.DB},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
