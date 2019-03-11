@@ -41,7 +41,7 @@ func (e *ExpectedDBClose) WillExecute(cb func(ctx context.Context) error) *Expec
 }
 
 func (e *ExpectedDBClose) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).Close()", e.DB().name, e.DB().id)
+	msg := fmt.Sprintf("call to DB(%s#%d).Close()", e.dbo().name, e.dbo().id)
 	extra := delayString(e.delay)
 	extra += errorString(e.err)
 	if extra != "" {
@@ -65,7 +65,7 @@ func (e *ExpectedAllDocs) String() string {
 }
 
 func (e *ExpectedBulkGet) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).BulkGet() which:", e.DB().name, e.DB().id)
+	msg := fmt.Sprintf("call to DB(%s#%d).BulkGet() which:", e.dbo().name, e.dbo().id)
 	if e.arg0 == nil {
 		msg += "\n\t- has any doc references"
 	} else {
@@ -100,7 +100,7 @@ func (e *ExpectedFind) WithQuery(query interface{}) *ExpectedFind {
 }
 
 func (e *ExpectedCreateIndex) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).CreateIndex() which:", e.DB().name, e.DB().id)
+	msg := fmt.Sprintf("call to DB(%s#%d).CreateIndex() which:", e.dbo().name, e.dbo().id)
 	if e.arg0 == "" {
 		msg += "\n\t- has any ddoc"
 	} else {
@@ -140,7 +140,7 @@ func (e *ExpectedCreateIndex) WithIndex(index interface{}) *ExpectedCreateIndex 
 }
 
 func (e *ExpectedGetIndexes) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).GetIndexes()", e.DB().name, e.DB().id)
+	msg := fmt.Sprintf("call to DB(%s#%d).GetIndexes()", e.dbo().name, e.dbo().id)
 	var extra string
 	if e.ret0 != nil {
 		extra += fmt.Sprintf("\n\t- should return indexes: %v", e.ret0)
@@ -154,7 +154,7 @@ func (e *ExpectedGetIndexes) String() string {
 }
 
 func (e *ExpectedDeleteIndex) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).DeleteIndex() which:", e.DB().name, e.DB().id)
+	msg := fmt.Sprintf("call to DB(%s#%d).DeleteIndex() which:", e.dbo().name, e.dbo().id)
 	if e.arg0 == "" {
 		msg += "\n\t- has any ddoc"
 	} else {
@@ -179,7 +179,7 @@ func (e *ExpectedDeleteIndex) WithName(name string) *ExpectedDeleteIndex {
 }
 
 func (e *ExpectedExplain) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).Explain() which:", e.DB().name, e.DB().id)
+	msg := fmt.Sprintf("call to DB(%s#%d).Explain() which:", e.dbo().name, e.dbo().id)
 	if e.arg0 == nil {
 		msg += "\n\t- has any query"
 	} else {
@@ -200,7 +200,7 @@ func (e *ExpectedExplain) WithQuery(query interface{}) *ExpectedExplain {
 }
 
 func (e *ExpectedCreateDoc) String() string {
-	msg := fmt.Sprintf("call to DB(%s#%d).CreateDoc() which:", e.DB().name, e.DB().id)
+	msg := fmt.Sprintf("call to DB(%s#%d).CreateDoc() which:", e.dbo().name, e.dbo().id)
 	if e.arg0 == nil {
 		msg += "\n\t- has any doc"
 	} else {

@@ -297,7 +297,7 @@ func (m *Method) MethodArgs() string {
 	prefix := ""
 	if m.DBMethod {
 		prefix = "DB(%s)."
-		args = append(args, "e.DB().name")
+		args = append(args, "e.dbo().name")
 	}
 	if m.AcceptsContext {
 		vars = append(vars, "ctx")

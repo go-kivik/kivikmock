@@ -11,9 +11,9 @@ func meets(a, e expectation) bool {
 	if reflect.TypeOf(a).Elem().Name() != reflect.TypeOf(e).Elem().Name() {
 		return false
 	}
-	// Skip the DB test for the DB() method
+	// Skip the DB test for the dbo() method
 	if _, ok := e.(*ExpectedDB); !ok {
-		if !dbMeetsExpectation(a.DB(), e.DB()) {
+		if !dbMeetsExpectation(a.dbo(), e.dbo()) {
 			return false
 		}
 	}
