@@ -89,3 +89,9 @@ func (r *Rows) AddDelay(delay time.Duration) *Rows {
 	r.push(&item{delay: delay})
 	return r
 }
+
+// Final converts the Rows object to a driver.Rows. This method is intended for
+// use within WillExecute() to return results.
+func (r *Rows) Final() driver.Rows {
+	return &driverRows{Rows: r}
+}
