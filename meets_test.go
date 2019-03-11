@@ -8,27 +8,27 @@ import (
 
 func TestDBMeetsExpectation(t *testing.T) {
 	type tst struct {
-		exp      *MockDB
-		act      *MockDB
+		exp      *DB
+		act      *DB
 		expected bool
 	}
 	tests := testy.NewTable()
 	tests.Add("different name", tst{
-		exp:      &MockDB{name: "foo"},
-		act:      &MockDB{name: "bar"},
+		exp:      &DB{name: "foo"},
+		act:      &DB{name: "bar"},
 		expected: false,
 	})
 	tests.Add("different id", tst{
-		exp:      &MockDB{name: "foo", id: 123},
-		act:      &MockDB{name: "foo", id: 321},
+		exp:      &DB{name: "foo", id: 123},
+		act:      &DB{name: "foo", id: 321},
 		expected: false,
 	})
 	tests.Add("no db", tst{
 		expected: true,
 	})
 	tests.Add("match", tst{
-		exp:      &MockDB{name: "foo", id: 123},
-		act:      &MockDB{name: "foo", id: 123},
+		exp:      &DB{name: "foo", id: 123},
+		act:      &DB{name: "foo", id: 123},
 		expected: true,
 	})
 	tests.Run(t, func(t *testing.T, test tst) {

@@ -9,7 +9,7 @@ import (
 	"github.com/go-kivik/kivik/driver"
 )
 
-func TestToDocument(t *testing.T) {
+func TestDocument(t *testing.T) {
 	type tst struct {
 		i        interface{}
 		expected *driver.Document
@@ -59,7 +59,7 @@ func TestToDocument(t *testing.T) {
 	})
 
 	tests.Run(t, func(t *testing.T, test tst) {
-		result, err := ToDocument(test.i)
+		result, err := Document(test.i)
 		testy.Error(t, test.err, err)
 		if d := diff.AsJSON(test.content, result.Body); d != nil {
 			t.Errorf("Unexpected content:\n%s\n", d)

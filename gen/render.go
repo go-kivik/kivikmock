@@ -98,7 +98,7 @@ func (m *Method) VariableDefinitions() string {
 		name := typeName(ret)
 		switch name {
 		case "driver.DB":
-			name = "*MockDB"
+			name = "*DB"
 		}
 		result = append(result, fmt.Sprintf("\tret%d %s\n", i, name))
 	}
@@ -128,7 +128,7 @@ func (m *Method) ExpectedVariables() string {
 func (m *Method) InputVariables() string {
 	var result, common []string
 	if m.DBMethod {
-		common = append(common, "\t\t\tdb: db.MockDB,\n")
+		common = append(common, "\t\t\tdb: db.DB,\n")
 	}
 	for i := range m.Accepts {
 		result = append(result, fmt.Sprintf("\t\targ%d: arg%d,\n", i, i))
@@ -197,7 +197,7 @@ func (m *Method) ExpectedReturns() string {
 		case "driver.Changes":
 			args = append(args, fmt.Sprintf("&driverChanges{Context: ctx, Changes: expected.ret%d}", i))
 		case "driver.DB":
-			args = append(args, fmt.Sprintf("&driverDB{MockDB: expected.ret%d}", i))
+			args = append(args, fmt.Sprintf("&driverDB{DB: expected.ret%d}", i))
 		case "driver.DBUpdates":
 			args = append(args, fmt.Sprintf("&driverDBUpdates{Context:ctx, Updates: expected.ret%d}", i))
 		default:
@@ -218,7 +218,7 @@ func (m *Method) ReturnTypes() string {
 		name := typeName(ret)
 		switch name {
 		case "driver.DB":
-			name = "*MockDB"
+			name = "*DB"
 		}
 		args[i] = fmt.Sprintf("ret%d %s", i, name)
 	}
@@ -248,7 +248,7 @@ func (m *Method) SetExpectations() string {
 		args = append(args, "commonExpectation: commonExpectation{db: db},\n")
 	}
 	if m.Name == "DB" {
-		args = append(args, "ret0: &MockDB{},\n")
+		args = append(args, "ret0: &DB{},\n")
 	}
 	for i, ret := range m.Returns {
 		var zero string

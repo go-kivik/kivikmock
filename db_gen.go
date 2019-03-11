@@ -13,7 +13,7 @@ var _ = &driver.Attachment{}
 func (db *driverDB) Compact(ctx context.Context) error {
 	expected := &ExpectedCompact{
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -29,7 +29,7 @@ func (db *driverDB) CompactView(ctx context.Context, arg0 string) error {
 	expected := &ExpectedCompactView{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -46,7 +46,7 @@ func (db *driverDB) Copy(ctx context.Context, arg0 string, arg1 string, options 
 		arg0: arg0,
 		arg1: arg1,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -63,7 +63,7 @@ func (db *driverDB) CreateDoc(ctx context.Context, arg0 interface{}, options map
 	expected := &ExpectedCreateDoc{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -82,7 +82,7 @@ func (db *driverDB) CreateIndex(ctx context.Context, arg0 string, arg1 string, a
 		arg1: arg1,
 		arg2: arg2,
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -99,7 +99,7 @@ func (db *driverDB) Delete(ctx context.Context, arg0 string, arg1 string, option
 		arg0: arg0,
 		arg1: arg1,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -118,7 +118,7 @@ func (db *driverDB) DeleteAttachment(ctx context.Context, arg0 string, arg1 stri
 		arg1: arg1,
 		arg2: arg2,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -136,7 +136,7 @@ func (db *driverDB) DeleteIndex(ctx context.Context, arg0 string, arg1 string) e
 		arg0: arg0,
 		arg1: arg1,
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -151,7 +151,7 @@ func (db *driverDB) DeleteIndex(ctx context.Context, arg0 string, arg1 string) e
 func (db *driverDB) Flush(ctx context.Context) error {
 	expected := &ExpectedFlush{
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -167,7 +167,7 @@ func (db *driverDB) GetMeta(ctx context.Context, arg0 string, options map[string
 	expected := &ExpectedGetMeta{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -185,7 +185,7 @@ func (db *driverDB) Put(ctx context.Context, arg0 string, arg1 interface{}, opti
 		arg0: arg0,
 		arg1: arg1,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -201,7 +201,7 @@ func (db *driverDB) Put(ctx context.Context, arg0 string, arg1 interface{}, opti
 func (db *driverDB) ViewCleanup(ctx context.Context) error {
 	expected := &ExpectedViewCleanup{
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -216,7 +216,7 @@ func (db *driverDB) ViewCleanup(ctx context.Context) error {
 func (db *driverDB) AllDocs(ctx context.Context, options map[string]interface{}) (driver.Rows, error) {
 	expected := &ExpectedAllDocs{
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -233,7 +233,7 @@ func (db *driverDB) BulkDocs(ctx context.Context, arg0 []interface{}, options ma
 	expected := &ExpectedBulkDocs{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -250,7 +250,7 @@ func (db *driverDB) BulkGet(ctx context.Context, arg0 []driver.BulkGetReference,
 	expected := &ExpectedBulkGet{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -266,7 +266,7 @@ func (db *driverDB) BulkGet(ctx context.Context, arg0 []driver.BulkGetReference,
 func (db *driverDB) Changes(ctx context.Context, options map[string]interface{}) (driver.Changes, error) {
 	expected := &ExpectedChanges{
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -282,7 +282,7 @@ func (db *driverDB) Changes(ctx context.Context, options map[string]interface{})
 func (db *driverDB) DesignDocs(ctx context.Context, options map[string]interface{}) (driver.Rows, error) {
 	expected := &ExpectedDesignDocs{
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -299,7 +299,7 @@ func (db *driverDB) Explain(ctx context.Context, arg0 interface{}) (*driver.Quer
 	expected := &ExpectedExplain{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -315,7 +315,7 @@ func (db *driverDB) Find(ctx context.Context, arg0 interface{}) (driver.Rows, er
 	expected := &ExpectedFind{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -331,7 +331,7 @@ func (db *driverDB) Get(ctx context.Context, arg0 string, options map[string]int
 	expected := &ExpectedGet{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -349,7 +349,7 @@ func (db *driverDB) GetAttachment(ctx context.Context, arg0 string, arg1 string,
 		arg0: arg0,
 		arg1: arg1,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -367,7 +367,7 @@ func (db *driverDB) GetAttachmentMeta(ctx context.Context, arg0 string, arg1 str
 		arg0: arg0,
 		arg1: arg1,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -383,7 +383,7 @@ func (db *driverDB) GetAttachmentMeta(ctx context.Context, arg0 string, arg1 str
 func (db *driverDB) GetIndexes(ctx context.Context) ([]driver.Index, error) {
 	expected := &ExpectedGetIndexes{
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -398,7 +398,7 @@ func (db *driverDB) GetIndexes(ctx context.Context) ([]driver.Index, error) {
 func (db *driverDB) LocalDocs(ctx context.Context, options map[string]interface{}) (driver.Rows, error) {
 	expected := &ExpectedLocalDocs{
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -415,7 +415,7 @@ func (db *driverDB) Purge(ctx context.Context, arg0 map[string][]string) (*drive
 	expected := &ExpectedPurge{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -433,7 +433,7 @@ func (db *driverDB) PutAttachment(ctx context.Context, arg0 string, arg1 string,
 		arg1: arg1,
 		arg2: arg2,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -451,7 +451,7 @@ func (db *driverDB) Query(ctx context.Context, arg0 string, arg1 string, options
 		arg0: arg0,
 		arg1: arg1,
 		commonExpectation: commonExpectation{
-			db:      db.MockDB,
+			db:      db.DB,
 			options: options,
 		},
 	}
@@ -467,7 +467,7 @@ func (db *driverDB) Query(ctx context.Context, arg0 string, arg1 string, options
 func (db *driverDB) Security(ctx context.Context) (*driver.Security, error) {
 	expected := &ExpectedSecurity{
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -483,7 +483,7 @@ func (db *driverDB) SetSecurity(ctx context.Context, arg0 *driver.Security) erro
 	expected := &ExpectedSetSecurity{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
@@ -498,7 +498,7 @@ func (db *driverDB) SetSecurity(ctx context.Context, arg0 *driver.Security) erro
 func (db *driverDB) Stats(ctx context.Context) (*driver.DBStats, error) {
 	expected := &ExpectedStats{
 		commonExpectation: commonExpectation{
-			db: db.MockDB,
+			db: db.DB,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {

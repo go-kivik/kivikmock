@@ -23,7 +23,7 @@ func meets(a, e expectation) bool {
 	return a.met(e)
 }
 
-func dbMeetsExpectation(a, e *MockDB) bool {
+func dbMeetsExpectation(a, e *DB) bool {
 	if e == nil {
 		return true
 	}

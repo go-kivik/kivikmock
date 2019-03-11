@@ -8,7 +8,7 @@ import (
 )
 
 type driverClient struct {
-	*MockClient
+	*Client
 }
 
 var _ driver.Client = &driverClient{}

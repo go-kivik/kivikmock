@@ -371,7 +371,7 @@ type ExpectedDB struct {
 	commonExpectation
 	callback func(ctx context.Context, arg0 string, options map[string]interface{}) (driver.DB, error)
 	arg0     string
-	ret0     *MockDB
+	ret0     *DB
 }
 
 // WithOptions sets the expected options for the call to DB().
@@ -389,7 +389,7 @@ func (e *ExpectedDB) WillExecute(cb func(ctx context.Context, arg0 string, optio
 }
 
 // WillReturn sets the values that will be returned by the call to DB().
-func (e *ExpectedDB) WillReturn(ret0 *MockDB) *ExpectedDB {
+func (e *ExpectedDB) WillReturn(ret0 *DB) *ExpectedDB {
 	e.ret0 = ret0
 	return e
 }

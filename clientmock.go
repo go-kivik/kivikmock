@@ -7,8 +7,11 @@ import (
 	"github.com/go-kivik/kivik"
 )
 
-// MockClient allows configuring the mock kivik client.
-type MockClient struct {
+// MockClient is deprecated
+type MockClient = Client
+
+// Client allows configuring the mock kivik client.
+type Client struct {
 	ordered    bool
 	dsn        string
 	opened     int
@@ -20,7 +23,7 @@ type MockClient struct {
 // nextExpectation accepts the expected value `e`, checks that this is a valid
 // expectation, and if so, populates e with the matching expectation. If the
 // expectation is not expected, an error is returned.
-func (c *MockClient) nextExpectation(actual expectation) error {
+func (c *Client) nextExpectation(actual expectation) error {
 	c.drv.Lock()
 	defer c.drv.Unlock()
 
@@ -69,14 +72,14 @@ func (c *MockClient) nextExpectation(actual expectation) error {
 	return nil
 }
 
-func (c *MockClient) open() (*kivik.Client, *MockClient, error) {
+func (c *Client) open() (*kivik.Client, *Client, error) {
 	client, err := kivik.New("kivikmock", c.dsn)
 	return client, c, err
 }
 
 // ExpectationsWereMet returns an error if any outstanding expectatios were
 // not met.
-func (c *MockClient) ExpectationsWereMet() error {
+func (c *Client) ExpectationsWereMet() error {
 	for _, e := range c.expected {
 		e.Lock()
 		fulfilled := e.fulfilled()
@@ -91,20 +94,20 @@ func (c *MockClient) ExpectationsWereMet() error {
 
 // MatchExpectationsInOrder sets whether expectations should occur in the
 // precise order in which they were defined.
-func (c *MockClient) MatchExpectationsInOrder(b bool) {
+func (c *Client) MatchExpectationsInOrder(b bool) {
 	c.ordered = b
 }
 
 // ExpectAuthenticate queues an expectation for an Authenticate() call.
-func (c *MockClient) ExpectAuthenticate() *ExpectedAuthenticate {
+func (c *Client) ExpectAuthenticate() *ExpectedAuthenticate {
 	e := &ExpectedAuthenticate{}
 	c.expected = append(c.expected, e)
 	return e
 }
 
 // ExpectCreateDB queues an expectation for a CreateDB() call.
-func (c *MockClient) ExpectCreateDB() *ExpectedCreateDB {
-	e2 := &ExpectedDB{ret0: &MockDB{}}
+func (c *Client) ExpectCreateDB() *ExpectedCreateDB {
+	e2 := &ExpectedDB{ret0: &DB{}}
 	e := &ExpectedCreateDB{
 		expectedDB: e2,
 	}
@@ -114,9 +117,9 @@ func (c *MockClient) ExpectCreateDB() *ExpectedCreateDB {
 
 // NewDB creates a new mock DB object, which can be used along with ExpectDB()
 // or ExpectCreateDB() calls to mock database actions.
-func (c *MockClient) NewDB() *MockDB {
+func (c *Client) NewDB() *DB {
 	c.newdbcount++
-	return &MockDB{
+	return &DB{
 		client: c,
 		id:     c.newdbcount,
 	}

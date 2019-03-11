@@ -24,8 +24,8 @@ type expectation interface {
 	// met is called on the actual value, and returns true if the expectation
 	// is met.
 	met(expectation) bool
-	// for DB methods, this returns the associated *MockDB object
-	dbo() *MockDB
+	// for DB methods, this returns the associated *DB object
+	dbo() *DB
 	opts() kivik.Options
 }
 
@@ -37,14 +37,14 @@ type commonExpectation struct {
 	err       error // nolint: structcheck
 	delay     time.Duration
 	options   kivik.Options
-	db        *MockDB
+	db        *DB
 }
 
 func (e *commonExpectation) opts() kivik.Options {
 	return e.options
 }
 
-func (e *commonExpectation) dbo() *MockDB {
+func (e *commonExpectation) dbo() *DB {
 	return e.db
 }
 

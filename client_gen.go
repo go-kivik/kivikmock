@@ -121,7 +121,7 @@ func (c *driverClient) DB(ctx context.Context, arg0 string, options map[string]i
 	if expected.callback != nil {
 		return expected.callback(ctx, arg0, options)
 	}
-	return &driverDB{MockDB: expected.ret0}, expected.wait(ctx)
+	return &driverDB{DB: expected.ret0}, expected.wait(ctx)
 }
 
 func (c *driverClient) DBUpdates(ctx context.Context) (driver.DBUpdates, error) {

@@ -27,7 +27,8 @@ for example, you might do something like this:
         }
 
         mock.ExpectDB().WithName("_users").WillReturn(mock.NewDB().
-            ExpectGet().WithDocID("bob"). WillReturn(kivikmock.ToDocument(`{"_id":"org.couchdb.user:bob"}`)),
+            ExpectGet().WithDocID("bob").
+                WillReturn(kivikmock.DocumentT(t, `{"_id":"org.couchdb.user:bob"}`)),
         )
         user, err := GetUser(client, "bob")
         if err != nil {
