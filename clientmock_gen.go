@@ -11,56 +11,56 @@ var _ = kivik.EndKeySuffix // To ensure a reference to kivik package
 var _ = &driver.Attachment{}
 
 // ExpectAllDBs queues an expectation that AllDBs will be called.
-func (c *MockClient) ExpectAllDBs() *ExpectedAllDBs {
+func (c *Client) ExpectAllDBs() *ExpectedAllDBs {
 	e := &ExpectedAllDBs{}
 	c.expected = append(c.expected, e)
 	return e
 }
 
 // ExpectClose queues an expectation that Close will be called.
-func (c *MockClient) ExpectClose() *ExpectedClose {
+func (c *Client) ExpectClose() *ExpectedClose {
 	e := &ExpectedClose{}
 	c.expected = append(c.expected, e)
 	return e
 }
 
 // ExpectClusterSetup queues an expectation that ClusterSetup will be called.
-func (c *MockClient) ExpectClusterSetup() *ExpectedClusterSetup {
+func (c *Client) ExpectClusterSetup() *ExpectedClusterSetup {
 	e := &ExpectedClusterSetup{}
 	c.expected = append(c.expected, e)
 	return e
 }
 
 // ExpectClusterStatus queues an expectation that ClusterStatus will be called.
-func (c *MockClient) ExpectClusterStatus() *ExpectedClusterStatus {
+func (c *Client) ExpectClusterStatus() *ExpectedClusterStatus {
 	e := &ExpectedClusterStatus{}
 	c.expected = append(c.expected, e)
 	return e
 }
 
 // ExpectDBExists queues an expectation that DBExists will be called.
-func (c *MockClient) ExpectDBExists() *ExpectedDBExists {
+func (c *Client) ExpectDBExists() *ExpectedDBExists {
 	e := &ExpectedDBExists{}
 	c.expected = append(c.expected, e)
 	return e
 }
 
 // ExpectDestroyDB queues an expectation that DestroyDB will be called.
-func (c *MockClient) ExpectDestroyDB() *ExpectedDestroyDB {
+func (c *Client) ExpectDestroyDB() *ExpectedDestroyDB {
 	e := &ExpectedDestroyDB{}
 	c.expected = append(c.expected, e)
 	return e
 }
 
 // ExpectPing queues an expectation that Ping will be called.
-func (c *MockClient) ExpectPing() *ExpectedPing {
+func (c *Client) ExpectPing() *ExpectedPing {
 	e := &ExpectedPing{}
 	c.expected = append(c.expected, e)
 	return e
 }
 
 // ExpectDB queues an expectation that DB will be called.
-func (c *MockClient) ExpectDB() *ExpectedDB {
+func (c *Client) ExpectDB() *ExpectedDB {
 	e := &ExpectedDB{
 		ret0: &MockDB{},
 	}
@@ -69,7 +69,7 @@ func (c *MockClient) ExpectDB() *ExpectedDB {
 }
 
 // ExpectDBUpdates queues an expectation that DBUpdates will be called.
-func (c *MockClient) ExpectDBUpdates() *ExpectedDBUpdates {
+func (c *Client) ExpectDBUpdates() *ExpectedDBUpdates {
 	e := &ExpectedDBUpdates{
 		ret0: &Updates{},
 	}
@@ -78,21 +78,21 @@ func (c *MockClient) ExpectDBUpdates() *ExpectedDBUpdates {
 }
 
 // ExpectDBsStats queues an expectation that DBsStats will be called.
-func (c *MockClient) ExpectDBsStats() *ExpectedDBsStats {
+func (c *Client) ExpectDBsStats() *ExpectedDBsStats {
 	e := &ExpectedDBsStats{}
 	c.expected = append(c.expected, e)
 	return e
 }
 
 // ExpectSession queues an expectation that Session will be called.
-func (c *MockClient) ExpectSession() *ExpectedSession {
+func (c *Client) ExpectSession() *ExpectedSession {
 	e := &ExpectedSession{}
 	c.expected = append(c.expected, e)
 	return e
 }
 
 // ExpectVersion queues an expectation that Version will be called.
-func (c *MockClient) ExpectVersion() *ExpectedVersion {
+func (c *Client) ExpectVersion() *ExpectedVersion {
 	e := &ExpectedVersion{}
 	c.expected = append(c.expected, e)
 	return e

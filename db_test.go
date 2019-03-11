@@ -15,7 +15,7 @@ import (
 func TestCloseDB(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectClose().WillReturnError(errors.New("foo err"))
@@ -27,7 +27,7 @@ func TestCloseDB(t *testing.T) {
 		err: "",
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -37,7 +37,7 @@ func TestCloseDB(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectClose().WillDelay(time.Second)
@@ -48,7 +48,7 @@ func TestCloseDB(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -65,7 +65,7 @@ func TestCloseDB(t *testing.T) {
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Add("callback", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectClose().WillExecute(func(_ context.Context) error {
@@ -83,7 +83,7 @@ func TestCloseDB(t *testing.T) {
 func TestAllDocs(t *testing.T) { // nolint: gocyclo
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturnError(errors.New("foo err"))
@@ -95,7 +95,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -106,7 +106,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows close error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturn(NewRows().CloseError(errors.New("bar err")))
@@ -119,7 +119,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows offset", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturn(NewRows().Offset(123))
@@ -134,7 +134,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows totalrows", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturn(NewRows().TotalRows(123))
@@ -149,7 +149,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows update seq", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturn(NewRows().UpdateSeq("1-xxx"))
@@ -164,7 +164,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows warning", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturn(NewRows().Warning("Caution!"))
@@ -179,7 +179,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturn(NewRows().
@@ -202,7 +202,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("row error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturn(NewRows().
@@ -225,7 +225,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WithOptions(map[string]interface{}{"foo": 123})
@@ -237,7 +237,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillDelay(time.Second)
@@ -249,7 +249,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("row delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectAllDocs().WillReturn(NewRows().
@@ -275,7 +275,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -297,7 +297,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 func TestBulkGet(t *testing.T) { // nolint: gocyclo
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkGet().WillReturnError(errors.New("foo err"))
@@ -309,7 +309,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -320,7 +320,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("rows", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkGet().WillReturn(NewRows().
@@ -343,7 +343,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkGet().WithOptions(map[string]interface{}{"foo": 123})
@@ -355,7 +355,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkGet().WillDelay(time.Second)
@@ -367,7 +367,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -389,7 +389,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 func TestFind(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectFind().WillReturnError(errors.New("foo err"))
@@ -401,7 +401,7 @@ func TestFind(t *testing.T) {
 		},
 	})
 	tests.Add("unmatched query", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectFind().WithQuery(123)
@@ -413,7 +413,7 @@ func TestFind(t *testing.T) {
 		},
 	})
 	tests.Add("rows", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectFind().WillReturn(NewRows().
@@ -436,7 +436,7 @@ func TestFind(t *testing.T) {
 		},
 	})
 	tests.Add("query", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectFind().WithQuery(map[string]interface{}{"foo": "123"})
@@ -448,7 +448,7 @@ func TestFind(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectFind().WillDelay(time.Second)
@@ -460,7 +460,7 @@ func TestFind(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -482,7 +482,7 @@ func TestFind(t *testing.T) {
 func TestCreateIndex(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateIndex().WillReturnError(errors.New("foo err"))
@@ -493,7 +493,7 @@ func TestCreateIndex(t *testing.T) {
 		},
 	})
 	tests.Add("unmatched index", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateIndex().WithIndex(321)
@@ -504,7 +504,7 @@ func TestCreateIndex(t *testing.T) {
 		},
 	})
 	tests.Add("ddoc", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateIndex().WithDDocID("moo")
@@ -515,7 +515,7 @@ func TestCreateIndex(t *testing.T) {
 		},
 	})
 	tests.Add("name", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateIndex().WithName("moo")
@@ -526,7 +526,7 @@ func TestCreateIndex(t *testing.T) {
 		},
 	})
 	tests.Add("index", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateIndex().WithIndex("moo")
@@ -537,7 +537,7 @@ func TestCreateIndex(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateIndex().WillDelay(time.Second)
@@ -548,7 +548,7 @@ func TestCreateIndex(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -570,7 +570,7 @@ func TestCreateIndex(t *testing.T) {
 func TestGetIndexes(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetIndexes().WillReturnError(errors.New("foo err"))
@@ -581,7 +581,7 @@ func TestGetIndexes(t *testing.T) {
 		},
 	})
 	tests.Add("indexes", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetIndexes().WillReturn([]driver.Index{
@@ -602,7 +602,7 @@ func TestGetIndexes(t *testing.T) {
 		},
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -612,7 +612,7 @@ func TestGetIndexes(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetIndexes().WillDelay(time.Second)
@@ -623,7 +623,7 @@ func TestGetIndexes(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -645,7 +645,7 @@ func TestGetIndexes(t *testing.T) {
 func TestDeleteIndex(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDeleteIndex().WillReturnError(errors.New("foo err"))
@@ -656,7 +656,7 @@ func TestDeleteIndex(t *testing.T) {
 		},
 	})
 	tests.Add("ddoc", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDeleteIndex().WithDDoc("oink")
@@ -667,7 +667,7 @@ func TestDeleteIndex(t *testing.T) {
 		},
 	})
 	tests.Add("name", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDeleteIndex().WithName("oink")
@@ -678,7 +678,7 @@ func TestDeleteIndex(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDeleteIndex().WillDelay(time.Second)
@@ -689,7 +689,7 @@ func TestDeleteIndex(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -711,7 +711,7 @@ func TestDeleteIndex(t *testing.T) {
 func TestExplain(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectExplain().WillReturnError(errors.New("foo err"))
@@ -722,7 +722,7 @@ func TestExplain(t *testing.T) {
 		},
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -732,7 +732,7 @@ func TestExplain(t *testing.T) {
 		},
 	})
 	tests.Add("query", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectExplain().WithQuery(map[string]string{"foo": "bar"})
@@ -743,7 +743,7 @@ func TestExplain(t *testing.T) {
 		},
 	})
 	tests.Add("plan", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectExplain().WillReturn(&driver.QueryPlan{DBName: "foo"})
@@ -758,7 +758,7 @@ func TestExplain(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectExplain().WillDelay(time.Second)
@@ -769,7 +769,7 @@ func TestExplain(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -791,7 +791,7 @@ func TestExplain(t *testing.T) {
 func TestCreateDoc(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateDoc().WillReturnError(errors.New("foo err"))
@@ -804,7 +804,7 @@ func TestCreateDoc(t *testing.T) {
 	tests.Add("return", func() interface{} {
 		docID, rev := "foo", "1-xxx"
 		return mockTest{
-			setup: func(m *MockClient) {
+			setup: func(m *Client) {
 				db := m.NewDB()
 				m.ExpectDB().WillReturn(db)
 				db.ExpectCreateDoc().WillReturn(docID, rev)
@@ -819,7 +819,7 @@ func TestCreateDoc(t *testing.T) {
 		}
 	})
 	tests.Add("mismatched doc", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateDoc().WithDoc("foo")
@@ -830,7 +830,7 @@ func TestCreateDoc(t *testing.T) {
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateDoc().WithOptions(map[string]interface{}{"foo": "bar"})
@@ -841,7 +841,7 @@ func TestCreateDoc(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCreateDoc().WillDelay(time.Second)
@@ -852,7 +852,7 @@ func TestCreateDoc(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -874,7 +874,7 @@ func TestCreateDoc(t *testing.T) {
 func TestCompact(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCompact().WillReturnError(errors.New("foo err"))
@@ -885,7 +885,7 @@ func TestCompact(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCompact().WillDelay(time.Second)
@@ -896,7 +896,7 @@ func TestCompact(t *testing.T) {
 		},
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -911,7 +911,7 @@ func TestCompact(t *testing.T) {
 func TestCompactView(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCompactView().WillReturnError(errors.New("foo err"))
@@ -922,7 +922,7 @@ func TestCompactView(t *testing.T) {
 		},
 	})
 	tests.Add("ddocID", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCompactView().WithDDoc("foo")
@@ -933,7 +933,7 @@ func TestCompactView(t *testing.T) {
 		},
 	})
 	tests.Add("unexpected ddoc", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCompactView().WithDDoc("foo")
@@ -944,7 +944,7 @@ func TestCompactView(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCompactView().WillDelay(time.Second)
@@ -955,7 +955,7 @@ func TestCompactView(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -977,7 +977,7 @@ func TestCompactView(t *testing.T) {
 func TestViewCleanup(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectViewCleanup().WillReturnError(errors.New("foo err"))
@@ -988,7 +988,7 @@ func TestViewCleanup(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectViewCleanup().WillDelay(time.Second)
@@ -999,7 +999,7 @@ func TestViewCleanup(t *testing.T) {
 		},
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -1014,7 +1014,7 @@ func TestViewCleanup(t *testing.T) {
 func TestPut(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPut().WillReturnError(errors.New("foo err"))
@@ -1025,7 +1025,7 @@ func TestPut(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPut().WillDelay(time.Second)
@@ -1036,7 +1036,7 @@ func TestPut(t *testing.T) {
 		},
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -1046,7 +1046,7 @@ func TestPut(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -1063,7 +1063,7 @@ func TestPut(t *testing.T) {
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Add("wrong id", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPut().WithDocID("foo")
@@ -1074,7 +1074,7 @@ func TestPut(t *testing.T) {
 		},
 	})
 	tests.Add("wrong doc", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPut().WithDoc(map[string]string{"foo": "bar"})
@@ -1085,7 +1085,7 @@ func TestPut(t *testing.T) {
 		},
 	})
 	tests.Add("wrong options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPut().WithOptions(map[string]interface{}{"foo": "bar"})
@@ -1096,7 +1096,7 @@ func TestPut(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPut().WillReturn("oink")
@@ -1115,7 +1115,7 @@ func TestPut(t *testing.T) {
 func TestGetMeta(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetMeta().WillReturnError(errors.New("foo err"))
@@ -1126,7 +1126,7 @@ func TestGetMeta(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetMeta().WillDelay(time.Second)
@@ -1137,7 +1137,7 @@ func TestGetMeta(t *testing.T) {
 		},
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -1147,7 +1147,7 @@ func TestGetMeta(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -1164,7 +1164,7 @@ func TestGetMeta(t *testing.T) {
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Add("wrong id", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetMeta().WithDocID("foo")
@@ -1175,7 +1175,7 @@ func TestGetMeta(t *testing.T) {
 		},
 	})
 	tests.Add("wrong options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetMeta().WithOptions(map[string]interface{}{"foo": "bar"})
@@ -1186,7 +1186,7 @@ func TestGetMeta(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetMeta().WillReturn(123, "1-oink")
@@ -1208,7 +1208,7 @@ func TestGetMeta(t *testing.T) {
 func TestFlush(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectFlush().WillReturnError(errors.New("foo err"))
@@ -1219,7 +1219,7 @@ func TestFlush(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectFlush().WillDelay(time.Second)
@@ -1230,7 +1230,7 @@ func TestFlush(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -1252,7 +1252,7 @@ func TestFlush(t *testing.T) {
 func TestDeleteAttachment(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDeleteAttachment().WillReturnError(errors.New("foo err"))
@@ -1263,7 +1263,7 @@ func TestDeleteAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDeleteAttachment().WillDelay(time.Second)
@@ -1274,7 +1274,7 @@ func TestDeleteAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -1291,7 +1291,7 @@ func TestDeleteAttachment(t *testing.T) {
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Add("wrong docID", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDeleteAttachment().WithDocID("bar")
@@ -1302,7 +1302,7 @@ func TestDeleteAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("wrong rev", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDeleteAttachment().WithRev("2-bar")
@@ -1313,7 +1313,7 @@ func TestDeleteAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("wrong filename", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDeleteAttachment().WithFilename("bar.txt")
@@ -1324,7 +1324,7 @@ func TestDeleteAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("wrong options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDeleteAttachment().WithOptions(map[string]interface{}{"foo": "baz"})
@@ -1335,7 +1335,7 @@ func TestDeleteAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDeleteAttachment().WillReturn("2-bar")
@@ -1354,7 +1354,7 @@ func TestDeleteAttachment(t *testing.T) {
 func TestDelete(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDelete().WillReturnError(errors.New("foo err"))
@@ -1365,7 +1365,7 @@ func TestDelete(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDelete().WillDelay(time.Second)
@@ -1376,7 +1376,7 @@ func TestDelete(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -1393,7 +1393,7 @@ func TestDelete(t *testing.T) {
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Add("wrong docID", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDelete().WithDocID("bar")
@@ -1404,7 +1404,7 @@ func TestDelete(t *testing.T) {
 		},
 	})
 	tests.Add("wrong rev", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDelete().WithRev("2-bar")
@@ -1415,7 +1415,7 @@ func TestDelete(t *testing.T) {
 		},
 	})
 	tests.Add("wrong options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDelete().WithOptions(map[string]interface{}{"foo": "baz"})
@@ -1426,7 +1426,7 @@ func TestDelete(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDelete().WillReturn("2-bar")
@@ -1445,7 +1445,7 @@ func TestDelete(t *testing.T) {
 func TestCopy(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCopy().WillReturnError(errors.New("foo err"))
@@ -1456,7 +1456,7 @@ func TestCopy(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCopy().WillDelay(time.Second)
@@ -1467,7 +1467,7 @@ func TestCopy(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -1484,7 +1484,7 @@ func TestCopy(t *testing.T) {
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Add("wrong targetID", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCopy().WithTargetID("bar")
@@ -1495,7 +1495,7 @@ func TestCopy(t *testing.T) {
 		},
 	})
 	tests.Add("wrong sourceID", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCopy().WithSourceID("baz")
@@ -1506,7 +1506,7 @@ func TestCopy(t *testing.T) {
 		},
 	})
 	tests.Add("wrong options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCopy().WithOptions(map[string]interface{}{"foo": "baz"})
@@ -1517,7 +1517,7 @@ func TestCopy(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectCopy().WillReturn("2-bar")
@@ -1536,7 +1536,7 @@ func TestCopy(t *testing.T) {
 func TestGet(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGet().WillReturnError(errors.New("foo err"))
@@ -1547,7 +1547,7 @@ func TestGet(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGet().WillDelay(time.Second)
@@ -1558,7 +1558,7 @@ func TestGet(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -1575,7 +1575,7 @@ func TestGet(t *testing.T) {
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Add("wrong docID", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGet().WithDocID("bar")
@@ -1586,7 +1586,7 @@ func TestGet(t *testing.T) {
 		},
 	})
 	tests.Add("wrong options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGet().WithOptions(map[string]interface{}{"foo": "baz"})
@@ -1597,7 +1597,7 @@ func TestGet(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGet().WillReturn(&driver.Document{Rev: "2-bar"})
@@ -1616,7 +1616,7 @@ func TestGet(t *testing.T) {
 func TestGetAttachmentMeta(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetAttachmentMeta().WillReturnError(errors.New("foo err"))
@@ -1627,7 +1627,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetAttachmentMeta().WillDelay(time.Second)
@@ -1638,7 +1638,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -1655,7 +1655,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Add("wrong docID", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetAttachmentMeta().WithDocID("bar")
@@ -1666,7 +1666,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 		},
 	})
 	tests.Add("wrong filename", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetAttachmentMeta().WithFilename("bar.jpg")
@@ -1677,7 +1677,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 		},
 	})
 	tests.Add("wrong options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetAttachmentMeta().WithOptions(map[string]interface{}{"foo": "baz"})
@@ -1688,7 +1688,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetAttachmentMeta().WillReturn(&driver.Attachment{Filename: "foo.txt"})
@@ -1707,7 +1707,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 func TestLocalDocs(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectLocalDocs().WillReturnError(errors.New("foo err"))
@@ -1719,7 +1719,7 @@ func TestLocalDocs(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectLocalDocs().WillReturn(NewRows().
@@ -1742,7 +1742,7 @@ func TestLocalDocs(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectLocalDocs().WillDelay(time.Second)
@@ -1754,7 +1754,7 @@ func TestLocalDocs(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -1776,7 +1776,7 @@ func TestLocalDocs(t *testing.T) {
 func TestPurge(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPurge().WillReturnError(errors.New("foo err"))
@@ -1788,7 +1788,7 @@ func TestPurge(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPurge().WillReturn(&driver.PurgeResult{Seq: 123})
@@ -1803,7 +1803,7 @@ func TestPurge(t *testing.T) {
 		},
 	})
 	tests.Add("wrong map", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPurge().WithDocRevMap(map[string][]string{"foo": {"a", "b"}})
@@ -1815,7 +1815,7 @@ func TestPurge(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPurge().WillDelay(time.Second)
@@ -1827,7 +1827,7 @@ func TestPurge(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -1849,7 +1849,7 @@ func TestPurge(t *testing.T) {
 func TestPutAttachment(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPutAttachment().WillReturnError(errors.New("foo err"))
@@ -1860,7 +1860,7 @@ func TestPutAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPutAttachment().WillDelay(time.Second)
@@ -1871,7 +1871,7 @@ func TestPutAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -1888,7 +1888,7 @@ func TestPutAttachment(t *testing.T) {
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Add("wrong id", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPutAttachment().WithDocID("bar")
@@ -1899,7 +1899,7 @@ func TestPutAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("wrong rev", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPutAttachment().WithRev("2-bar")
@@ -1910,7 +1910,7 @@ func TestPutAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("wrong attachment", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPutAttachment().WithAttachment(&driver.Attachment{Filename: "bar.jpg"})
@@ -1921,7 +1921,7 @@ func TestPutAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("wrong options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPutAttachment().WithOptions(map[string]interface{}{"foo": "bar"})
@@ -1932,7 +1932,7 @@ func TestPutAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectPutAttachment().WillReturn("2-boo")
@@ -1951,7 +1951,7 @@ func TestPutAttachment(t *testing.T) {
 func TestQuery(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectQuery().WillReturnError(errors.New("foo err"))
@@ -1963,7 +1963,7 @@ func TestQuery(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectQuery().WillReturn(NewRows().
@@ -1986,7 +1986,7 @@ func TestQuery(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectQuery().WillDelay(time.Second)
@@ -1998,7 +1998,7 @@ func TestQuery(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -2015,7 +2015,7 @@ func TestQuery(t *testing.T) {
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Add("wrong ddocID", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectQuery().WithDDocID("bar")
@@ -2027,7 +2027,7 @@ func TestQuery(t *testing.T) {
 		},
 	})
 	tests.Add("wrong view", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectQuery().WithView("baz")
@@ -2049,7 +2049,7 @@ var (
 func TestSecurity(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectSecurity().WillReturnError(errors.New("foo err"))
@@ -2061,7 +2061,7 @@ func TestSecurity(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectSecurity().WillReturn(driverSec)
@@ -2076,7 +2076,7 @@ func TestSecurity(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectSecurity().WillDelay(time.Second)
@@ -2088,7 +2088,7 @@ func TestSecurity(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -2110,7 +2110,7 @@ func TestSecurity(t *testing.T) {
 func TestSetSecurity(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectSetSecurity().WillReturnError(errors.New("foo err"))
@@ -2122,7 +2122,7 @@ func TestSetSecurity(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectSetSecurity().WithSecurity(driverSec)
@@ -2134,7 +2134,7 @@ func TestSetSecurity(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectSetSecurity().WillDelay(time.Second)
@@ -2146,7 +2146,7 @@ func TestSetSecurity(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -2168,7 +2168,7 @@ func TestSetSecurity(t *testing.T) {
 func TestStats(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectStats().WillReturnError(errors.New("foo err"))
@@ -2180,7 +2180,7 @@ func TestStats(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectStats().WillReturn(&driver.DBStats{Name: "foo"})
@@ -2196,7 +2196,7 @@ func TestStats(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectStats().WillDelay(time.Second)
@@ -2208,7 +2208,7 @@ func TestStats(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -2230,7 +2230,7 @@ func TestStats(t *testing.T) {
 func TestBulkDocs(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkDocs().WillReturnError(errors.New("foo err"))
@@ -2242,7 +2242,7 @@ func TestBulkDocs(t *testing.T) {
 		},
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -2253,7 +2253,7 @@ func TestBulkDocs(t *testing.T) {
 		},
 	})
 	tests.Add("rows close error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkDocs().WillReturn(NewBulkResults().CloseError(errors.New("bar err")))
@@ -2266,7 +2266,7 @@ func TestBulkDocs(t *testing.T) {
 		},
 	})
 	tests.Add("results", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkDocs().WillReturn(NewBulkResults().
@@ -2289,7 +2289,7 @@ func TestBulkDocs(t *testing.T) {
 		},
 	})
 	tests.Add("result error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkDocs().WillReturn(NewBulkResults().
@@ -2312,7 +2312,7 @@ func TestBulkDocs(t *testing.T) {
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkDocs().WithOptions(map[string]interface{}{"foo": 123})
@@ -2324,7 +2324,7 @@ func TestBulkDocs(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkDocs().WillDelay(time.Second)
@@ -2336,7 +2336,7 @@ func TestBulkDocs(t *testing.T) {
 		},
 	})
 	tests.Add("result delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectBulkDocs().WillReturn(NewBulkResults().
@@ -2362,7 +2362,7 @@ func TestBulkDocs(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -2384,7 +2384,7 @@ func TestBulkDocs(t *testing.T) {
 func TestGetAttachment(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetAttachment().WillReturnError(errors.New("foo err"))
@@ -2395,7 +2395,7 @@ func TestGetAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetAttachment().WillDelay(time.Second)
@@ -2406,7 +2406,7 @@ func TestGetAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -2423,7 +2423,7 @@ func TestGetAttachment(t *testing.T) {
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
 	tests.Add("wrong docID", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetAttachment().WithDocID("bar")
@@ -2434,7 +2434,7 @@ func TestGetAttachment(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectGetAttachment().WillReturn(&driver.Attachment{Filename: "foo.txt"})
@@ -2453,7 +2453,7 @@ func TestGetAttachment(t *testing.T) {
 func TestDesignDocs(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDesignDocs().WillReturnError(errors.New("foo err"))
@@ -2465,7 +2465,7 @@ func TestDesignDocs(t *testing.T) {
 		},
 	})
 	tests.Add("success", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDesignDocs().WillReturn(NewRows().
@@ -2488,7 +2488,7 @@ func TestDesignDocs(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectDesignDocs().WillDelay(time.Second)
@@ -2500,7 +2500,7 @@ func TestDesignDocs(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)
@@ -2522,7 +2522,7 @@ func TestDesignDocs(t *testing.T) {
 func TestChanges(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectChanges().WillReturnError(errors.New("foo err"))
@@ -2534,7 +2534,7 @@ func TestChanges(t *testing.T) {
 		},
 	})
 	tests.Add("unexpected", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 		},
@@ -2545,7 +2545,7 @@ func TestChanges(t *testing.T) {
 		},
 	})
 	tests.Add("close error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectChanges().WillReturn(NewChanges().CloseError(errors.New("bar err")))
@@ -2558,7 +2558,7 @@ func TestChanges(t *testing.T) {
 		},
 	})
 	tests.Add("changes", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectChanges().WillReturn(NewChanges().
@@ -2581,7 +2581,7 @@ func TestChanges(t *testing.T) {
 		},
 	})
 	tests.Add("row error", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectChanges().WillReturn(NewChanges().
@@ -2604,7 +2604,7 @@ func TestChanges(t *testing.T) {
 		},
 	})
 	tests.Add("options", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectChanges().WithOptions(map[string]interface{}{"foo": 123})
@@ -2616,7 +2616,7 @@ func TestChanges(t *testing.T) {
 		},
 	})
 	tests.Add("delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectChanges().WillDelay(time.Second)
@@ -2628,7 +2628,7 @@ func TestChanges(t *testing.T) {
 		},
 	})
 	tests.Add("change delay", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
 			db.ExpectChanges().WillReturn(NewChanges().
@@ -2654,7 +2654,7 @@ func TestChanges(t *testing.T) {
 		},
 	})
 	tests.Add("wrong db", mockTest{
-		setup: func(m *MockClient) {
+		setup: func(m *Client) {
 			foo := m.NewDB()
 			bar := m.NewDB()
 			m.ExpectDB().WithName("foo").WillReturn(foo)

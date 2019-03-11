@@ -5,7 +5,7 @@ package kivikmock
 type MockDB struct {
 	name   string
 	id     int
-	client *MockClient
+	client *Client
 	count  int
 }
 
