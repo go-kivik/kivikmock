@@ -55,3 +55,9 @@ func (r *Changes) AddDelay(delay time.Duration) *Changes {
 	r.push(&item{delay: delay})
 	return r
 }
+
+// Final converts the Changes object to a driver.Changes. This method is
+// intended for use within WillExecute() to return results.
+func (r *Changes) Final() driver.Changes {
+	return &driverChanges{Changes: r}
+}

@@ -55,3 +55,9 @@ func (r *BulkResults) AddDelay(delay time.Duration) *BulkResults {
 	r.push(&item{delay: delay})
 	return r
 }
+
+// Final converts the BulkResults object to a driver.BulkResults. This method
+// is intended for use within WillExecute() to return results.
+func (r *BulkResults) Final() driver.BulkResults {
+	return &driverBulkResults{BulkResults: r}
+}

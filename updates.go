@@ -55,3 +55,9 @@ func (u *Updates) AddDelay(delay time.Duration) *Updates {
 	u.push(&item{delay: delay})
 	return u
 }
+
+// Final converts the Updates object to a driver.DBUpdates. This method is
+// intended for use within WillExecute() to return results.
+func (u *Updates) Final() driver.DBUpdates {
+	return &driverDBUpdates{Updates: u}
+}
