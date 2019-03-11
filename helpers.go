@@ -9,16 +9,26 @@ import (
 	"github.com/go-kivik/kivik/driver"
 )
 
-// ToDocumentT calls ToDocument, and passes any error to t.Fatal.
+// ToDocumentT is deprecated.
 func ToDocumentT(t *testing.T, i interface{}) *driver.Document {
-	doc, err := ToDocument(i)
+	return DocumentT(t, i)
+}
+
+// ToDocument is deprecated.
+func ToDocument(i interface{}) (*driver.Document, error) {
+	return Document(i)
+}
+
+// DocumentT calls Document, and passes any error to t.Fatal.
+func DocumentT(t *testing.T, i interface{}) *driver.Document {
+	doc, err := Document(i)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return doc
 }
 
-// ToDocument converts i, which should be of a supported type (see below), into
+// Document converts i, which should be of a supported type (see below), into
 // a document which can be passed to ExpectedGet.WillReturn().
 //
 // i is checked against the following list of types, in order. If no match
@@ -27,7 +37,7 @@ func ToDocumentT(t *testing.T, i interface{}) *driver.Document {
 //    - string, []byte, or json.RawMessage (interpreted as a JSON string)
 //    - io.Reader (assumes JSON can be read from the stream)
 //    - any other JSON-marshalable object
-func ToDocument(i interface{}) (*driver.Document, error) {
+func Document(i interface{}) (*driver.Document, error) {
 	buf, err := toJSON(i)
 	if err != nil {
 		return nil, err
