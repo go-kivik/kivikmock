@@ -48,7 +48,7 @@ func (e *ExpectedCompact) method(v bool) string {
 	if !v {
 		return "DB.Compact()"
 	}
-	return fmt.Sprintf("DB(%s).Compact(ctx)", e.DB().name)
+	return fmt.Sprintf("DB(%s).Compact(ctx)", e.dbo().name)
 }
 
 // ExpectedCompactView represents an expectation for a call to DB.CompactView().
@@ -94,7 +94,7 @@ func (e *ExpectedCompactView) method(v bool) string {
 	if e.arg0 != "" {
 		arg0 = fmt.Sprintf("%q", e.arg0)
 	}
-	return fmt.Sprintf("DB(%s).CompactView(ctx, %s)", e.DB().name, arg0)
+	return fmt.Sprintf("DB(%s).CompactView(ctx, %s)", e.dbo().name, arg0)
 }
 
 // ExpectedCopy represents an expectation for a call to DB.Copy().
@@ -163,7 +163,7 @@ func (e *ExpectedCopy) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).Copy(ctx, %s, %s, %s)", e.DB().name, arg0, arg1, options)
+	return fmt.Sprintf("DB(%s).Copy(ctx, %s, %s, %s)", e.dbo().name, arg0, arg1, options)
 }
 
 // ExpectedCreateDoc represents an expectation for a call to DB.CreateDoc().
@@ -227,7 +227,7 @@ func (e *ExpectedCreateDoc) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).CreateDoc(ctx, %s, %s)", e.DB().name, arg0, options)
+	return fmt.Sprintf("DB(%s).CreateDoc(ctx, %s, %s)", e.dbo().name, arg0, options)
 }
 
 // ExpectedCreateIndex represents an expectation for a call to DB.CreateIndex().
@@ -287,7 +287,7 @@ func (e *ExpectedCreateIndex) method(v bool) string {
 	if e.arg2 != nil {
 		arg2 = fmt.Sprintf("%v", e.arg2)
 	}
-	return fmt.Sprintf("DB(%s).CreateIndex(ctx, %s, %s, %s)", e.DB().name, arg0, arg1, arg2)
+	return fmt.Sprintf("DB(%s).CreateIndex(ctx, %s, %s, %s)", e.dbo().name, arg0, arg1, arg2)
 }
 
 // ExpectedDelete represents an expectation for a call to DB.Delete().
@@ -356,7 +356,7 @@ func (e *ExpectedDelete) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).Delete(ctx, %s, %s, %s)", e.DB().name, arg0, arg1, options)
+	return fmt.Sprintf("DB(%s).Delete(ctx, %s, %s, %s)", e.dbo().name, arg0, arg1, options)
 }
 
 // ExpectedDeleteAttachment represents an expectation for a call to DB.DeleteAttachment().
@@ -432,7 +432,7 @@ func (e *ExpectedDeleteAttachment) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).DeleteAttachment(ctx, %s, %s, %s, %s)", e.DB().name, arg0, arg1, arg2, options)
+	return fmt.Sprintf("DB(%s).DeleteAttachment(ctx, %s, %s, %s, %s)", e.dbo().name, arg0, arg1, arg2, options)
 }
 
 // ExpectedDeleteIndex represents an expectation for a call to DB.DeleteIndex().
@@ -485,7 +485,7 @@ func (e *ExpectedDeleteIndex) method(v bool) string {
 	if e.arg1 != "" {
 		arg1 = fmt.Sprintf("%q", e.arg1)
 	}
-	return fmt.Sprintf("DB(%s).DeleteIndex(ctx, %s, %s)", e.DB().name, arg0, arg1)
+	return fmt.Sprintf("DB(%s).DeleteIndex(ctx, %s, %s)", e.dbo().name, arg0, arg1)
 }
 
 // ExpectedFlush represents an expectation for a call to DB.Flush().
@@ -522,7 +522,7 @@ func (e *ExpectedFlush) method(v bool) string {
 	if !v {
 		return "DB.Flush()"
 	}
-	return fmt.Sprintf("DB(%s).Flush(ctx)", e.DB().name)
+	return fmt.Sprintf("DB(%s).Flush(ctx)", e.dbo().name)
 }
 
 // ExpectedGetMeta represents an expectation for a call to DB.GetMeta().
@@ -586,7 +586,7 @@ func (e *ExpectedGetMeta) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).GetMeta(ctx, %s, %s)", e.DB().name, arg0, options)
+	return fmt.Sprintf("DB(%s).GetMeta(ctx, %s, %s)", e.dbo().name, arg0, options)
 }
 
 // ExpectedPut represents an expectation for a call to DB.Put().
@@ -655,7 +655,7 @@ func (e *ExpectedPut) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).Put(ctx, %s, %s, %s)", e.DB().name, arg0, arg1, options)
+	return fmt.Sprintf("DB(%s).Put(ctx, %s, %s, %s)", e.dbo().name, arg0, arg1, options)
 }
 
 // ExpectedViewCleanup represents an expectation for a call to DB.ViewCleanup().
@@ -692,7 +692,7 @@ func (e *ExpectedViewCleanup) method(v bool) string {
 	if !v {
 		return "DB.ViewCleanup()"
 	}
-	return fmt.Sprintf("DB(%s).ViewCleanup(ctx)", e.DB().name)
+	return fmt.Sprintf("DB(%s).ViewCleanup(ctx)", e.dbo().name)
 }
 
 // ExpectedAllDocs represents an expectation for a call to DB.AllDocs().
@@ -746,7 +746,7 @@ func (e *ExpectedAllDocs) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).AllDocs(ctx, %s)", e.DB().name, options)
+	return fmt.Sprintf("DB(%s).AllDocs(ctx, %s)", e.dbo().name, options)
 }
 
 // ExpectedBulkDocs represents an expectation for a call to DB.BulkDocs().
@@ -808,7 +808,7 @@ func (e *ExpectedBulkDocs) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).BulkDocs(ctx, %s, %s)", e.DB().name, arg0, options)
+	return fmt.Sprintf("DB(%s).BulkDocs(ctx, %s, %s)", e.dbo().name, arg0, options)
 }
 
 // ExpectedBulkGet represents an expectation for a call to DB.BulkGet().
@@ -870,7 +870,7 @@ func (e *ExpectedBulkGet) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).BulkGet(ctx, %s, %s)", e.DB().name, arg0, options)
+	return fmt.Sprintf("DB(%s).BulkGet(ctx, %s, %s)", e.dbo().name, arg0, options)
 }
 
 // ExpectedChanges represents an expectation for a call to DB.Changes().
@@ -924,7 +924,7 @@ func (e *ExpectedChanges) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).Changes(ctx, %s)", e.DB().name, options)
+	return fmt.Sprintf("DB(%s).Changes(ctx, %s)", e.dbo().name, options)
 }
 
 // ExpectedDesignDocs represents an expectation for a call to DB.DesignDocs().
@@ -978,7 +978,7 @@ func (e *ExpectedDesignDocs) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).DesignDocs(ctx, %s)", e.DB().name, options)
+	return fmt.Sprintf("DB(%s).DesignDocs(ctx, %s)", e.dbo().name, options)
 }
 
 // ExpectedExplain represents an expectation for a call to DB.Explain().
@@ -1031,7 +1031,7 @@ func (e *ExpectedExplain) method(v bool) string {
 	if e.arg0 != nil {
 		arg0 = fmt.Sprintf("%v", e.arg0)
 	}
-	return fmt.Sprintf("DB(%s).Explain(ctx, %s)", e.DB().name, arg0)
+	return fmt.Sprintf("DB(%s).Explain(ctx, %s)", e.dbo().name, arg0)
 }
 
 // ExpectedFind represents an expectation for a call to DB.Find().
@@ -1084,7 +1084,7 @@ func (e *ExpectedFind) method(v bool) string {
 	if e.arg0 != nil {
 		arg0 = fmt.Sprintf("%v", e.arg0)
 	}
-	return fmt.Sprintf("DB(%s).Find(ctx, %s)", e.DB().name, arg0)
+	return fmt.Sprintf("DB(%s).Find(ctx, %s)", e.dbo().name, arg0)
 }
 
 // ExpectedGet represents an expectation for a call to DB.Get().
@@ -1146,7 +1146,7 @@ func (e *ExpectedGet) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).Get(ctx, %s, %s)", e.DB().name, arg0, options)
+	return fmt.Sprintf("DB(%s).Get(ctx, %s, %s)", e.dbo().name, arg0, options)
 }
 
 // ExpectedGetAttachment represents an expectation for a call to DB.GetAttachment().
@@ -1215,7 +1215,7 @@ func (e *ExpectedGetAttachment) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).GetAttachment(ctx, %s, %s, %s)", e.DB().name, arg0, arg1, options)
+	return fmt.Sprintf("DB(%s).GetAttachment(ctx, %s, %s, %s)", e.dbo().name, arg0, arg1, options)
 }
 
 // ExpectedGetAttachmentMeta represents an expectation for a call to DB.GetAttachmentMeta().
@@ -1284,7 +1284,7 @@ func (e *ExpectedGetAttachmentMeta) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).GetAttachmentMeta(ctx, %s, %s, %s)", e.DB().name, arg0, arg1, options)
+	return fmt.Sprintf("DB(%s).GetAttachmentMeta(ctx, %s, %s, %s)", e.dbo().name, arg0, arg1, options)
 }
 
 // ExpectedGetIndexes represents an expectation for a call to DB.GetIndexes().
@@ -1328,7 +1328,7 @@ func (e *ExpectedGetIndexes) method(v bool) string {
 	if !v {
 		return "DB.GetIndexes()"
 	}
-	return fmt.Sprintf("DB(%s).GetIndexes(ctx)", e.DB().name)
+	return fmt.Sprintf("DB(%s).GetIndexes(ctx)", e.dbo().name)
 }
 
 // ExpectedLocalDocs represents an expectation for a call to DB.LocalDocs().
@@ -1382,7 +1382,7 @@ func (e *ExpectedLocalDocs) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).LocalDocs(ctx, %s)", e.DB().name, options)
+	return fmt.Sprintf("DB(%s).LocalDocs(ctx, %s)", e.dbo().name, options)
 }
 
 // ExpectedPurge represents an expectation for a call to DB.Purge().
@@ -1435,7 +1435,7 @@ func (e *ExpectedPurge) method(v bool) string {
 	if e.arg0 != nil {
 		arg0 = fmt.Sprintf("%v", e.arg0)
 	}
-	return fmt.Sprintf("DB(%s).Purge(ctx, %s)", e.DB().name, arg0)
+	return fmt.Sprintf("DB(%s).Purge(ctx, %s)", e.dbo().name, arg0)
 }
 
 // ExpectedPutAttachment represents an expectation for a call to DB.PutAttachment().
@@ -1511,7 +1511,7 @@ func (e *ExpectedPutAttachment) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).PutAttachment(ctx, %s, %s, %s, %s)", e.DB().name, arg0, arg1, arg2, options)
+	return fmt.Sprintf("DB(%s).PutAttachment(ctx, %s, %s, %s, %s)", e.dbo().name, arg0, arg1, arg2, options)
 }
 
 // ExpectedQuery represents an expectation for a call to DB.Query().
@@ -1580,7 +1580,7 @@ func (e *ExpectedQuery) method(v bool) string {
 	if e.options != nil {
 		options = fmt.Sprintf("%v", e.options)
 	}
-	return fmt.Sprintf("DB(%s).Query(ctx, %s, %s, %s)", e.DB().name, arg0, arg1, options)
+	return fmt.Sprintf("DB(%s).Query(ctx, %s, %s, %s)", e.dbo().name, arg0, arg1, options)
 }
 
 // ExpectedSecurity represents an expectation for a call to DB.Security().
@@ -1624,7 +1624,7 @@ func (e *ExpectedSecurity) method(v bool) string {
 	if !v {
 		return "DB.Security()"
 	}
-	return fmt.Sprintf("DB(%s).Security(ctx)", e.DB().name)
+	return fmt.Sprintf("DB(%s).Security(ctx)", e.dbo().name)
 }
 
 // ExpectedSetSecurity represents an expectation for a call to DB.SetSecurity().
@@ -1670,7 +1670,7 @@ func (e *ExpectedSetSecurity) method(v bool) string {
 	if e.arg0 != nil {
 		arg0 = fmt.Sprintf("%v", e.arg0)
 	}
-	return fmt.Sprintf("DB(%s).SetSecurity(ctx, %s)", e.DB().name, arg0)
+	return fmt.Sprintf("DB(%s).SetSecurity(ctx, %s)", e.dbo().name, arg0)
 }
 
 // ExpectedStats represents an expectation for a call to DB.Stats().
@@ -1714,5 +1714,5 @@ func (e *ExpectedStats) method(v bool) string {
 	if !v {
 		return "DB.Stats()"
 	}
-	return fmt.Sprintf("DB(%s).Stats(ctx)", e.DB().name)
+	return fmt.Sprintf("DB(%s).Stats(ctx)", e.dbo().name)
 }

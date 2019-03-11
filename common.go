@@ -25,7 +25,7 @@ type expectation interface {
 	// is met.
 	met(expectation) bool
 	// for DB methods, this returns the associated *MockDB object
-	DB() *MockDB
+	dbo() *MockDB
 	opts() kivik.Options
 }
 
@@ -44,7 +44,7 @@ func (e *commonExpectation) opts() kivik.Options {
 	return e.options
 }
 
-func (e *commonExpectation) DB() *MockDB {
+func (e *commonExpectation) dbo() *MockDB {
 	return e.db
 }
 
