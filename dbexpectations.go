@@ -213,7 +213,7 @@ func (e *ExpectedCreateDoc) String() string {
 	if e.arg0 == nil {
 		msg += "\n\t- has any doc"
 	} else {
-		msg += fmt.Sprintf("\n\t- has doc: %v", e.arg0)
+		msg += fmt.Sprintf("\n\t- has doc: %s", jsonDoc(e.arg0))
 	}
 	msg += optionsString(e.options)
 	if e.ret0 != "" {
@@ -275,7 +275,7 @@ func (e *ExpectedPut) String() string {
 	if e.arg1 == nil {
 		custom = append(custom, "has any doc")
 	} else {
-		custom = append(custom, fmt.Sprintf("has doc: %v", e.arg1))
+		custom = append(custom, fmt.Sprintf("has doc: %s", jsonDoc(e.arg1)))
 	}
 	return dbStringer("Put", &e.commonExpectation, withOptions, custom, nil)
 }

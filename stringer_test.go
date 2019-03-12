@@ -556,7 +556,7 @@ func TestCreateDocString(t *testing.T) {
 	tests.Add("doc", stringerTest{
 		input: &ExpectedCreateDoc{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg0: map[string]string{"foo": "bar"}},
 		expected: `call to DB(foo#0).CreateDoc() which:
-	- has doc: map[foo:bar]
+	- has doc: {"foo":"bar"}
 	- has any options`,
 	})
 	tests.Add("options", stringerTest{
@@ -656,7 +656,7 @@ func TestPutString(t *testing.T) {
 		input: &ExpectedPut{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg1: map[string]string{"foo": "bar"}},
 		expected: `call to DB(foo#0).Put() which:
 	- has any docID
-	- has doc: map[foo:bar]
+	- has doc: {"foo":"bar"}
 	- has any options`,
 	})
 	tests.Add("error", stringerTest{

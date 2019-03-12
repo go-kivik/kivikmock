@@ -826,7 +826,7 @@ func TestCreateDoc(t *testing.T) {
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			_, _, err := c.DB(context.TODO(), "foo").CreateDoc(context.TODO(), "bar")
-			testy.ErrorRE(t, "has doc: foo", err)
+			testy.ErrorRE(t, `has doc: "foo"`, err)
 		},
 	})
 	tests.Add("options", mockTest{
