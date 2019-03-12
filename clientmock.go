@@ -107,11 +107,8 @@ func (c *Client) ExpectAuthenticate() *ExpectedAuthenticate {
 
 // ExpectCreateDB queues an expectation for a CreateDB() call.
 func (c *Client) ExpectCreateDB() *ExpectedCreateDB {
-	e2 := &ExpectedDB{ret0: &DB{}}
-	e := &ExpectedCreateDB{
-		expectedDB: e2,
-	}
-	c.expected = append(c.expected, e, e2)
+	e := &ExpectedCreateDB{}
+	c.expected = append(c.expected, e)
 	return e
 }
 

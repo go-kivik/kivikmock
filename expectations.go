@@ -230,9 +230,8 @@ func (e *ExpectedDB) WithName(name string) *ExpectedDB {
 // expectation is removed.
 type ExpectedCreateDB struct {
 	commonExpectation
-	arg0       string
-	expectedDB *ExpectedDB
-	callback   func(ctx context.Context, arg0 string, options map[string]interface{}) error
+	arg0     string
+	callback func(ctx context.Context, arg0 string, options map[string]interface{}) error
 }
 
 func (e *ExpectedCreateDB) String() string {
@@ -276,14 +275,7 @@ func (e *ExpectedCreateDB) WithOptions(options map[string]interface{}) *Expected
 
 // WithName sets the expectation that DB() will be called with this name.
 func (e *ExpectedCreateDB) WithName(name string) *ExpectedCreateDB {
-	e.expectedDB.arg0 = name
 	e.arg0 = name
-	return e
-}
-
-// WillReturn sets the return value for the DB() call.
-func (e *ExpectedCreateDB) WillReturn(db *DB) *ExpectedCreateDB {
-	e.expectedDB.ret0 = db
 	return e
 }
 
@@ -297,7 +289,6 @@ func (e *ExpectedCreateDB) WillExecute(cb func(ctx context.Context, arg0 string,
 
 // WillReturnError sets the return value for the DB() call.
 func (e *ExpectedCreateDB) WillReturnError(err error) *ExpectedCreateDB {
-	e.expectedDB.triggered = true
 	e.err = err
 	return e
 }
