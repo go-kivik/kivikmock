@@ -16,6 +16,7 @@ type stringerTest struct {
 }
 
 func testStringer(t *testing.T, test stringerTest) {
+	t.Helper()
 	result := test.input.String()
 	if test.expected != result {
 		t.Errorf("Unexpected String() output.\nWant: %s\n Got: %s\n", test.expected, result)
@@ -387,7 +388,7 @@ func TestBulkGetString(t *testing.T) {
 			{ID: "bar"},
 		}},
 		expected: `call to DB(foo#0).BulkGet() which:
-	- has doc references: [{foo  } {bar  }]
+	- has doc references: [{"id":"foo"},{"id":"bar"}]
 	- has any options`,
 	})
 	tests.Add("results", stringerTest{
