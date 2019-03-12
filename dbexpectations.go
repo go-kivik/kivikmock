@@ -2,6 +2,7 @@ package kivikmock
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -64,12 +65,20 @@ func (e *ExpectedAllDocs) String() string {
 	return dbStringer("AllDocs", &e.commonExpectation, withOptions, nil, rets)
 }
 
+func jsonDoc(i interface{}) string {
+	jsonText, err := json.Marshal(i)
+	if err != nil {
+		return fmt.Sprintf("<invalid json:%s>", err)
+	}
+	return string(jsonText)
+}
+
 func (e *ExpectedBulkGet) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).BulkGet() which:", e.dbo().name, e.dbo().id)
 	if e.arg0 == nil {
 		msg += "\n\t- has any doc references"
 	} else {
-		msg += fmt.Sprintf("\n\t- has doc references: %v", e.arg0)
+		msg += fmt.Sprintf("\n\t- has doc references: %v", jsonDoc(e.arg0))
 	}
 	msg += optionsString(e.options)
 	if e.ret0 != nil {
