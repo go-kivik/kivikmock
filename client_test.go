@@ -671,7 +671,7 @@ func TestCreateDB(t *testing.T) {
 			m.ExpectCreateDB().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.CreateDB(context.TODO(), "foo").Err()
+			err := c.CreateDB(context.TODO(), "foo")
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -680,13 +680,13 @@ func TestCreateDB(t *testing.T) {
 			m.ExpectCreateDB().WithName("foo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.CreateDB(context.TODO(), "foo").Err()
+			err := c.CreateDB(context.TODO(), "foo")
 			testy.Error(t, "", err)
 		},
 	})
 	tests.Add("unexpected", mockTest{
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.CreateDB(context.TODO(), "foo").Err()
+			err := c.CreateDB(context.TODO(), "foo")
 			testy.Error(t, "call to CreateDB() was not expected, all expectations already fulfilled", err)
 		},
 	})
@@ -695,21 +695,17 @@ func TestCreateDB(t *testing.T) {
 			m.ExpectCreateDB().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.CreateDB(context.TODO(), "foo", kivik.Options{"foo": 123}).Err()
+			err := c.CreateDB(context.TODO(), "foo", kivik.Options{"foo": 123})
 			testy.Error(t, "", err)
 		},
 	})
 	tests.Add("success", mockTest{
 		setup: func(m *Client) {
-			m.ExpectCreateDB().WillReturn(m.NewDB())
+			m.ExpectCreateDB()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.CreateDB(context.TODO(), "foo")
-			err := db.Err()
+			err := c.CreateDB(context.TODO(), "foo")
 			testy.Error(t, "", err)
-			if db.Name() != "foo" {
-				t.Errorf("Unexpected db name: %s", db.Name())
-			}
 		},
 	})
 	tests.Add("delay", mockTest{
@@ -717,28 +713,8 @@ func TestCreateDB(t *testing.T) {
 			m.ExpectCreateDB().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.CreateDB(newCanceledContext(), "foo").Err()
+			err := c.CreateDB(newCanceledContext(), "foo")
 			testy.Error(t, "context canceled", err)
-		},
-	})
-	tests.Add("name confusion", mockTest{
-		setup: func(m *Client) {
-			db := m.NewDB()
-			m.ExpectCreateDB().WithName("bundle-foo").WillReturn(db)
-			db.ExpectSetSecurity().WithSecurity(&driver.Security{
-				Admins: driver.Members{Names: []string{"bob"}},
-			}).WillReturnError(errors.New("security fail"))
-		},
-		test: func(t *testing.T, c *kivik.Client) {
-			ctx := context.Background()
-			db := c.CreateDB(ctx, "bundle-foo")
-			security := &kivik.Security{
-				Admins: kivik.Members{
-					Names: []string{"bob"},
-				},
-			}
-			err := db.SetSecurity(ctx, security)
-			testy.Error(t, "security fail", err)
 		},
 	})
 	tests.Add("cleanup expectations", mockTest{
@@ -746,7 +722,7 @@ func TestCreateDB(t *testing.T) {
 			m.ExpectCreateDB().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.CreateDB(context.TODO(), "foo").Err()
+			err := c.CreateDB(context.TODO(), "foo")
 			if err == nil {
 				t.Fatal("expected error")
 			}
@@ -759,7 +735,7 @@ func TestCreateDB(t *testing.T) {
 			})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.CreateDB(context.TODO(), "foo").Err()
+			err := c.CreateDB(context.TODO(), "foo")
 			testy.Error(t, "custom error", err)
 		},
 	})
