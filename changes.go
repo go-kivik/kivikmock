@@ -10,6 +10,8 @@ import (
 // Changes is a mocked collection of Changes results.
 type Changes struct {
 	iter
+	lastSeq string
+	pending int64
 }
 
 type driverChanges struct {
@@ -28,9 +30,24 @@ func (r *driverChanges) Next(res *driver.Change) error {
 	return nil
 }
 
+func (r *driverChanges) LastSeq() string { return r.lastSeq }
+func (r *driverChanges) Pending() int64  { return r.pending }
+
 // CloseError sets an error to be returned when the iterator is closed.
 func (r *Changes) CloseError(err error) *Changes {
 	r.closeErr = err
+	return r
+}
+
+// LastSeq sets the last_seq value to be returned by the changes iterator.
+func (r *Changes) LastSeq(seq string) *Changes {
+	r.lastSeq = seq
+	return r
+}
+
+// Pending sets the pending value to be returned by the changes iterator.
+func (r *Changes) Pending(pending int64) *Changes {
+	r.pending = pending
 	return r
 }
 

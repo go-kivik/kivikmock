@@ -2670,5 +2670,35 @@ func TestChanges(t *testing.T) {
 		},
 		err: "there is a remaining unmet expectation: call to DB().Close()",
 	})
+	tests.Add("changes last_seq", mockTest{
+		setup: func(m *Client) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectChanges().WillReturn(NewChanges().LastSeq("1-asdf"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			ch, err := db.Changes(context.TODO())
+			testy.Error(t, "", err)
+			if o := ch.LastSeq(); o != "1-asdf" {
+				t.Errorf("Unexpected last_seq: %s", o)
+			}
+		},
+	})
+	tests.Add("changes pending", mockTest{
+		setup: func(m *Client) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectChanges().WillReturn(NewChanges().Pending(123))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			ch, err := db.Changes(context.TODO())
+			testy.Error(t, "", err)
+			if o := ch.Pending(); o != 123 {
+				t.Errorf("Unexpected pending: %d", o)
+			}
+		},
+	})
 	tests.Run(t, testMock)
 }
