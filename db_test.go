@@ -2700,5 +2700,20 @@ func TestChanges(t *testing.T) {
 			}
 		},
 	})
+	tests.Add("changes etag", mockTest{
+		setup: func(m *Client) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectChanges().WillReturn(NewChanges().ETag("etag-foo"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			ch, err := db.Changes(context.TODO())
+			testy.Error(t, "", err)
+			if o := ch.ETag(); o != "etag-foo" {
+				t.Errorf("Unexpected pending: %s", o)
+			}
+		},
+	})
 	tests.Run(t, testMock)
 }

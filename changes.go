@@ -12,6 +12,7 @@ type Changes struct {
 	iter
 	lastSeq string
 	pending int64
+	etag    string
 }
 
 type driverChanges struct {
@@ -32,6 +33,7 @@ func (r *driverChanges) Next(res *driver.Change) error {
 
 func (r *driverChanges) LastSeq() string { return r.lastSeq }
 func (r *driverChanges) Pending() int64  { return r.pending }
+func (r *driverChanges) ETag() string    { return r.etag }
 
 // CloseError sets an error to be returned when the iterator is closed.
 func (r *Changes) CloseError(err error) *Changes {
@@ -48,6 +50,12 @@ func (r *Changes) LastSeq(seq string) *Changes {
 // Pending sets the pending value to be returned by the changes iterator.
 func (r *Changes) Pending(pending int64) *Changes {
 	r.pending = pending
+	return r
+}
+
+// ETag sets the etag value to be returned by the changes iterator.
+func (r *Changes) ETag(etag string) *Changes {
+	r.etag = etag
 	return r
 }
 
