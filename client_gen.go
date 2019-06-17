@@ -64,6 +64,21 @@ func (c *driverClient) ClusterStatus(ctx context.Context, options map[string]int
 	return expected.ret0, expected.wait(ctx)
 }
 
+func (c *driverClient) ConfigValue(ctx context.Context, arg0 string, arg1 string, arg2 string) (string, error) {
+	expected := &ExpectedConfigValue{
+		arg0: arg0,
+		arg1: arg1,
+		arg2: arg2,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return "", err
+	}
+	if expected.callback != nil {
+		return expected.callback(ctx, arg0, arg1, arg2)
+	}
+	return expected.ret0, expected.wait(ctx)
+}
+
 func (c *driverClient) DBExists(ctx context.Context, arg0 string, options map[string]interface{}) (bool, error) {
 	expected := &ExpectedDBExists{
 		arg0: arg0,
@@ -76,6 +91,21 @@ func (c *driverClient) DBExists(ctx context.Context, arg0 string, options map[st
 	}
 	if expected.callback != nil {
 		return expected.callback(ctx, arg0, options)
+	}
+	return expected.ret0, expected.wait(ctx)
+}
+
+func (c *driverClient) DeleteConfigKey(ctx context.Context, arg0 string, arg1 string, arg2 string) (string, error) {
+	expected := &ExpectedDeleteConfigKey{
+		arg0: arg0,
+		arg1: arg1,
+		arg2: arg2,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return "", err
+	}
+	if expected.callback != nil {
+		return expected.callback(ctx, arg0, arg1, arg2)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -103,6 +133,49 @@ func (c *driverClient) Ping(ctx context.Context) (bool, error) {
 	}
 	if expected.callback != nil {
 		return expected.callback(ctx)
+	}
+	return expected.ret0, expected.wait(ctx)
+}
+
+func (c *driverClient) SetConfigValue(ctx context.Context, arg0 string, arg1 string, arg2 string, arg3 string) (string, error) {
+	expected := &ExpectedSetConfigValue{
+		arg0: arg0,
+		arg1: arg1,
+		arg2: arg2,
+		arg3: arg3,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return "", err
+	}
+	if expected.callback != nil {
+		return expected.callback(ctx, arg0, arg1, arg2, arg3)
+	}
+	return expected.ret0, expected.wait(ctx)
+}
+
+func (c *driverClient) Config(ctx context.Context, arg0 string) (driver.Config, error) {
+	expected := &ExpectedConfig{
+		arg0: arg0,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	if expected.callback != nil {
+		return expected.callback(ctx, arg0)
+	}
+	return expected.ret0, expected.wait(ctx)
+}
+
+func (c *driverClient) ConfigSection(ctx context.Context, arg0 string, arg1 string) (driver.ConfigSection, error) {
+	expected := &ExpectedConfigSection{
+		arg0: arg0,
+		arg1: arg1,
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	if expected.callback != nil {
+		return expected.callback(ctx, arg0, arg1)
 	}
 	return expected.ret0, expected.wait(ctx)
 }

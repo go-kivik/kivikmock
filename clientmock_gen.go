@@ -38,9 +38,23 @@ func (c *Client) ExpectClusterStatus() *ExpectedClusterStatus {
 	return e
 }
 
+// ExpectConfigValue queues an expectation that ConfigValue will be called.
+func (c *Client) ExpectConfigValue() *ExpectedConfigValue {
+	e := &ExpectedConfigValue{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
 // ExpectDBExists queues an expectation that DBExists will be called.
 func (c *Client) ExpectDBExists() *ExpectedDBExists {
 	e := &ExpectedDBExists{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+// ExpectDeleteConfigKey queues an expectation that DeleteConfigKey will be called.
+func (c *Client) ExpectDeleteConfigKey() *ExpectedDeleteConfigKey {
+	e := &ExpectedDeleteConfigKey{}
 	c.expected = append(c.expected, e)
 	return e
 }
@@ -55,6 +69,27 @@ func (c *Client) ExpectDestroyDB() *ExpectedDestroyDB {
 // ExpectPing queues an expectation that Ping will be called.
 func (c *Client) ExpectPing() *ExpectedPing {
 	e := &ExpectedPing{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+// ExpectSetConfigValue queues an expectation that SetConfigValue will be called.
+func (c *Client) ExpectSetConfigValue() *ExpectedSetConfigValue {
+	e := &ExpectedSetConfigValue{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+// ExpectConfig queues an expectation that Config will be called.
+func (c *Client) ExpectConfig() *ExpectedConfig {
+	e := &ExpectedConfig{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+// ExpectConfigSection queues an expectation that ConfigSection will be called.
+func (c *Client) ExpectConfigSection() *ExpectedConfigSection {
+	e := &ExpectedConfigSection{}
 	c.expected = append(c.expected, e)
 	return e
 }

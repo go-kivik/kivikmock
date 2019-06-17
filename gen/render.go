@@ -55,12 +55,6 @@ func RenderExpectedType(m *Method) (string, error) {
 	return buf.String(), err
 }
 
-func RenderMock(m *Method) (string, error) {
-	buf := &bytes.Buffer{}
-	err := tmpl.ExecuteTemplate(buf, "mock.tmpl", m)
-	return buf.String(), err
-}
-
 func (m *Method) DriverArgs() string {
 	args := make([]string, 0, len(m.Accepts)+2)
 	if m.AcceptsContext {
@@ -97,7 +91,7 @@ func (m *Method) VariableDefinitions() string {
 	for i, ret := range m.Returns {
 		name := typeName(ret)
 		switch name {
-		case "driver.DB":
+		case "driver.DB": // nolint: goconst
 			name = "*DB"
 		}
 		result = append(result, fmt.Sprintf("\tret%d %s\n", i, name))
@@ -337,7 +331,7 @@ func (m *Method) CallbackTypes() string {
 		inputs = append(inputs, "context.Context")
 	}
 	for _, arg := range m.Accepts {
-		inputs = append(inputs, fmt.Sprintf("%s", typeName(arg)))
+		inputs = append(inputs, typeName(arg))
 	}
 	if m.AcceptsOptions {
 		inputs = append(inputs, "map[string]interface{}")
@@ -363,7 +357,7 @@ func (m *Method) CallbackArgs() string {
 func (m *Method) CallbackReturns() string {
 	args := make([]string, 0, len(m.Returns)+1)
 	for _, ret := range m.Returns {
-		args = append(args, fmt.Sprintf("%s", ret))
+		args = append(args, ret.String())
 	}
 	if m.ReturnsError {
 		args = append(args, "error")
