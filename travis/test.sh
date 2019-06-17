@@ -14,7 +14,7 @@ case "$1" in
         gopherjs test ./...
     ;;
     "linter")
-        gometalinter.v2 --config=.linter.json
+        golangci-lint run ./...
     ;;
     "coverage")
         echo "" > coverage.txt

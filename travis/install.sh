@@ -36,8 +36,7 @@ case "$1" in
         go get -u -d -tags=js github.com/gopherjs/jsbuiltin
     ;;
     "linter")
-        go get -u gopkg.in/alecthomas/gometalinter.v2
-        gometalinter.v2 --install
+        curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.17.1
     ;;
     "coverage")
     ;;
