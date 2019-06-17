@@ -164,12 +164,8 @@ func (e *ExpectedGetIndexes) String() string {
 
 func (e *ExpectedDeleteIndex) String() string {
 	msg := fmt.Sprintf("call to DB(%s#%d).DeleteIndex() which:", e.dbo().name, e.dbo().id)
-	if e.arg0 == "" {
-		msg += "\n\t- has any ddoc"
-	} else {
-		msg += "\n\t- has ddoc: " + e.arg0
-	}
-	msg += nameString(e.arg1)
+	msg += fieldString("ddoc", e.arg0)
+	msg += fieldString("name", e.arg1)
 	msg += delayString(e.delay)
 	msg += errorString(e.err)
 	return msg

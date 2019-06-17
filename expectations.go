@@ -121,7 +121,7 @@ func (e *ExpectedClusterSetup) WithAction(action interface{}) *ExpectedClusterSe
 
 func (e *ExpectedDBExists) String() string {
 	msg := "call to DBExists() which:" +
-		nameString(e.arg0) +
+		fieldString("name", e.arg0) +
 		optionsString(e.options) +
 		delayString(e.delay)
 	if e.err == nil {
@@ -141,7 +141,7 @@ func (e *ExpectedDBExists) WithName(name string) *ExpectedDBExists {
 
 func (e *ExpectedDestroyDB) String() string {
 	return "call to DestroyDB() which:" +
-		nameString(e.arg0) +
+		fieldString("name", e.arg0) +
 		optionsString(e.options) +
 		delayString(e.delay) +
 		errorString(e.err)
@@ -206,7 +206,7 @@ func (e *ExpectedVersion) String() string {
 
 func (e *ExpectedDB) String() string {
 	msg := "call to DB() which:" +
-		nameString(e.arg0) +
+		fieldString("name", e.arg0) +
 		optionsString(e.options)
 	if e.db != nil {
 		msg += fmt.Sprintf("\n\t- should return database with %d expectations", e.db.expectations())
@@ -236,7 +236,7 @@ type ExpectedCreateDB struct {
 
 func (e *ExpectedCreateDB) String() string {
 	msg := "call to CreateDB() which:" +
-		nameString(e.arg0) +
+		fieldString("name", e.arg0) +
 		optionsString(e.options)
 	if e.db != nil {
 		msg += fmt.Sprintf("\n\t- should return database with %d expectations", e.db.expectations())
@@ -315,11 +315,7 @@ func (e *ExpectedDBUpdates) String() string {
 
 func (e *ExpectedConfig) String() string {
 	msg := "call to Config() which:"
-	if e.arg0 == "" {
-		msg += "\n\t- has any node"
-	} else {
-		msg += "\n\t- has node: " + e.arg0
-	}
+	msg += fieldString("node", e.arg0)
 	if e.ret0 != nil {
 		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
 	}
@@ -334,17 +330,9 @@ func (e *ExpectedConfig) WithNode(node string) *ExpectedConfig {
 }
 
 func (e *ExpectedConfigSection) String() string {
-	msg := "call to ConfigSection() which:"
-	if e.arg0 == "" {
-		msg += "\n\t- has any node"
-	} else {
-		msg += "\n\t- has node: " + e.arg0
-	}
-	if e.arg1 == "" {
-		msg += "\n\t- has any section"
-	} else {
-		msg += "\n\t- has section: " + e.arg1
-	}
+	msg := "call to ConfigSection() which:" +
+		fieldString("node", e.arg0) +
+		fieldString("section", e.arg1)
 	if e.ret0 != nil {
 		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
 	}
@@ -364,22 +352,10 @@ func (e *ExpectedConfigSection) WithSection(section string) *ExpectedConfigSecti
 }
 
 func (e *ExpectedConfigValue) String() string {
-	msg := "call to ConfigValue() which:"
-	if e.arg0 == "" {
-		msg += "\n\t- has any node"
-	} else {
-		msg += "\n\t- has node: " + e.arg0
-	}
-	if e.arg1 == "" {
-		msg += "\n\t- has any section"
-	} else {
-		msg += "\n\t- has section: " + e.arg1
-	}
-	if e.arg2 == "" {
-		msg += "\n\t- has any key"
-	} else {
-		msg += "\n\t- has key: " + e.arg2
-	}
+	msg := "call to ConfigValue() which:" +
+		fieldString("node", e.arg0) +
+		fieldString("section", e.arg1) +
+		fieldString("key", e.arg2)
 	if e.ret0 != "" {
 		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
 	}
@@ -404,27 +380,11 @@ func (e *ExpectedConfigValue) WithKey(key string) *ExpectedConfigValue {
 }
 
 func (e *ExpectedSetConfigValue) String() string {
-	msg := "call to SetConfigValue() which:"
-	if e.arg0 == "" {
-		msg += "\n\t- has any node"
-	} else {
-		msg += "\n\t- has node: " + e.arg0
-	}
-	if e.arg1 == "" {
-		msg += "\n\t- has any section"
-	} else {
-		msg += "\n\t- has section: " + e.arg1
-	}
-	if e.arg2 == "" {
-		msg += "\n\t- has any key"
-	} else {
-		msg += "\n\t- has key: " + e.arg2
-	}
-	if e.arg3 == "" {
-		msg += "\n\t- has any value"
-	} else {
-		msg += "\n\t- has value: " + e.arg3
-	}
+	msg := "call to SetConfigValue() which:" +
+		fieldString("node", e.arg0) +
+		fieldString("section", e.arg1) +
+		fieldString("key", e.arg2) +
+		fieldString("value", e.arg3)
 	if e.ret0 != "" {
 		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
 	}
@@ -454,22 +414,10 @@ func (e *ExpectedSetConfigValue) WithValue(value string) *ExpectedSetConfigValue
 }
 
 func (e *ExpectedDeleteConfigKey) String() string {
-	msg := "call to DeleteConfigKey() which:"
-	if e.arg0 == "" {
-		msg += "\n\t- has any node"
-	} else {
-		msg += "\n\t- has node: " + e.arg0
-	}
-	if e.arg1 == "" {
-		msg += "\n\t- has any section"
-	} else {
-		msg += "\n\t- has section: " + e.arg1
-	}
-	if e.arg2 == "" {
-		msg += "\n\t- has any key"
-	} else {
-		msg += "\n\t- has key: " + e.arg2
-	}
+	msg := "call to DeleteConfigKey() which:" +
+		fieldString("node", e.arg0) +
+		fieldString("section", e.arg1) +
+		fieldString("key", e.arg2)
 	if e.ret0 != "" {
 		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
 	}

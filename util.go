@@ -26,9 +26,9 @@ func delayString(delay time.Duration) string {
 	return fmt.Sprintf("\n\t- should delay for: %s", delay)
 }
 
-func nameString(name string) string {
-	if name == "" {
-		return "\n\t- has any name"
+func fieldString(field, value string) string {
+	if value == "" {
+		return "\n\t- has any " + field
 	}
-	return "\n\t- has name: " + name
+	return "\n\t- has " + field + ": " + value
 }
