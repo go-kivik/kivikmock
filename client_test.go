@@ -844,3 +844,246 @@ func TestDBUpdates(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestConfig(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *Client) {
+			m.ExpectConfig().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Config(context.TODO(), "local")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Config(context.TODO(), "local")
+			testy.Error(t, "call to Config() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *Client) {
+			m.ExpectConfig().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Config(newCanceledContext(), "local")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("success", func() interface{} {
+		expected := kivik.Config{"foo": kivik.ConfigSection{"bar": "baz"}}
+		return mockTest{
+			setup: func(m *Client) {
+				m.ExpectConfig().
+					WithNode("local").
+					WillReturn(driver.Config{"foo": driver.ConfigSection{"bar": "baz"}})
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				result, err := c.Config(newCanceledContext(), "local")
+				testy.Error(t, "", err)
+				if d := diff.Interface(expected, result); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+
+	tests.Run(t, testMock)
+}
+
+func TestConfigSection(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *Client) {
+			m.ExpectConfigSection().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ConfigSection(context.TODO(), "local", "foo")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ConfigSection(context.TODO(), "local", "foo")
+			testy.Error(t, "call to ConfigSection() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *Client) {
+			m.ExpectConfigSection().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ConfigSection(newCanceledContext(), "local", "foo")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("success", func() interface{} {
+		expected := kivik.ConfigSection{"bar": "baz"}
+		return mockTest{
+			setup: func(m *Client) {
+				m.ExpectConfigSection().
+					WithNode("local").
+					WithSection("foo").
+					WillReturn(driver.ConfigSection{"bar": "baz"})
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				result, err := c.ConfigSection(newCanceledContext(), "local", "foo")
+				testy.Error(t, "", err)
+				if d := diff.Interface(expected, result); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+
+	tests.Run(t, testMock)
+}
+
+func TestConfigValue(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *Client) {
+			m.ExpectConfigValue().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ConfigValue(context.TODO(), "local", "foo", "bar")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ConfigValue(context.TODO(), "local", "foo", "bar")
+			testy.Error(t, "call to ConfigValue() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *Client) {
+			m.ExpectConfigValue().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.ConfigValue(newCanceledContext(), "local", "foo", "bar")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("success", func() interface{} {
+		expected := "baz"
+		return mockTest{
+			setup: func(m *Client) {
+				m.ExpectConfigValue().
+					WithNode("local").
+					WithSection("foo").
+					WithKey("bar").
+					WillReturn("baz")
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				result, err := c.ConfigValue(newCanceledContext(), "local", "foo", "bar")
+				testy.Error(t, "", err)
+				if d := diff.Interface(expected, result); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+
+	tests.Run(t, testMock)
+}
+
+func TestSetConfigValue(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *Client) {
+			m.ExpectSetConfigValue().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.SetConfigValue(context.TODO(), "local", "foo", "bar", "baz")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.SetConfigValue(context.TODO(), "local", "foo", "bar", "baz")
+			testy.Error(t, "call to SetConfigValue() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *Client) {
+			m.ExpectSetConfigValue().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.SetConfigValue(newCanceledContext(), "local", "foo", "bar", "baz")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("success", func() interface{} {
+		expected := "old"
+		return mockTest{
+			setup: func(m *Client) {
+				m.ExpectSetConfigValue().
+					WithNode("local").
+					WithSection("foo").
+					WithKey("bar").
+					WithValue("baz").
+					WillReturn("old")
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				result, err := c.SetConfigValue(newCanceledContext(), "local", "foo", "bar", "baz")
+				testy.Error(t, "", err)
+				if d := diff.Interface(expected, result); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+
+	tests.Run(t, testMock)
+}
+
+func TestDeleteConfigKey(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *Client) {
+			m.ExpectDeleteConfigKey().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DeleteConfigKey(context.TODO(), "local", "foo", "bar")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DeleteConfigKey(context.TODO(), "local", "foo", "bar")
+			testy.Error(t, "call to DeleteConfigKey() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *Client) {
+			m.ExpectDeleteConfigKey().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.DeleteConfigKey(newCanceledContext(), "local", "foo", "bar")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Add("success", func() interface{} {
+		expected := "old"
+		return mockTest{
+			setup: func(m *Client) {
+				m.ExpectDeleteConfigKey().
+					WithNode("local").
+					WithSection("foo").
+					WithKey("bar").
+					WillReturn("old")
+			},
+			test: func(t *testing.T, c *kivik.Client) {
+				result, err := c.DeleteConfigKey(newCanceledContext(), "local", "foo", "bar")
+				testy.Error(t, "", err)
+				if d := diff.Interface(expected, result); d != nil {
+					t.Error(d)
+				}
+			},
+		}
+	})
+
+	tests.Run(t, testMock)
+}

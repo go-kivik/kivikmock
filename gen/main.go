@@ -48,6 +48,7 @@ type fullClient interface {
 	driver.Authenticator
 	driver.ClientReplicator
 	driver.DBUpdater
+	driver.Configer
 }
 
 func client() error {

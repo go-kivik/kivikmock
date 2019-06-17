@@ -1232,3 +1232,137 @@ func TestDBUpdatesString(t *testing.T) {
 	})
 	tests.Run(t, testStringer)
 }
+
+func TestConfigString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedConfig{},
+		expected: `call to Config() which:
+	- has any node`,
+	})
+	tests.Add("node", stringerTest{
+		input: &ExpectedConfig{arg0: "local"},
+		expected: `call to Config() which:
+	- has node: local`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedConfig{ret0: driver.Config{"foo": driver.ConfigSection{"bar": "baz"}}},
+		expected: `call to Config() which:
+	- has any node
+	- should return: map[foo:map[bar:baz]]`,
+	})
+
+	tests.Run(t, testStringer)
+}
+
+func TestConfigSectionString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedConfigSection{},
+		expected: `call to ConfigSection() which:
+	- has any node
+	- has any section`,
+	})
+	tests.Add("full", stringerTest{
+		input: &ExpectedConfigSection{arg0: "local", arg1: "httpd"},
+		expected: `call to ConfigSection() which:
+	- has node: local
+	- has section: httpd`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedConfigSection{ret0: driver.ConfigSection{"bar": "baz"}},
+		expected: `call to ConfigSection() which:
+	- has any node
+	- has any section
+	- should return: map[bar:baz]`,
+	})
+
+	tests.Run(t, testStringer)
+}
+
+func TestConfigValueString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedConfigValue{},
+		expected: `call to ConfigValue() which:
+	- has any node
+	- has any section
+	- has any key`,
+	})
+	tests.Add("full", stringerTest{
+		input: &ExpectedConfigValue{arg0: "local", arg1: "httpd", arg2: "foo"},
+		expected: `call to ConfigValue() which:
+	- has node: local
+	- has section: httpd
+	- has key: foo`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedConfigValue{ret0: "baz"},
+		expected: `call to ConfigValue() which:
+	- has any node
+	- has any section
+	- has any key
+	- should return: baz`,
+	})
+
+	tests.Run(t, testStringer)
+}
+
+func TestSetConfigValueString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedSetConfigValue{},
+		expected: `call to SetConfigValue() which:
+	- has any node
+	- has any section
+	- has any key
+	- has any value`,
+	})
+	tests.Add("full", stringerTest{
+		input: &ExpectedSetConfigValue{arg0: "local", arg1: "httpd", arg2: "foo", arg3: "bar"},
+		expected: `call to SetConfigValue() which:
+	- has node: local
+	- has section: httpd
+	- has key: foo
+	- has value: bar`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedSetConfigValue{ret0: "baz"},
+		expected: `call to SetConfigValue() which:
+	- has any node
+	- has any section
+	- has any key
+	- has any value
+	- should return: baz`,
+	})
+
+	tests.Run(t, testStringer)
+}
+
+func TestDeleteConfigKeyString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedDeleteConfigKey{},
+		expected: `call to DeleteConfigKey() which:
+	- has any node
+	- has any section
+	- has any key`,
+	})
+	tests.Add("full", stringerTest{
+		input: &ExpectedDeleteConfigKey{arg0: "local", arg1: "httpd", arg2: "foo"},
+		expected: `call to DeleteConfigKey() which:
+	- has node: local
+	- has section: httpd
+	- has key: foo`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedDeleteConfigKey{ret0: "baz"},
+		expected: `call to DeleteConfigKey() which:
+	- has any node
+	- has any section
+	- has any key
+	- should return: baz`,
+	})
+
+	tests.Run(t, testStringer)
+}

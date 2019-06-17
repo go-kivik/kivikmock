@@ -312,3 +312,183 @@ func (e *ExpectedDBUpdates) String() string {
 	}
 	return msg
 }
+
+func (e *ExpectedConfig) String() string {
+	msg := "call to Config() which:"
+	if e.arg0 == "" {
+		msg += "\n\t- has any node"
+	} else {
+		msg += "\n\t- has node: " + e.arg0
+	}
+	if e.ret0 != nil {
+		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
+	}
+	msg += delayString(e.delay)
+	msg += errorString(e.err)
+	return msg
+}
+
+func (e *ExpectedConfig) WithNode(node string) *ExpectedConfig {
+	e.arg0 = node
+	return e
+}
+
+func (e *ExpectedConfigSection) String() string {
+	msg := "call to ConfigSection() which:"
+	if e.arg0 == "" {
+		msg += "\n\t- has any node"
+	} else {
+		msg += "\n\t- has node: " + e.arg0
+	}
+	if e.arg1 == "" {
+		msg += "\n\t- has any section"
+	} else {
+		msg += "\n\t- has section: " + e.arg1
+	}
+	if e.ret0 != nil {
+		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
+	}
+	msg += delayString(e.delay)
+	msg += errorString(e.err)
+	return msg
+}
+
+func (e *ExpectedConfigSection) WithNode(node string) *ExpectedConfigSection {
+	e.arg0 = node
+	return e
+}
+
+func (e *ExpectedConfigSection) WithSection(section string) *ExpectedConfigSection {
+	e.arg1 = section
+	return e
+}
+
+func (e *ExpectedConfigValue) String() string {
+	msg := "call to ConfigValue() which:"
+	if e.arg0 == "" {
+		msg += "\n\t- has any node"
+	} else {
+		msg += "\n\t- has node: " + e.arg0
+	}
+	if e.arg1 == "" {
+		msg += "\n\t- has any section"
+	} else {
+		msg += "\n\t- has section: " + e.arg1
+	}
+	if e.arg2 == "" {
+		msg += "\n\t- has any key"
+	} else {
+		msg += "\n\t- has key: " + e.arg2
+	}
+	if e.ret0 != "" {
+		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
+	}
+	msg += delayString(e.delay)
+	msg += errorString(e.err)
+	return msg
+}
+
+func (e *ExpectedConfigValue) WithNode(node string) *ExpectedConfigValue {
+	e.arg0 = node
+	return e
+}
+
+func (e *ExpectedConfigValue) WithSection(section string) *ExpectedConfigValue {
+	e.arg1 = section
+	return e
+}
+
+func (e *ExpectedConfigValue) WithKey(key string) *ExpectedConfigValue {
+	e.arg2 = key
+	return e
+}
+
+func (e *ExpectedSetConfigValue) String() string {
+	msg := "call to SetConfigValue() which:"
+	if e.arg0 == "" {
+		msg += "\n\t- has any node"
+	} else {
+		msg += "\n\t- has node: " + e.arg0
+	}
+	if e.arg1 == "" {
+		msg += "\n\t- has any section"
+	} else {
+		msg += "\n\t- has section: " + e.arg1
+	}
+	if e.arg2 == "" {
+		msg += "\n\t- has any key"
+	} else {
+		msg += "\n\t- has key: " + e.arg2
+	}
+	if e.arg3 == "" {
+		msg += "\n\t- has any value"
+	} else {
+		msg += "\n\t- has value: " + e.arg3
+	}
+	if e.ret0 != "" {
+		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
+	}
+	msg += delayString(e.delay)
+	msg += errorString(e.err)
+	return msg
+}
+
+func (e *ExpectedSetConfigValue) WithNode(node string) *ExpectedSetConfigValue {
+	e.arg0 = node
+	return e
+}
+
+func (e *ExpectedSetConfigValue) WithSection(section string) *ExpectedSetConfigValue {
+	e.arg1 = section
+	return e
+}
+
+func (e *ExpectedSetConfigValue) WithKey(key string) *ExpectedSetConfigValue {
+	e.arg2 = key
+	return e
+}
+
+func (e *ExpectedSetConfigValue) WithValue(value string) *ExpectedSetConfigValue {
+	e.arg3 = value
+	return e
+}
+
+func (e *ExpectedDeleteConfigKey) String() string {
+	msg := "call to DeleteConfigKey() which:"
+	if e.arg0 == "" {
+		msg += "\n\t- has any node"
+	} else {
+		msg += "\n\t- has node: " + e.arg0
+	}
+	if e.arg1 == "" {
+		msg += "\n\t- has any section"
+	} else {
+		msg += "\n\t- has section: " + e.arg1
+	}
+	if e.arg2 == "" {
+		msg += "\n\t- has any key"
+	} else {
+		msg += "\n\t- has key: " + e.arg2
+	}
+	if e.ret0 != "" {
+		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
+	}
+	msg += delayString(e.delay)
+	msg += errorString(e.err)
+	return msg
+}
+
+func (e *ExpectedDeleteConfigKey) WithNode(node string) *ExpectedDeleteConfigKey {
+	e.arg0 = node
+	return e
+}
+
+func (e *ExpectedDeleteConfigKey) WithSection(section string) *ExpectedDeleteConfigKey {
+	e.arg1 = section
+	return e
+}
+
+func (e *ExpectedDeleteConfigKey) WithKey(key string) *ExpectedDeleteConfigKey {
+	e.arg2 = key
+	return e
+}

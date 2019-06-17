@@ -18,6 +18,7 @@ var _ driver.Cluster = &driverClient{}
 var _ driver.DBsStatser = &driverClient{}
 var _ driver.Pinger = &driverClient{}
 var _ driver.Sessioner = &driverClient{}
+var _ driver.Configer = &driverClient{}
 
 func (c *driverClient) Authenticate(ctx context.Context, authenticator interface{}) error {
 	expected := &ExpectedAuthenticate{
