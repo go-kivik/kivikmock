@@ -10,19 +10,19 @@ import (
 )
 
 var clientSkips = map[string]struct{}{
-	"Driver":       struct{}{},
-	"DSN":          struct{}{},
-	"CreateDB":     struct{}{},
-	"Authenticate": struct{}{},
+	"Driver":       {},
+	"DSN":          {},
+	"CreateDB":     {},
+	"Authenticate": {},
 	// to consider later
-	"GetReplications": struct{}{},
-	"Replicate":       struct{}{},
+	"GetReplications": {},
+	"Replicate":       {},
 }
 var dbSkips = map[string]struct{}{
-	"Close":  struct{}{},
-	"Client": struct{}{},
-	"Err":    struct{}{},
-	"Name":   struct{}{},
+	"Close":  {},
+	"Client": {},
+	"Err":    {},
+	"Name":   {},
 }
 
 func main() {
@@ -52,12 +52,12 @@ type fullClient interface {
 }
 
 func client() error {
-	dMethods, err := parseMethods(struct{ X fullClient }{}, false, clientSkips)
+	dMethods, err := parseMethods(struct{ X fullClient }{}, false, clientSkips) // nolint: unused
 	if err != nil {
 		return err
 	}
 
-	client, err := parseMethods(struct{ X *kivik.Client }{}, true, clientSkips)
+	client, err := parseMethods(struct{ X *kivik.Client }{}, true, clientSkips) // nolint: unused
 	if err != nil {
 		return err
 	}
@@ -91,12 +91,12 @@ type fullDB interface {
 }
 
 func db() error {
-	dMethods, err := parseMethods(struct{ X fullDB }{}, false, dbSkips)
+	dMethods, err := parseMethods(struct{ X fullDB }{}, false, dbSkips) // nolint: unused
 	if err != nil {
 		return err
 	}
 
-	client, err := parseMethods(struct{ X *kivik.DB }{}, true, dbSkips)
+	client, err := parseMethods(struct{ X *kivik.DB }{}, true, dbSkips) // nolint: unused
 	if err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func db() error {
 func compareMethods(client, driver []*Method) (same []*Method, differentClient []*Method, differentDriver []*Method) {
 	dMethods := toMap(driver)
 	cMethods := toMap(client)
-	sameMethods := make(map[string]*Method, 0)
+	sameMethods := make(map[string]*Method)
 	for name, method := range dMethods {
 		if cMethod, ok := cMethods[name]; ok {
 			if reflect.DeepEqual(cMethod, method) {

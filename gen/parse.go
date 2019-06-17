@@ -6,7 +6,6 @@ import (
 	"reflect"
 
 	"github.com/go-kivik/kivik"
-	"github.com/go-kivik/kivik/driver"
 )
 
 // Method contains the relevant information for a driver method.
@@ -24,15 +23,11 @@ type Method struct {
 }
 
 var (
-	typeContext           = reflect.TypeOf((*context.Context)(nil)).Elem()
-	typeDriverOptions     = reflect.TypeOf(map[string]interface{}{})
-	typeClientOptions     = reflect.TypeOf([]kivik.Options{})
-	typeError             = reflect.TypeOf((*error)(nil)).Elem()
-	typeString            = reflect.TypeOf("")
-	typeDriverRows        = reflect.TypeOf((*driver.Rows)(nil)).Elem()
-	typeDriverBulkResults = reflect.TypeOf((*driver.BulkResults)(nil)).Elem()
-	typeDriverChanges     = reflect.TypeOf((*driver.Changes)(nil)).Elem()
-	typeDriverDBUpdates   = reflect.TypeOf((*driver.DBUpdates)(nil)).Elem()
+	typeContext       = reflect.TypeOf((*context.Context)(nil)).Elem()
+	typeDriverOptions = reflect.TypeOf(map[string]interface{}{})
+	typeClientOptions = reflect.TypeOf([]kivik.Options{})
+	typeError         = reflect.TypeOf((*error)(nil)).Elem()
+	typeString        = reflect.TypeOf("")
 )
 
 func parseMethods(input interface{}, isClient bool, skip map[string]struct{}) ([]*Method, error) {

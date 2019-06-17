@@ -1305,11 +1305,11 @@ func TestDeleteAttachment(t *testing.T) {
 		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectDeleteAttachment().WithRev("2-bar")
+			db.ExpectDeleteAttachment().WithRev("2-asd")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			_, err := c.DB(context.TODO(), "foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
-			testy.ErrorRE(t, "has rev: 2-bar", err)
+			testy.ErrorRE(t, "has rev: 2-asd", err)
 		},
 	})
 	tests.Add("wrong filename", mockTest{
@@ -1338,12 +1338,12 @@ func TestDeleteAttachment(t *testing.T) {
 		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectDeleteAttachment().WillReturn("2-bar")
+			db.ExpectDeleteAttachment().WillReturn("2-fds")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			rev, err := c.DB(context.TODO(), "foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
 			testy.Error(t, "", err)
-			if rev != "2-bar" {
+			if rev != "2-fds" {
 				t.Errorf("Unexpected rev: %s", rev)
 			}
 		},
@@ -1407,11 +1407,11 @@ func TestDelete(t *testing.T) {
 		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectDelete().WithRev("2-bar")
+			db.ExpectDelete().WithRev("2-lkj")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			_, err := c.DB(context.TODO(), "foo").Delete(context.TODO(), "foo", "1-foo")
-			testy.ErrorRE(t, "has rev: 2-bar", err)
+			testy.ErrorRE(t, "has rev: 2-lkj", err)
 		},
 	})
 	tests.Add("wrong options", mockTest{
@@ -1429,12 +1429,12 @@ func TestDelete(t *testing.T) {
 		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectDelete().WillReturn("2-bar")
+			db.ExpectDelete().WillReturn("2-uio")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			rev, err := c.DB(context.TODO(), "foo").Delete(context.TODO(), "foo", "1-foo")
 			testy.Error(t, "", err)
-			if rev != "2-bar" {
+			if rev != "2-uio" {
 				t.Errorf("Unexpected rev: %s", rev)
 			}
 		},
@@ -1520,12 +1520,12 @@ func TestCopy(t *testing.T) {
 		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectCopy().WillReturn("2-bar")
+			db.ExpectCopy().WillReturn("2-oiu")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			rev, err := c.DB(context.TODO(), "foo").Copy(context.TODO(), "foo", "bar")
 			testy.Error(t, "", err)
-			if rev != "2-bar" {
+			if rev != "2-oiu" {
 				t.Errorf("Unexpected rev: %s", rev)
 			}
 		},
