@@ -88,6 +88,7 @@ type fullDB interface {
 	driver.LocalDocer
 	driver.MetaGetter
 	driver.Purger
+	driver.RevsDiffer
 }
 
 func db() error {
