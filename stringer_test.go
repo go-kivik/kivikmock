@@ -1366,3 +1366,29 @@ func TestDeleteConfigKeyString(t *testing.T) {
 
 	tests.Run(t, testStringer)
 }
+
+func TestRevsDiffString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedRevsDiff{commonExpectation: commonExpectation{db: &DB{name: "foo"}}},
+		expected: `call to DB(foo#0).RevsDiff() which:
+	- has any revMap`,
+	})
+	tests.Add("revMap", stringerTest{
+		input: &ExpectedRevsDiff{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg0: map[string][]string{"foo": {"1", "2"}}},
+		expected: `call to DB(foo#0).RevsDiff() which:
+	- with revMap: map[foo:[1 2]]`,
+	})
+	tests.Add("results", stringerTest{
+		input: &ExpectedRevsDiff{
+			commonExpectation: commonExpectation{db: &DB{name: "foo"}},
+			ret0: map[string]driver.RevDiff{
+				"foo": {Missing: []string{"1"}, PossibleAncestors: []string{"2", "3"}}},
+		},
+		expected: `call to DB(foo#0).RevsDiff() which:
+	- has any revMap
+	- should return: map[foo:{[1] [2 3]}]`,
+	})
+
+	tests.Run(t, testStringer)
+}

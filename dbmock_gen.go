@@ -288,6 +288,16 @@ func (db *DB) ExpectQuery() *ExpectedQuery {
 	return e
 }
 
+// ExpectRevsDiff queues an expectation that DB.RevsDiff will be called.
+func (db *DB) ExpectRevsDiff() *ExpectedRevsDiff {
+	e := &ExpectedRevsDiff{
+		commonExpectation: commonExpectation{db: db},
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
 // ExpectSecurity queues an expectation that DB.Security will be called.
 func (db *DB) ExpectSecurity() *ExpectedSecurity {
 	e := &ExpectedSecurity{

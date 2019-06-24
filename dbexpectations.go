@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-kivik/kivik"
 	"github.com/go-kivik/kivik/driver"
 )
 
@@ -664,4 +665,24 @@ func (e *ExpectedChanges) String() string {
 		rets = []string{fmt.Sprintf("should return: %d results", e.ret0.count())}
 	}
 	return dbStringer("Changes", &e.commonExpectation, withOptions, nil, rets)
+}
+
+func (e *ExpectedRevsDiff) String() string {
+	var rets, opts []string
+	if e.ret0 != nil {
+		rets = []string{fmt.Sprintf("should return: %v", e.ret0)}
+	}
+	if e.arg0 != nil {
+		opts = []string{fmt.Sprintf("with revMap: %v", e.arg0)}
+	} else {
+		opts = []string{"has any revMap"}
+	}
+	return dbStringer("RevsDiff", &e.commonExpectation, 0, opts, rets)
+}
+
+// WithRevLookup sets the expectation for the rev lookup passed to the
+// DB.RevsDiff() call.
+func (e *ExpectedRevsDiff) WithRevLookup(revLookup kivik.RevLookup) *ExpectedRevsDiff {
+	e.arg0 = revLookup
+	return e
 }

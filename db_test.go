@@ -2717,3 +2717,50 @@ func TestChanges(t *testing.T) {
 	})
 	tests.Run(t, testMock)
 }
+
+func TestRevsDiff(t *testing.T) {
+	revMap := kivik.RevLookup{"foo": []string{"1", "2"}}
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *Client) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectRevsDiff().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.RevsDiff(context.TODO(), revMap)
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("success", mockTest{
+		setup: func(m *Client) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectRevsDiff().
+				WithRevLookup(revMap).
+				WillReturn(map[string]driver.RevDiff{
+					"foo": {
+						Missing:           []string{"1"},
+						PossibleAncestors: []string{"2"},
+					},
+				})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			expected := kivik.Diffs{
+				"foo": kivik.RevDiff{
+					Missing:           []string{"1"},
+					PossibleAncestors: []string{"2"},
+				},
+			}
+			db := c.DB(context.TODO(), "foo")
+			result, err := db.RevsDiff(context.TODO(), revMap)
+			testy.Error(t, "", err)
+			if d := diff.Interface(expected, result); d != nil {
+				t.Error(d)
+			}
+		},
+	})
+
+	tests.Run(t, testMock)
+}
