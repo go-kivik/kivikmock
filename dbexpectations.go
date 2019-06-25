@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-kivik/kivik"
 	"github.com/go-kivik/kivik/driver"
 )
 
@@ -682,7 +681,7 @@ func (e *ExpectedRevsDiff) String() string {
 
 // WithRevLookup sets the expectation for the rev lookup passed to the
 // DB.RevsDiff() call.
-func (e *ExpectedRevsDiff) WithRevLookup(revLookup kivik.RevLookup) *ExpectedRevsDiff {
+func (e *ExpectedRevsDiff) WithRevLookup(revLookup interface{}) *ExpectedRevsDiff {
 	e.arg0 = revLookup
 	return e
 }

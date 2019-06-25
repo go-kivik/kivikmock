@@ -2719,7 +2719,7 @@ func TestChanges(t *testing.T) {
 }
 
 func TestRevsDiff(t *testing.T) {
-	revMap := kivik.RevLookup{"foo": []string{"1", "2"}}
+	revMap := map[string]interface{}{"foo": []string{"1", "2"}}
 	tests := testy.NewTable()
 	tests.Add("error", mockTest{
 		setup: func(m *Client) {
