@@ -464,7 +464,7 @@ func (db *driverDB) Query(ctx context.Context, arg0 string, arg1 string, options
 	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
 }
 
-func (db *driverDB) RevsDiff(ctx context.Context, arg0 interface{}) (map[string]driver.RevDiff, error) {
+func (db *driverDB) RevsDiff(ctx context.Context, arg0 interface{}) (driver.Rows, error) {
 	expected := &ExpectedRevsDiff{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
@@ -477,7 +477,7 @@ func (db *driverDB) RevsDiff(ctx context.Context, arg0 interface{}) (map[string]
 	if expected.callback != nil {
 		return expected.callback(ctx, arg0)
 	}
-	return expected.ret0, expected.wait(ctx)
+	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
 }
 
 func (db *driverDB) Security(ctx context.Context) (*driver.Security, error) {

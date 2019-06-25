@@ -2739,24 +2739,29 @@ func TestRevsDiff(t *testing.T) {
 			m.ExpectDB().WillReturn(db)
 			db.ExpectRevsDiff().
 				WithRevLookup(revMap).
-				WillReturn(map[string]driver.RevDiff{
-					"foo": {
-						Missing:           []string{"1"},
-						PossibleAncestors: []string{"2"},
-					},
-				})
+				WillReturn(NewRows().
+					AddRow(&driver.Row{
+						ID:    "foo",
+						Value: []byte(`{"missing":["1"],"possible_ancestors":["2"]}`),
+					}).
+					AddRow(&driver.Row{
+						ID:    "bar",
+						Value: []byte(`{"missing":["x"]}`),
+					}))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			expected := kivik.Diffs{
-				"foo": kivik.RevDiff{
-					Missing:           []string{"1"},
-					PossibleAncestors: []string{"2"},
-				},
-			}
 			db := c.DB(context.TODO(), "foo")
-			result, err := db.RevsDiff(context.TODO(), revMap)
+			rows, err := db.RevsDiff(context.TODO(), revMap)
 			testy.Error(t, "", err)
-			if d := diff.Interface(expected, result); d != nil {
+			results := map[string]interface{}{}
+			for rows.Next() {
+				var val map[string][]string
+				if err := rows.ScanValue(&val); err != nil {
+					t.Fatal(err)
+				}
+				results[rows.ID()] = val
+			}
+			if d := diff.AsJSON(&diff.File{Path: "testdata/" + testy.Stub(t)}, results); d != nil {
 				t.Error(d)
 			}
 		},

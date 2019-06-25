@@ -1382,12 +1382,11 @@ func TestRevsDiffString(t *testing.T) {
 	tests.Add("results", stringerTest{
 		input: &ExpectedRevsDiff{
 			commonExpectation: commonExpectation{db: &DB{name: "foo"}},
-			ret0: map[string]driver.RevDiff{
-				"foo": {Missing: []string{"1"}, PossibleAncestors: []string{"2", "3"}}},
+			ret0:              &Rows{},
 		},
 		expected: `call to DB(foo#0).RevsDiff() which:
 	- has any revMap
-	- should return: map[foo:{[1] [2 3]}]`,
+	- should return: 0 results`,
 	})
 
 	tests.Run(t, testStringer)
