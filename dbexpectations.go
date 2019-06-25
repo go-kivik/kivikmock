@@ -669,7 +669,7 @@ func (e *ExpectedChanges) String() string {
 func (e *ExpectedRevsDiff) String() string {
 	var rets, opts []string
 	if e.ret0 != nil {
-		rets = []string{fmt.Sprintf("should return: %v", e.ret0)}
+		rets = []string{fmt.Sprintf("should return: %d results", e.ret0.count())}
 	}
 	if e.arg0 != nil {
 		opts = []string{fmt.Sprintf("with revMap: %v", e.arg0)}

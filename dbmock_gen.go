@@ -292,6 +292,7 @@ func (db *DB) ExpectQuery() *ExpectedQuery {
 func (db *DB) ExpectRevsDiff() *ExpectedRevsDiff {
 	e := &ExpectedRevsDiff{
 		commonExpectation: commonExpectation{db: db},
+		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
