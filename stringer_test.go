@@ -42,6 +42,55 @@ func TestCloseString(t *testing.T) {
 	tests.Run(t, testStringer)
 }
 
+func TestReplicateString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("standard", stringerTest{
+		input: &ExpectedReplicate{},
+		expected: `call to Replicate() which:
+	- has any target
+	- has any source
+	- has any options`,
+	})
+	tests.Add("target", stringerTest{
+		input: &ExpectedReplicate{arg0: "foo"},
+		expected: `call to Replicate() which:
+	- has target: foo
+	- has any source
+	- has any options`,
+	})
+	tests.Add("source", stringerTest{
+		input: &ExpectedReplicate{arg1: "http://example.com/bar"},
+		expected: `call to Replicate() which:
+	- has any target
+	- has source: http://example.com/bar
+	- has any options`,
+	})
+	tests.Add("options", stringerTest{
+		input: &ExpectedReplicate{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},
+		expected: `call to Replicate() which:
+	- has any target
+	- has any source
+	- has options: map[foo:123]`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedReplicate{commonExpectation: commonExpectation{err: errors.New("foo error")}},
+		expected: `call to Replicate() which:
+	- has any target
+	- has any source
+	- has any options
+	- should return error: foo error`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedReplicate{commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to Replicate() which:
+	- has any target
+	- has any source
+	- has any options
+	- should delay for: 1s`,
+	})
+	tests.Run(t, testStringer)
+}
+
 func TestAllDBsString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("standard", stringerTest{

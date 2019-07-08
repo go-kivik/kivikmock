@@ -221,6 +221,23 @@ func (c *driverClient) DBsStats(ctx context.Context, arg0 []string) ([]*driver.D
 	return expected.ret0, expected.wait(ctx)
 }
 
+func (c *driverClient) Replicate(ctx context.Context, arg0 string, arg1 string, options map[string]interface{}) (driver.Replication, error) {
+	expected := &ExpectedReplicate{
+		arg0: arg0,
+		arg1: arg1,
+		commonExpectation: commonExpectation{
+			options: options,
+		},
+	}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	if expected.callback != nil {
+		return expected.callback(ctx, arg0, arg1, options)
+	}
+	return expected.ret0, expected.wait(ctx)
+}
+
 func (c *driverClient) Session(ctx context.Context) (*driver.Session, error) {
 	expected := &ExpectedSession{}
 	if err := c.nextExpectation(expected); err != nil {

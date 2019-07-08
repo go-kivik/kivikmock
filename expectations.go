@@ -440,3 +440,26 @@ func (e *ExpectedDeleteConfigKey) WithKey(key string) *ExpectedDeleteConfigKey {
 	e.arg2 = key
 	return e
 }
+
+func (e *ExpectedReplicate) String() string {
+	msg := "call to Replicate() which:" +
+		fieldString("target", e.arg0) +
+		fieldString("source", e.arg1)
+	if e.ret0 != nil {
+		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
+	}
+	return msg +
+		optionsString(e.options) +
+		delayString(e.delay) +
+		errorString(e.err)
+}
+
+func (e *ExpectedReplicate) WithSource(source string) *ExpectedReplicate {
+	e.arg1 = source
+	return e
+}
+
+func (e *ExpectedReplicate) WithTarget(target string) *ExpectedReplicate {
+	e.arg0 = target
+	return e
+}
