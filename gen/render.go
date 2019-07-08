@@ -93,6 +93,8 @@ func (m *Method) VariableDefinitions() string {
 		switch name {
 		case "driver.DB": // nolint: goconst
 			name = "*DB"
+		case "driver.Replication":
+			name = "*Replication"
 		}
 		result = append(result, fmt.Sprintf("\tret%d %s\n", i, name))
 	}
@@ -194,6 +196,8 @@ func (m *Method) ExpectedReturns() string {
 			args = append(args, fmt.Sprintf("&driverDB{DB: expected.ret%d}", i))
 		case "driver.DBUpdates":
 			args = append(args, fmt.Sprintf("&driverDBUpdates{Context:ctx, Updates: expected.ret%d}", i))
+		case "driver.Replication":
+			args = append(args, fmt.Sprintf("&driverReplication{Replication: expected.ret%d}", i))
 		default:
 			args = append(args, fmt.Sprintf("expected.ret%d", i))
 		}
@@ -213,6 +217,8 @@ func (m *Method) ReturnTypes() string {
 		switch name {
 		case "driver.DB":
 			name = "*DB"
+		case "driver.Replication":
+			name = "*Replication"
 		}
 		args[i] = fmt.Sprintf("ret%d %s", i, name)
 	}

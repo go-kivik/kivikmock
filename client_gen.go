@@ -250,7 +250,7 @@ func (c *driverClient) Replicate(ctx context.Context, arg0 string, arg1 string, 
 	if expected.callback != nil {
 		return expected.callback(ctx, arg0, arg1, options)
 	}
-	return expected.ret0, expected.wait(ctx)
+	return &driverReplication{Replication: expected.ret0}, expected.wait(ctx)
 }
 
 func (c *driverClient) Session(ctx context.Context) (*driver.Session, error) {

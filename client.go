@@ -2,7 +2,9 @@ package kivikmock
 
 import (
 	"context"
+	"errors"
 	"reflect"
+	"time"
 
 	"github.com/go-kivik/kivik/driver"
 )
@@ -47,4 +49,46 @@ func (c *driverClient) CreateDB(ctx context.Context, name string, options map[st
 		return expected.callback(ctx, name, options)
 	}
 	return expected.wait(ctx)
+}
+
+type driverReplication struct {
+	*Replication
+}
+
+var _ driver.Replication = &driverReplication{}
+
+func (r *driverReplication) ReplicationID() string {
+	return r.Replication.ID
+}
+
+func (r *driverReplication) Source() string {
+	return r.Replication.Source
+}
+
+func (r *driverReplication) Target() string {
+	return r.Replication.Target
+}
+
+func (r *driverReplication) StartTime() time.Time {
+	return r.Replication.StartTime
+}
+
+func (r *driverReplication) EndTime() time.Time {
+	return r.Replication.EndTime
+}
+
+func (r *driverReplication) State() string {
+	return r.Replication.State
+}
+
+func (r *driverReplication) Err() error {
+	return r.Replication.Err
+}
+
+func (r *driverReplication) Delete(_ context.Context) error {
+	return errors.New("not implemented")
+}
+
+func (r *driverReplication) Update(_ context.Context, _ *driver.ReplicationInfo) error {
+	return errors.New("not implemented")
 }

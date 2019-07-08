@@ -3,6 +3,7 @@ package kivikmock
 import (
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/go-kivik/kivik"
 )
@@ -146,4 +147,20 @@ func NewChanges() *Changes {
 // DBUpdates() expectation.
 func NewDBUpdates() *Updates {
 	return &Updates{}
+}
+
+// Replication is a replication instance.
+type Replication struct {
+	ID        string
+	Source    string
+	Target    string
+	StartTime time.Time
+	EndTime   time.Time
+	State     string
+	Err       error
+}
+
+// NewReplication returns a new, empty Replication.
+func (c *Client) NewReplication() *Replication {
+	return &Replication{}
 }

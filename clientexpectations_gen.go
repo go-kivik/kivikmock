@@ -906,7 +906,7 @@ type ExpectedReplicate struct {
 	callback func(ctx context.Context, arg0 string, arg1 string, options map[string]interface{}) (driver.Replication, error)
 	arg0     string
 	arg1     string
-	ret0     driver.Replication
+	ret0     *Replication
 }
 
 // WithOptions sets the expected options for the call to Replicate().
@@ -924,7 +924,7 @@ func (e *ExpectedReplicate) WillExecute(cb func(ctx context.Context, arg0 string
 }
 
 // WillReturn sets the values that will be returned by the call to Replicate().
-func (e *ExpectedReplicate) WillReturn(ret0 driver.Replication) *ExpectedReplicate {
+func (e *ExpectedReplicate) WillReturn(ret0 *Replication) *ExpectedReplicate {
 	e.ret0 = ret0
 	return e
 }

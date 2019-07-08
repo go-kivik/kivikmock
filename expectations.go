@@ -444,12 +444,12 @@ func (e *ExpectedDeleteConfigKey) WithKey(key string) *ExpectedDeleteConfigKey {
 func (e *ExpectedReplicate) String() string {
 	msg := "call to Replicate() which:" +
 		fieldString("target", e.arg0) +
-		fieldString("source", e.arg1)
+		fieldString("source", e.arg1) +
+		optionsString(e.options)
 	if e.ret0 != nil {
 		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
 	}
 	return msg +
-		optionsString(e.options) +
 		delayString(e.delay) +
 		errorString(e.err)
 }
@@ -462,4 +462,15 @@ func (e *ExpectedReplicate) WithSource(source string) *ExpectedReplicate {
 func (e *ExpectedReplicate) WithTarget(target string) *ExpectedReplicate {
 	e.arg0 = target
 	return e
+}
+
+func (e *ExpectedGetReplications) String() string {
+	msg := "call to GetReplications() which:" +
+		optionsString(e.options)
+	if l := len(e.ret0); l > 0 {
+		msg += fmt.Sprintf("\n\t- should return: %d results", l)
+	}
+	return msg +
+		delayString(e.delay) +
+		errorString(e.err)
 }
