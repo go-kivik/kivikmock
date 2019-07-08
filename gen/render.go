@@ -93,9 +93,9 @@ func (m *Method) VariableDefinitions() string {
 		switch name {
 		case "driver.DB": // nolint: goconst
 			name = "*DB"
-		case "driver.Replication":
+		case "driver.Replication": // nolint: goconst
 			name = "*Replication"
-		case "[]driver.Replication":
+		case "[]driver.Replication": // nolint: goconst
 			name = "[]*Replication"
 		}
 		result = append(result, fmt.Sprintf("\tret%d %s\n", i, name))

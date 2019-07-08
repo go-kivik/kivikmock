@@ -644,10 +644,10 @@ func TestDB(t *testing.T) {
 			m.ExpectDB().WillReturn(m.NewDB())
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB(context.TODO(), "asd")
 			err := db.Err()
 			testy.Error(t, "", err)
-			if db.Name() != "foo" {
+			if db.Name() != "asd" {
 				t.Errorf("Unexpected db name: %s", db.Name())
 			}
 		},
@@ -1120,14 +1120,14 @@ func TestReplicate(t *testing.T) {
 	tests.Add("return", mockTest{
 		setup: func(m *Client) {
 			r := m.NewReplication()
-			r.ID = "foo"
+			r.ID = "aaa"
 			m.ExpectReplicate().
 				WillReturn(r)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			rep, err := c.Replicate(context.TODO(), "foo", "bar")
 			testy.Error(t, "", err)
-			if id := rep.ReplicationID(); id != "foo" {
+			if id := rep.ReplicationID(); id != "aaa" {
 				t.Errorf("Unexpected replication ID: %s", id)
 			}
 		},
@@ -1164,19 +1164,19 @@ func TestGetReplications(t *testing.T) {
 	tests.Add("return", mockTest{
 		setup: func(m *Client) {
 			r1 := m.NewReplication()
-			r1.ID = "foo"
+			r1.ID = "bbb"
 			r2 := m.NewReplication()
-			r2.ID = "bar"
+			r2.ID = "ccc"
 			m.ExpectGetReplications().
 				WillReturn([]*Replication{r1, r2})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			reps, err := c.GetReplications(context.TODO())
 			testy.Error(t, "", err)
-			if id := reps[0].ReplicationID(); id != "foo" {
+			if id := reps[0].ReplicationID(); id != "bbb" {
 				t.Errorf("Unexpected replication 1 ID: %s", id)
 			}
-			if id := reps[1].ReplicationID(); id != "bar" {
+			if id := reps[1].ReplicationID(); id != "ccc" {
 				t.Errorf("Unexpected replication 2 ID: %s", id)
 			}
 		},
