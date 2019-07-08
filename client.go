@@ -92,3 +92,11 @@ func (r *driverReplication) Delete(_ context.Context) error {
 func (r *driverReplication) Update(_ context.Context, _ *driver.ReplicationInfo) error {
 	return errors.New("not implemented")
 }
+
+func driverReplications(in []*Replication) []driver.Replication {
+	out := make([]driver.Replication, len(in))
+	for i, r := range in {
+		out[i] = &driverReplication{r}
+	}
+	return out
+}

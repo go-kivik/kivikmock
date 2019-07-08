@@ -233,7 +233,7 @@ func (c *driverClient) GetReplications(ctx context.Context, options map[string]i
 	if expected.callback != nil {
 		return expected.callback(ctx, options)
 	}
-	return expected.ret0, expected.wait(ctx)
+	return driverReplications(expected.ret0), expected.wait(ctx)
 }
 
 func (c *driverClient) Replicate(ctx context.Context, arg0 string, arg1 string, options map[string]interface{}) (driver.Replication, error) {

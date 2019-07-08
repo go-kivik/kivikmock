@@ -850,7 +850,7 @@ func (e *ExpectedDBsStats) method(v bool) string {
 type ExpectedGetReplications struct {
 	commonExpectation
 	callback func(ctx context.Context, options map[string]interface{}) ([]driver.Replication, error)
-	ret0     []driver.Replication
+	ret0     []*Replication
 }
 
 // WithOptions sets the expected options for the call to GetReplications().
@@ -868,7 +868,7 @@ func (e *ExpectedGetReplications) WillExecute(cb func(ctx context.Context, optio
 }
 
 // WillReturn sets the values that will be returned by the call to GetReplications().
-func (e *ExpectedGetReplications) WillReturn(ret0 []driver.Replication) *ExpectedGetReplications {
+func (e *ExpectedGetReplications) WillReturn(ret0 []*Replication) *ExpectedGetReplications {
 	e.ret0 = ret0
 	return e
 }

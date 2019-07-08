@@ -1087,3 +1087,108 @@ func TestDeleteConfigKey(t *testing.T) {
 
 	tests.Run(t, testMock)
 }
+
+func TestReplicate(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("err", mockTest{
+		setup: func(m *Client) {
+			m.ExpectReplicate().WillReturnError(errors.New("replicate failed"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Replicate(context.TODO(), "foo", "bar")
+			testy.Error(t, "replicate failed", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Replicate(context.TODO(), "foo", "bar")
+			testy.Error(t, "call to Replicate() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("source and target", mockTest{
+		setup: func(m *Client) {
+			m.ExpectReplicate().
+				WithSource("bar").
+				WithTarget("foo").
+				WillReturnError(errors.New("expected"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Replicate(context.TODO(), "foo", "bar")
+			testy.Error(t, "expected", err)
+		},
+	})
+	tests.Add("return", mockTest{
+		setup: func(m *Client) {
+			r := m.NewReplication()
+			r.ID = "foo"
+			m.ExpectReplicate().
+				WillReturn(r)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			rep, err := c.Replicate(context.TODO(), "foo", "bar")
+			testy.Error(t, "", err)
+			if id := rep.ReplicationID(); id != "foo" {
+				t.Errorf("Unexpected replication ID: %s", id)
+			}
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *Client) {
+			m.ExpectReplicate().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.Replicate(newCanceledContext(), "foo", "bar")
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}
+
+func TestGetReplications(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("err", mockTest{
+		setup: func(m *Client) {
+			m.ExpectGetReplications().WillReturnError(errors.New("get replications failed"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.GetReplications(context.TODO())
+			testy.Error(t, "get replications failed", err)
+		},
+	})
+	tests.Add("unexpected", mockTest{
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.GetReplications(context.TODO())
+			testy.Error(t, "call to GetReplications() was not expected, all expectations already fulfilled", err)
+		},
+	})
+	tests.Add("return", mockTest{
+		setup: func(m *Client) {
+			r1 := m.NewReplication()
+			r1.ID = "foo"
+			r2 := m.NewReplication()
+			r2.ID = "bar"
+			m.ExpectGetReplications().
+				WillReturn([]*Replication{r1, r2})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			reps, err := c.GetReplications(context.TODO())
+			testy.Error(t, "", err)
+			if id := reps[0].ReplicationID(); id != "foo" {
+				t.Errorf("Unexpected replication 1 ID: %s", id)
+			}
+			if id := reps[1].ReplicationID(); id != "bar" {
+				t.Errorf("Unexpected replication 2 ID: %s", id)
+			}
+		},
+	})
+	tests.Add("delay", mockTest{
+		setup: func(m *Client) {
+			m.ExpectGetReplications().WillDelay(time.Second)
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			_, err := c.GetReplications(newCanceledContext())
+			testy.Error(t, "context canceled", err)
+		},
+	})
+	tests.Run(t, testMock)
+}

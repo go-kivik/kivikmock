@@ -112,7 +112,7 @@ func TestGetReplicationsString(t *testing.T) {
 	- has options: map[foo:123]`,
 	})
 	tests.Add("return", stringerTest{
-		input: &ExpectedGetReplications{ret0: []driver.Replication{&driverReplication{}, &driverReplication{}}},
+		input: &ExpectedGetReplications{ret0: []*Replication{{}, {}}},
 		expected: `call to GetReplications() which:
 	- has any options
 	- should return: 2 results`,

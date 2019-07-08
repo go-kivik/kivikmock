@@ -95,6 +95,8 @@ func (m *Method) VariableDefinitions() string {
 			name = "*DB"
 		case "driver.Replication":
 			name = "*Replication"
+		case "[]driver.Replication":
+			name = "[]*Replication"
 		}
 		result = append(result, fmt.Sprintf("\tret%d %s\n", i, name))
 	}
@@ -198,6 +200,8 @@ func (m *Method) ExpectedReturns() string {
 			args = append(args, fmt.Sprintf("&driverDBUpdates{Context:ctx, Updates: expected.ret%d}", i))
 		case "driver.Replication":
 			args = append(args, fmt.Sprintf("&driverReplication{Replication: expected.ret%d}", i))
+		case "[]driver.Replication":
+			args = append(args, fmt.Sprintf("driverReplications(expected.ret%d)", i))
 		default:
 			args = append(args, fmt.Sprintf("expected.ret%d", i))
 		}
@@ -219,6 +223,8 @@ func (m *Method) ReturnTypes() string {
 			name = "*DB"
 		case "driver.Replication":
 			name = "*Replication"
+		case "[]driver.Replication":
+			name = "[]*Replication"
 		}
 		args[i] = fmt.Sprintf("ret%d %s", i, name)
 	}
