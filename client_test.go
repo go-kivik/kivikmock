@@ -1119,8 +1119,7 @@ func TestReplicate(t *testing.T) {
 	})
 	tests.Add("return", mockTest{
 		setup: func(m *Client) {
-			r := m.NewReplication()
-			r.ID = "aaa"
+			r := m.NewReplication().ID("aaa")
 			m.ExpectReplicate().
 				WillReturn(r)
 		},
@@ -1163,12 +1162,11 @@ func TestGetReplications(t *testing.T) {
 	})
 	tests.Add("return", mockTest{
 		setup: func(m *Client) {
-			r1 := m.NewReplication()
-			r1.ID = "bbb"
-			r2 := m.NewReplication()
-			r2.ID = "ccc"
 			m.ExpectGetReplications().
-				WillReturn([]*Replication{r1, r2})
+				WillReturn([]*Replication{
+					m.NewReplication().ID("bbb"),
+					m.NewReplication().ID("ccc"),
+				})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			reps, err := c.GetReplications(context.TODO())

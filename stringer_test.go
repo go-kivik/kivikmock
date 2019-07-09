@@ -66,12 +66,12 @@ func TestReplicateString(t *testing.T) {
 	- has any options`,
 	})
 	tests.Add("return", stringerTest{
-		input: &ExpectedReplicate{ret0: &Replication{ID: "foo"}},
+		input: &ExpectedReplicate{ret0: &Replication{id: "foo"}},
 		expected: `call to Replicate() which:
 	- has any target
 	- has any source
 	- has any options
-	- should return: &{foo   0001-01-01 00:00:00 +0000 UTC 0001-01-01 00:00:00 +0000 UTC  <nil>}`,
+	- should return: {"replication_id":"foo"}`,
 	})
 	tests.Add("options", stringerTest{
 		input: &ExpectedReplicate{commonExpectation: commonExpectation{options: map[string]interface{}{"foo": 123}}},

@@ -447,7 +447,7 @@ func (e *ExpectedReplicate) String() string {
 		fieldString("source", e.arg1) +
 		optionsString(e.options)
 	if e.ret0 != nil {
-		msg += fmt.Sprintf("\n\t- should return: %v", e.ret0)
+		msg += fmt.Sprintf("\n\t- should return: %v", jsonDoc(e.ret0))
 	}
 	return msg +
 		delayString(e.delay) +
