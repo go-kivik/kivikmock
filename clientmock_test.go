@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/flimzy/testy"
+
+	"github.com/go-kivik/kivik"
 )
 
 func TestReplication(t *testing.T) {
@@ -19,7 +21,7 @@ func TestReplication(t *testing.T) {
 	eTarget := "a3"
 	eStartTime := ts
 	eEndTime := ts.Add(time.Second)
-	eState := "a4"
+	eState := kivik.ReplicationComplete
 	eErr := "a5"
 	r := m.NewReplication().
 		ID(eID).
@@ -51,7 +53,7 @@ func TestReplication(t *testing.T) {
 		}
 	})
 	t.Run("State", func(t *testing.T) {
-		if s := dr.State(); s != eState {
+		if s := kivik.ReplicationState(dr.State()); s != eState {
 			t.Errorf("Unexpected State. Got %s, want %s", s, eState)
 		}
 	})

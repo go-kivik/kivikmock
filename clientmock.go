@@ -219,8 +219,8 @@ func (r *Replication) EndTime(t time.Time) *Replication {
 	return r
 }
 
-func (r *Replication) State(s string) *Replication {
-	r.state = s
+func (r *Replication) State(s kivik.ReplicationState) *Replication {
+	r.state = string(s)
 	return r
 }
 
