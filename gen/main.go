@@ -14,10 +14,8 @@ var clientSkips = map[string]struct{}{
 	"DSN":          {},
 	"CreateDB":     {},
 	"Authenticate": {},
-	// to consider later
-	"GetReplications": {},
-	"Replicate":       {},
 }
+
 var dbSkips = map[string]struct{}{
 	"Close":  {},
 	"Client": {},

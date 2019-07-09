@@ -1,8 +1,10 @@
 package kivikmock
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/go-kivik/kivik"
 )
@@ -146,4 +148,83 @@ func NewChanges() *Changes {
 // DBUpdates() expectation.
 func NewDBUpdates() *Updates {
 	return &Updates{}
+}
+
+// Replication is a replication instance.
+type Replication struct {
+	id        string
+	source    string
+	target    string
+	startTime time.Time
+	endTime   time.Time
+	state     string
+	err       error
+}
+
+// NewReplication returns a new, empty Replication.
+func (c *Client) NewReplication() *Replication {
+	return &Replication{}
+}
+
+func (r *Replication) MarshalJSON() ([]byte, error) {
+	type rep struct {
+		ID        string     `json:"replication_id,omitempty"`
+		Source    string     `json:"source,omitempty"`
+		Target    string     `json:"target,omitempty"`
+		StartTime *time.Time `json:"start_time,omitempty"`
+		EndTime   *time.Time `json:"end_time,omitempty"`
+		State     string     `json:"state,omitempty"`
+		Err       string     `json:"error,omitempty"`
+	}
+	doc := &rep{
+		ID:     r.id,
+		Source: r.source,
+		Target: r.target,
+		State:  r.state,
+	}
+	if !r.startTime.IsZero() {
+		doc.StartTime = &r.startTime
+	}
+	if !r.endTime.IsZero() {
+		doc.EndTime = &r.endTime
+	}
+	if r.err != nil {
+		doc.Err = r.err.Error()
+	}
+	return json.Marshal(doc)
+}
+
+func (r *Replication) ID(id string) *Replication {
+	r.id = id
+	return r
+}
+
+func (r *Replication) Source(s string) *Replication {
+	r.source = s
+	return r
+}
+
+func (r *Replication) Target(t string) *Replication {
+	r.target = t
+	return r
+}
+
+func (r *Replication) StartTime(t time.Time) *Replication {
+	r.startTime = t
+	return r
+}
+
+func (r *Replication) EndTime(t time.Time) *Replication {
+	r.endTime = t
+	return r
+}
+
+func (r *Replication) State(s string) *Replication {
+	r.state = s
+	return r
+}
+
+func (r *Replication) Err(e error) *Replication {
+	r.err = e
+	return r
 }
