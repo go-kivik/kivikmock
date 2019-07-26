@@ -54,6 +54,7 @@ func New() (*kivik.Client, *Client, error) {
 
 // NewT works exactly as New, except that any error will be passed to t.Fatal.
 func NewT(t *testing.T) (*kivik.Client, *Client) {
+	t.Helper()
 	client, mock, err := New()
 	if err != nil {
 		t.Fatal(err)
