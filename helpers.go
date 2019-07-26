@@ -11,6 +11,7 @@ import (
 
 // ToDocumentT is deprecated.
 func ToDocumentT(t *testing.T, i interface{}) *driver.Document {
+	t.Helper()
 	return DocumentT(t, i)
 }
 
@@ -21,6 +22,7 @@ func ToDocument(i interface{}) (*driver.Document, error) {
 
 // DocumentT calls Document, and passes any error to t.Fatal.
 func DocumentT(t *testing.T, i interface{}) *driver.Document {
+	t.Helper()
 	doc, err := Document(i)
 	if err != nil {
 		t.Fatal(err)
