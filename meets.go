@@ -27,6 +27,10 @@ func dbMeetsExpectation(a, e *DB) bool {
 	if e == nil {
 		return true
 	}
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	a.mu.RLock()
+	defer a.mu.RUnlock()
 	return e.name == a.name && e.id == a.id
 }
 
