@@ -190,7 +190,9 @@ func (c *driverClient) DB(ctx context.Context, arg0 string, options map[string]i
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
 	}
+	expected.ret0.mu.Lock()
 	expected.ret0.name = arg0
+	expected.ret0.mu.Unlock()
 	if expected.callback != nil {
 		return expected.callback(ctx, arg0, options)
 	}

@@ -1,5 +1,7 @@
 package kivikmock
 
+import "sync"
+
 // MockDB is deprecated
 type MockDB = DB
 
@@ -10,6 +12,7 @@ type DB struct {
 	id     int
 	client *Client
 	count  int
+	mu     sync.RWMutex
 }
 
 func (db *DB) expectations() int {
