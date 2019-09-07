@@ -4,8 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/flimzy/diff"
-	"github.com/flimzy/testy"
+	"gitlab.com/flimzy/testy"
 )
 
 func init() {
@@ -29,14 +28,10 @@ func TestRenderExpectedType(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if d := diff.Text(&diff.File{Path: "testdata/" + testy.Stub(t)}, result); d != nil {
+		if d := testy.DiffText(testy.Snapshot(t), result); d != nil {
 			t.Error(d)
 		}
 	})
-}
-
-func TestRenderMock(t *testing.T) {
-
 }
 
 func TestRenderDriverMethod(t *testing.T) {
@@ -64,7 +59,7 @@ func TestRenderDriverMethod(t *testing.T) {
 	tests.Run(t, func(t *testing.T, test tst) {
 		result, err := RenderDriverMethod(test.method)
 		testy.Error(t, test.err, err)
-		if d := diff.Text(&diff.File{Path: "testdata/" + testy.Stub(t)}, result); d != nil {
+		if d := testy.DiffText(testy.Snapshot(t), result); d != nil {
 			t.Error(d)
 		}
 	})
@@ -100,7 +95,7 @@ options: options,`,
 
 	tests.Run(t, func(t *testing.T, test tst) {
 		result := test.method.Variables(test.indent)
-		if d := diff.Text(test.expected, result); d != nil {
+		if d := testy.DiffText(test.expected, result); d != nil {
 			t.Error(d)
 		}
 	})

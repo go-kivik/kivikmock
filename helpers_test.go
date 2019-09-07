@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/flimzy/diff"
-	"github.com/flimzy/testy"
+	"gitlab.com/flimzy/testy"
+
 	"github.com/go-kivik/kivik/driver"
 )
 
@@ -61,12 +61,12 @@ func TestDocument(t *testing.T) {
 	tests.Run(t, func(t *testing.T, test tst) {
 		result, err := Document(test.i)
 		testy.Error(t, test.err, err)
-		if d := diff.AsJSON(test.content, result.Body); d != nil {
+		if d := testy.DiffAsJSON(test.content, result.Body); d != nil {
 			t.Errorf("Unexpected content:\n%s\n", d)
 		}
 		result.Body.Close() // nolint: errcheck
 		result.Body = nil
-		if d := diff.Interface(test.expected, result); d != nil {
+		if d := testy.DiffInterface(test.expected, result); d != nil {
 			t.Error(d)
 		}
 	})
