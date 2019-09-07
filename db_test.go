@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flimzy/diff"
-	"github.com/flimzy/testy"
+	"gitlab.com/flimzy/testy"
+
 	"github.com/go-kivik/kivik"
 	"github.com/go-kivik/kivik/driver"
 )
@@ -196,7 +196,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo", "bar", "baz"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 		},
@@ -218,7 +218,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 			testy.Error(t, "foo err", rows.Err())
@@ -268,7 +268,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 			testy.Error(t, "context deadline exceeded", rows.Err())
@@ -337,7 +337,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo", "bar", "baz"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 		},
@@ -430,7 +430,7 @@ func TestFind(t *testing.T) {
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo", "bar", "baz"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 		},
@@ -596,7 +596,7 @@ func TestGetIndexes(t *testing.T) {
 				{Name: "foo"},
 				{Name: "bar"},
 			}
-			if d := diff.Interface(expected, indexes); d != nil {
+			if d := testy.DiffInterface(expected, indexes); d != nil {
 				t.Error(d)
 			}
 		},
@@ -752,7 +752,7 @@ func TestExplain(t *testing.T) {
 			plan, err := c.DB(context.TODO(), "foo").Explain(context.TODO(), map[string]interface{}{"foo": "bar"})
 			testy.Error(t, "", err)
 			expected := &kivik.QueryPlan{DBName: "foo"}
-			if d := diff.Interface(expected, plan); d != nil {
+			if d := testy.DiffInterface(expected, plan); d != nil {
 				t.Error(d)
 			}
 		},
@@ -1736,7 +1736,7 @@ func TestLocalDocs(t *testing.T) {
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo", "bar", "baz"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 		},
@@ -1980,7 +1980,7 @@ func TestQuery(t *testing.T) {
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo", "bar", "baz"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 		},
@@ -2070,7 +2070,7 @@ func TestSecurity(t *testing.T) {
 			db := c.DB(context.TODO(), "foo")
 			result, err := db.Security(context.TODO())
 			testy.Error(t, "", err)
-			if d := diff.Interface(clientSec, result); d != nil {
+			if d := testy.DiffInterface(clientSec, result); d != nil {
 				t.Error(d)
 			}
 		},
@@ -2190,7 +2190,7 @@ func TestStats(t *testing.T) {
 			result, err := db.Stats(context.TODO())
 			testy.Error(t, "", err)
 			expected := &kivik.DBStats{Name: "foo"}
-			if d := diff.Interface(expected, result); d != nil {
+			if d := testy.DiffInterface(expected, result); d != nil {
 				t.Error(d)
 			}
 		},
@@ -2283,7 +2283,7 @@ func TestBulkDocs(t *testing.T) {
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo", "bar", "baz"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 		},
@@ -2305,7 +2305,7 @@ func TestBulkDocs(t *testing.T) {
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 			testy.Error(t, "foo err", rows.Err())
@@ -2355,7 +2355,7 @@ func TestBulkDocs(t *testing.T) {
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 			testy.Error(t, "context deadline exceeded", rows.Err())
@@ -2482,7 +2482,7 @@ func TestDesignDocs(t *testing.T) {
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo", "bar", "baz"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 		},
@@ -2575,7 +2575,7 @@ func TestChanges(t *testing.T) {
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo", "bar", "baz"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 		},
@@ -2597,7 +2597,7 @@ func TestChanges(t *testing.T) {
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 			testy.Error(t, "foo err", rows.Err())
@@ -2647,7 +2647,7 @@ func TestChanges(t *testing.T) {
 				ids = append(ids, rows.ID())
 			}
 			expected := []string{"foo"}
-			if d := diff.Interface(expected, ids); d != nil {
+			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
 			testy.Error(t, "context deadline exceeded", rows.Err())
@@ -2761,7 +2761,7 @@ func TestRevsDiff(t *testing.T) {
 				}
 				results[rows.ID()] = val
 			}
-			if d := diff.AsJSON(&diff.File{Path: "testdata/" + testy.Stub(t)}, results); d != nil {
+			if d := testy.DiffAsJSON(testy.Snapshot(t), results); d != nil {
 				t.Error(d)
 			}
 		},

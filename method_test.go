@@ -3,7 +3,7 @@ package kivikmock
 import (
 	"testing"
 
-	"github.com/flimzy/testy"
+	"gitlab.com/flimzy/testy"
 )
 
 type methodTest struct {

@@ -3,8 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/flimzy/diff"
-	"github.com/flimzy/testy"
+	"gitlab.com/flimzy/testy"
 )
 
 func TestCompareMethods(t *testing.T) {
@@ -47,13 +46,13 @@ func TestCompareMethods(t *testing.T) {
 
 	tests.Run(t, func(t *testing.T, test tst) {
 		same, client, driver := compareMethods(test.client, test.driver)
-		if d := diff.Interface(test.expSame, same); d != nil {
+		if d := testy.DiffInterface(test.expSame, same); d != nil {
 			t.Errorf("Same:\n%s\n", d)
 		}
-		if d := diff.Interface(test.expClient, client); d != nil {
+		if d := testy.DiffInterface(test.expClient, client); d != nil {
 			t.Errorf("Same:\n%s\n", d)
 		}
-		if d := diff.Interface(test.expDriver, driver); d != nil {
+		if d := testy.DiffInterface(test.expDriver, driver); d != nil {
 			t.Errorf("Same:\n%s\n", d)
 		}
 	})

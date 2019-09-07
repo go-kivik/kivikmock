@@ -6,7 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flimzy/testy"
+	"gitlab.com/flimzy/testy"
+
 	"github.com/go-kivik/kivik/driver"
 )
 

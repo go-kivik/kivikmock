@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/flimzy/diff"
-	"github.com/flimzy/testy"
+	"gitlab.com/flimzy/testy"
+
 	"github.com/go-kivik/kivik"
 )
 
@@ -97,7 +97,7 @@ func TestMethods(t *testing.T) {
 	tests.Run(t, func(t *testing.T, test tst) {
 		result, err := parseMethods(test.input, test.isClient, nil)
 		testy.Error(t, test.err, err)
-		if d := diff.Interface(test.expected, result); d != nil {
+		if d := testy.DiffInterface(test.expected, result); d != nil {
 			t.Error(d)
 		}
 	})
