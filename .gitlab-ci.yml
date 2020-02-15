@@ -2,17 +2,12 @@ stages:
     - test
 
 variables:
-    SRCDIR: /go/src/github.com/go-kivik/kivikmock
     GO111MODULE: "on"
 
 .test: &test_template
     stage: test
     script:
-        - mkdir -p /go/src
-        - ln -s /builds /go/src/github.com
-        - cd ${SRCDIR}
-        - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-        - dep ensure && dep status
+        - go mod download
         - go test -race -tags=livetest ./...
 
 lint:
@@ -22,12 +17,8 @@ lint:
     before_script:
         - ''
     script:
-        - mkdir -p /go/src
-        - ln -s /builds /go/src/github.com
-        - cd ${SRCDIR}
-        - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-        - dep ensure && dep status
-        - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.17.1
+        - go mod download
+        - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.23.6
         - golangci-lint run ./...
 
 coverage:
@@ -37,11 +28,7 @@ coverage:
     before_script:
         - ''
     script:
-        - mkdir -p /go/src
-        - ln -s /builds /go/src/github.com
-        - cd ${SRCDIR}
-        - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-        - dep ensure && dep status
+        - go mod download
         - ./script/coverage.sh
 
 go-1.11:
@@ -58,17 +45,21 @@ go-1.13:
 
 gopherjs-1.12:
     <<: *test_template
+    variables:
+      SRCDIR: /go/src/github.com/go-kivik/kivikmock/v3
+      GO111MODULE: "on"
     image: golang:1.12
     script:
-        - mkdir -p /go/src
-        - ln -s /builds /go/src/github.com
+        - go get golang.org/dl/go1.12.16
+        - go1.12.16 download
+        - mkdir -p ${SRCDIR}
+        - mv ${CI_PROJECT_DIR}/* ${SRCDIR}
         - cd ${SRCDIR}
-        - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-        - dep ensure && dep status
-        - curl -sL https://deb.nodesource.com/setup_6.x | bash -
-        - apt-get update -qq && apt-get install -y nodejs npm
+        - go mod vendor
+        - curl -sL https://deb.nodesource.com/setup_12.x | bash -
+        - apt-get update -qq && apt-get install -y nodejs
         - npm install
-        - go get -u github.com/gopherjs/gopherjs
+        - GO111MODULE=off go get -u github.com/gopherjs/gopherjs
         - npm install source-map-support
         - |
             (
@@ -78,7 +69,7 @@ gopherjs-1.12:
                 mkdir -p ~/.node_libraries/
                 cp build/Release/syscall.node ~/.node_libraries/syscall.node
             )
-        - gopherjs test ./...
+        - GOPHERJS_GOROOT="$(go1.12.16 env GOROOT)" gopherjs test ./...
 
 go-rc:
     <<: *test_template
