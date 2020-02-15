@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-kivik/kivik/driver"
+	"github.com/go-kivik/kivik/v3/driver"
 )
 
 // ExpectedDBClose is used to manage *kivik.Client.Close expectation returned

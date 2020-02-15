@@ -3,7 +3,7 @@ package kivikmock
 import (
 	"context"
 
-	"github.com/go-kivik/kivik/driver"
+	"github.com/go-kivik/kivik/v3/driver"
 )
 
 type driverDB struct {
