@@ -3,6 +3,7 @@ stages:
 
 variables:
     SRCDIR: /go/src/github.com/go-kivik/kivikmock
+    GO111MODULE: "on"
 
 .test: &test_template
     stage: test
@@ -16,7 +17,7 @@ variables:
 
 lint:
     stage: test
-    image: golang:1.12
+    image: golang:1.13
     services: []
     before_script:
         - ''
@@ -31,7 +32,7 @@ lint:
 
 coverage:
     stage: test
-    image: golang:1.12
+    image: golang:1.13
     services: []
     before_script:
         - ''
@@ -43,29 +44,20 @@ coverage:
         - dep ensure && dep status
         - ./script/coverage.sh
 
-go-1.9:
-    <<: *test_template
-    stage: test
-    image: golang:1.9
-
-go-1.10:
-    <<: *test_template
-    stage: test
-    image: golang:1.10
-
 go-1.11:
     <<: *test_template
-    stage: test
     image: golang:1.11
 
 go-1.12:
     <<: *test_template
-    stage: test
     image: golang:1.12
+
+go-1.13:
+    <<: *test_template
+    image: golang:1.13
 
 gopherjs-1.12:
     <<: *test_template
-    stage: test
     image: golang:1.12
     script:
         - mkdir -p /go/src

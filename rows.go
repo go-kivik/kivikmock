@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-kivik/kivik/driver"
+	"github.com/go-kivik/kivik/v3/driver"
 )
 
 // Rows is a mocked collection of rows.

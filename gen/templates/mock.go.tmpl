@@ -3,8 +3,8 @@
 package kivikmock
 
 import (
-	"github.com/go-kivik/kivik"
-	"github.com/go-kivik/kivik/driver"
+	kivik "github.com/go-kivik/kivik/v3"
+	"github.com/go-kivik/kivik/v3/driver"
 )
 
 var _ = kivik.EndKeySuffix // To ensure a reference to kivik package

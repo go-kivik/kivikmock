@@ -6,8 +6,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/go-kivik/kivik"
-	"github.com/go-kivik/kivik/driver"
+	kivik "github.com/go-kivik/kivik/v3"
+	"github.com/go-kivik/kivik/v3/driver"
 )
 
 var pool *mockDriver
