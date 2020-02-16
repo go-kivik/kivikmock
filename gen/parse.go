@@ -5,7 +5,7 @@ import (
 	"errors"
 	"reflect"
 
-	kivik "github.com/go-kivik/kivik/v3"
+	kivik "github.com/go-kivik/kivik/v4"
 )
 
 // Method contains the relevant information for a driver method.

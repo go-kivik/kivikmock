@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 
-	kivik "github.com/go-kivik/kivik/v3"
+	kivik "github.com/go-kivik/kivik/v4"
 )
 
 func meets(a, e expectation) bool {

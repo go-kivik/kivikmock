@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-kivik/kivik/v3/driver"
+	"github.com/go-kivik/kivik/v4/driver"
 )
 
 // Updates is a mocked collection of database updates.

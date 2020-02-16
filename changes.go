@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-kivik/kivik/v3/driver"
+	"github.com/go-kivik/kivik/v4/driver"
 )
 
 // Changes is a mocked collection of Changes results.

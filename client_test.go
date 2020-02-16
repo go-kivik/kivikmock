@@ -10,9 +10,9 @@ import (
 	"github.com/flimzy/diff"
 	"gitlab.com/flimzy/testy"
 
-	couchdb "github.com/go-kivik/couchdb/v3"
-	kivik "github.com/go-kivik/kivik/v3"
-	"github.com/go-kivik/kivik/v3/driver"
+	couchdb "github.com/go-kivik/couchdb/v4"
+	kivik "github.com/go-kivik/kivik/v4"
+	"github.com/go-kivik/kivik/v4/driver"
 )
 
 type mockTest struct {

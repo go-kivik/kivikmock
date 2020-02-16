@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"sort"
 
-	kivik "github.com/go-kivik/kivik/v3"
-	"github.com/go-kivik/kivik/v3/driver"
+	kivik "github.com/go-kivik/kivik/v4"
+	"github.com/go-kivik/kivik/v4/driver"
 )
 
 var clientSkips = map[string]struct{}{
