@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flimzy/diff"
 	"gitlab.com/flimzy/testy"
 
 	couchdb "github.com/go-kivik/couchdb/v4"
@@ -104,7 +103,7 @@ func TestAllDBs(t *testing.T) {
 			test: func(t *testing.T, c *kivik.Client) {
 				result, err := c.AllDBs(context.TODO())
 				testy.Error(t, "", err)
-				if d := diff.Interface(expected, result); d != nil {
+				if d := testy.DiffInterface(expected, result); d != nil {
 					t.Error(d)
 				}
 			},
@@ -451,7 +450,7 @@ func TestDBsStats(t *testing.T) {
 					{Name: "foo", Cluster: &kivik.ClusterConfig{Replicas: 5}},
 					{Name: "bar"},
 				}
-				if d := diff.Interface(expected, result); d != nil {
+				if d := testy.DiffInterface(expected, result); d != nil {
 					t.Error(d)
 				}
 			},
@@ -537,7 +536,7 @@ func TestSession(t *testing.T) {
 				expected := &kivik.Session{
 					Name: "bob",
 				}
-				if d := diff.Interface(expected, session); d != nil {
+				if d := testy.DiffInterface(expected, session); d != nil {
 					t.Error(d)
 				}
 			},
@@ -581,7 +580,7 @@ func TestVersion(t *testing.T) {
 				session, err := c.Version(context.TODO())
 				testy.Error(t, "", err)
 				expected := &kivik.Version{Version: "1.2"}
-				if d := diff.Interface(expected, session); d != nil {
+				if d := testy.DiffInterface(expected, session); d != nil {
 					t.Error(d)
 				}
 			},
@@ -785,7 +784,7 @@ func TestDBUpdates(t *testing.T) {
 				names = append(names, updates.DBName())
 			}
 			expected := []string{"foo", "bar", "baz"}
-			if d := diff.Interface(expected, names); d != nil {
+			if d := testy.DiffInterface(expected, names); d != nil {
 				t.Error(d)
 			}
 		},
@@ -804,7 +803,7 @@ func TestDBUpdates(t *testing.T) {
 				names = append(names, updates.DBName())
 			}
 			expected := []string{"foo"}
-			if d := diff.Interface(expected, names); d != nil {
+			if d := testy.DiffInterface(expected, names); d != nil {
 				t.Error(d)
 			}
 			testy.Error(t, "foo err", updates.Err())
@@ -837,7 +836,7 @@ func TestDBUpdates(t *testing.T) {
 				names = append(names, updates.DBName())
 			}
 			expected := []string{"foo"}
-			if d := diff.Interface(expected, names); d != nil {
+			if d := testy.DiffInterface(expected, names); d != nil {
 				t.Error(d)
 			}
 			testy.Error(t, "context deadline exceeded", updates.Err())
@@ -883,7 +882,7 @@ func TestConfig(t *testing.T) {
 			test: func(t *testing.T, c *kivik.Client) {
 				result, err := c.Config(newCanceledContext(), "local")
 				testy.Error(t, "", err)
-				if d := diff.Interface(expected, result); d != nil {
+				if d := testy.DiffInterface(expected, result); d != nil {
 					t.Error(d)
 				}
 			},
@@ -931,7 +930,7 @@ func TestConfigSection(t *testing.T) {
 			test: func(t *testing.T, c *kivik.Client) {
 				result, err := c.ConfigSection(newCanceledContext(), "local", "foo")
 				testy.Error(t, "", err)
-				if d := diff.Interface(expected, result); d != nil {
+				if d := testy.DiffInterface(expected, result); d != nil {
 					t.Error(d)
 				}
 			},
@@ -980,7 +979,7 @@ func TestConfigValue(t *testing.T) {
 			test: func(t *testing.T, c *kivik.Client) {
 				result, err := c.ConfigValue(newCanceledContext(), "local", "foo", "bar")
 				testy.Error(t, "", err)
-				if d := diff.Interface(expected, result); d != nil {
+				if d := testy.DiffInterface(expected, result); d != nil {
 					t.Error(d)
 				}
 			},
@@ -1030,7 +1029,7 @@ func TestSetConfigValue(t *testing.T) {
 			test: func(t *testing.T, c *kivik.Client) {
 				result, err := c.SetConfigValue(newCanceledContext(), "local", "foo", "bar", "baz")
 				testy.Error(t, "", err)
-				if d := diff.Interface(expected, result); d != nil {
+				if d := testy.DiffInterface(expected, result); d != nil {
 					t.Error(d)
 				}
 			},
@@ -1079,7 +1078,7 @@ func TestDeleteConfigKey(t *testing.T) {
 			test: func(t *testing.T, c *kivik.Client) {
 				result, err := c.DeleteConfigKey(newCanceledContext(), "local", "foo", "bar")
 				testy.Error(t, "", err)
-				if d := diff.Interface(expected, result); d != nil {
+				if d := testy.DiffInterface(expected, result); d != nil {
 					t.Error(d)
 				}
 			},
