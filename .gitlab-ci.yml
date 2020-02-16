@@ -46,7 +46,7 @@ go-1.13:
 gopherjs-1.12:
     <<: *test_template
     variables:
-      SRCDIR: /go/src/github.com/go-kivik/kivikmock/v3
+      SRCDIR: /go/src/github.com/go-kivik/kivikmock/v4
       GO111MODULE: "on"
     image: golang:1.12
     script:

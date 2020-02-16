@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/go-kivik/kivik/v3/driver"
+	"github.com/go-kivik/kivik/v4/driver"
 )
 
 // ToDocumentT is deprecated.

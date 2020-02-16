@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"time"
 
-	kivik "github.com/go-kivik/kivik/v3"
+	kivik "github.com/go-kivik/kivik/v4"
 )
 
 // MockClient is deprecated
