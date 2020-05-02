@@ -3,6 +3,8 @@ package kivikmock
 import "sync"
 
 // MockDB is deprecated
+//
+// Deprecated: Use DB instead.
 type MockDB = DB
 
 // DB serves to create expectations for database actions to mock and test real
