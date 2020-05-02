@@ -9,9 +9,6 @@ import (
 	kivik "github.com/go-kivik/kivik/v4"
 )
 
-// MockClient is deprecated
-type MockClient = Client
-
 // Client allows configuring the mock kivik client.
 type Client struct {
 	ordered    bool

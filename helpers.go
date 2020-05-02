@@ -9,17 +9,6 @@ import (
 	"github.com/go-kivik/kivik/v4/driver"
 )
 
-// ToDocumentT is deprecated.
-func ToDocumentT(t *testing.T, i interface{}) *driver.Document {
-	t.Helper()
-	return DocumentT(t, i)
-}
-
-// ToDocument is deprecated.
-func ToDocument(i interface{}) (*driver.Document, error) {
-	return Document(i)
-}
-
 // DocumentT calls Document, and passes any error to t.Fatal.
 func DocumentT(t *testing.T, i interface{}) *driver.Document {
 	t.Helper()
