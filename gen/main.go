@@ -17,10 +17,13 @@ var clientSkips = map[string]struct{}{
 }
 
 var dbSkips = map[string]struct{}{
-	"Close":  {},
-	"Client": {},
-	"Err":    {},
-	"Name":   {},
+	"Close":         {},
+	"Client":        {},
+	"Err":           {},
+	"Name":          {},
+	"Search":        {},
+	"SearchAnalyze": {},
+	"SearchInfo":    {},
 }
 
 func main() {
@@ -81,12 +84,13 @@ type fullDB interface {
 	driver.Copier
 	driver.DBCloser
 	driver.DesignDocer
-	driver.Finder
+	driver.OptsFinder
 	driver.Flusher
 	driver.LocalDocer
 	driver.MetaGetter
 	driver.Purger
 	driver.RevsDiffer
+	driver.PartitionedDB
 }
 
 func db() error {

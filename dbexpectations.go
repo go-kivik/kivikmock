@@ -685,3 +685,23 @@ func (e *ExpectedRevsDiff) WithRevLookup(revLookup interface{}) *ExpectedRevsDif
 	e.arg0 = revLookup
 	return e
 }
+
+func (e *ExpectedPartitionStats) String() string {
+	var rets, opts []string
+	if e.ret0 != nil {
+		rets = []string{fmt.Sprintf("should return: %s", jsonDoc(e.ret0))}
+	}
+	if e.arg0 != "" {
+		opts = []string{fmt.Sprintf("with name: %v", e.arg0)}
+	} else {
+		opts = []string{"has any name"}
+	}
+	return dbStringer("PartitionStats", &e.commonExpectation, 0, opts, rets)
+}
+
+// WithName sets the expectation for the partition name passed to the
+// DB.PartitionStats() call.
+func (e *ExpectedPartitionStats) WithName(name string) *ExpectedPartitionStats {
+	e.arg0 = name
+	return e
+}
