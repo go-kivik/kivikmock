@@ -15,6 +15,8 @@ github.com/go-kivik/kivik/v3 v3.0.0-pre1 h1:9LMdKntRidwO/sou+ICYhAm/u6BvLyRlut2k
 github.com/go-kivik/kivik/v3 v3.0.0-pre1/go.mod h1:+4F5AG/l5+s1DKAu/SVREvNFa/ffVpwlG32gXB8yUng=
 github.com/go-kivik/kivik/v4 v4.0.0-20200214160900-846fe547c809 h1:tHMOmNuZ5G9p7lx0ogfEaaG/RIkVeuKEriFX4llWTEQ=
 github.com/go-kivik/kivik/v4 v4.0.0-20200214160900-846fe547c809/go.mod h1:yZnDIahvQZWysqlj1PZ3xS3uAldJ7LnAeBnCI7i/r20=
+github.com/go-kivik/kivik/v4 v4.0.0-20200502113154-ff3706e7b047 h1:N3OPfe5qQC2WCj2Ia5t3x6WjlO4PI6qTilUndPP4pnQ=
+github.com/go-kivik/kivik/v4 v4.0.0-20200502113154-ff3706e7b047/go.mod h1:O2fxy5xMXO7vaVr2gQG38sYTj/mHwg5Md/8kP7qUZQk=
 github.com/go-kivik/kiviktest v2.0.0+incompatible h1:y1RyPHqWQr+eFlevD30Tr3ipiPCxK78vRoD3o9YysjI=
 github.com/go-kivik/kiviktest v2.0.0+incompatible/go.mod h1:JdhVyzixoYhoIDUt6hRf1yAfYyaDa5/u9SDOindDkfQ=
 github.com/go-kivik/kiviktest/v3 v3.0.0-pre1 h1:OysIzVnRMXBQlr5aSfxasDNDOI//NP/ODBo+jAwJGAE=
@@ -45,6 +47,8 @@ github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81P
 gitlab.com/flimzy/testy v0.0.0-20190816103046-aca1ef5ffe7e/go.mod h1:MQwjgAyueIbBZv+qSYAMs6LaZwsJysPs0BK/niv9JiI=
 gitlab.com/flimzy/testy v0.0.2 h1:wii65HpZEbstqGT44+msiwzrX7SaxqNXj0BFjJc9iUY=
 gitlab.com/flimzy/testy v0.0.2/go.mod h1:YObF4cq711ubd/3U0ydRQQVz7Cnq/ChgJpVwNr/AJac=
+gitlab.com/flimzy/testy v0.0.3 h1:UkCz4aDa52cUX6uwvuVrwlTFZC1AesU5W6grDUcVFlg=
+gitlab.com/flimzy/testy v0.0.3/go.mod h1:YObF4cq711ubd/3U0ydRQQVz7Cnq/ChgJpVwNr/AJac=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/net v0.0.0-20200202094626-16171245cfb2 h1:CCH4IOTTfewWjGOlSp+zGcjutRKlBEZQ6wTn8ozI/nI=
 golang.org/x/net v0.0.0-20200202094626-16171245cfb2/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
