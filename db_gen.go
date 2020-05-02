@@ -76,20 +76,21 @@ func (db *driverDB) CreateDoc(ctx context.Context, arg0 interface{}, options map
 	return expected.ret0, expected.ret1, expected.wait(ctx)
 }
 
-func (db *driverDB) CreateIndex(ctx context.Context, arg0 string, arg1 string, arg2 interface{}) error {
+func (db *driverDB) CreateIndex(ctx context.Context, arg0 string, arg1 string, arg2 interface{}, options map[string]interface{}) error {
 	expected := &ExpectedCreateIndex{
 		arg0: arg0,
 		arg1: arg1,
 		arg2: arg2,
 		commonExpectation: commonExpectation{
-			db: db.DB,
+			db:      db.DB,
+			options: options,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
 	}
 	if expected.callback != nil {
-		return expected.callback(ctx, arg0, arg1, arg2)
+		return expected.callback(ctx, arg0, arg1, arg2, options)
 	}
 	return expected.wait(ctx)
 }
@@ -131,19 +132,20 @@ func (db *driverDB) DeleteAttachment(ctx context.Context, arg0 string, arg1 stri
 	return expected.ret0, expected.wait(ctx)
 }
 
-func (db *driverDB) DeleteIndex(ctx context.Context, arg0 string, arg1 string) error {
+func (db *driverDB) DeleteIndex(ctx context.Context, arg0 string, arg1 string, options map[string]interface{}) error {
 	expected := &ExpectedDeleteIndex{
 		arg0: arg0,
 		arg1: arg1,
 		commonExpectation: commonExpectation{
-			db: db.DB,
+			db:      db.DB,
+			options: options,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return err
 	}
 	if expected.callback != nil {
-		return expected.callback(ctx, arg0, arg1)
+		return expected.callback(ctx, arg0, arg1, options)
 	}
 	return expected.wait(ctx)
 }
@@ -295,34 +297,36 @@ func (db *driverDB) DesignDocs(ctx context.Context, options map[string]interface
 	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
 }
 
-func (db *driverDB) Explain(ctx context.Context, arg0 interface{}) (*driver.QueryPlan, error) {
+func (db *driverDB) Explain(ctx context.Context, arg0 interface{}, options map[string]interface{}) (*driver.QueryPlan, error) {
 	expected := &ExpectedExplain{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
-			db: db.DB,
+			db:      db.DB,
+			options: options,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
 	if expected.callback != nil {
-		return expected.callback(ctx, arg0)
+		return expected.callback(ctx, arg0, options)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
 
-func (db *driverDB) Find(ctx context.Context, arg0 interface{}) (driver.Rows, error) {
+func (db *driverDB) Find(ctx context.Context, arg0 interface{}, options map[string]interface{}) (driver.Rows, error) {
 	expected := &ExpectedFind{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
-			db: db.DB,
+			db:      db.DB,
+			options: options,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
 	if expected.callback != nil {
-		return expected.callback(ctx, arg0)
+		return expected.callback(ctx, arg0, options)
 	}
 	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
 }
@@ -380,17 +384,18 @@ func (db *driverDB) GetAttachmentMeta(ctx context.Context, arg0 string, arg1 str
 	return expected.ret0, expected.wait(ctx)
 }
 
-func (db *driverDB) GetIndexes(ctx context.Context) ([]driver.Index, error) {
+func (db *driverDB) GetIndexes(ctx context.Context, options map[string]interface{}) ([]driver.Index, error) {
 	expected := &ExpectedGetIndexes{
 		commonExpectation: commonExpectation{
-			db: db.DB,
+			db:      db.DB,
+			options: options,
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
 		return nil, err
 	}
 	if expected.callback != nil {
-		return expected.callback(ctx)
+		return expected.callback(ctx, options)
 	}
 	return expected.ret0, expected.wait(ctx)
 }
@@ -409,6 +414,22 @@ func (db *driverDB) LocalDocs(ctx context.Context, options map[string]interface{
 		return expected.callback(ctx, options)
 	}
 	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
+}
+
+func (db *driverDB) PartitionStats(ctx context.Context, arg0 string) (*driver.PartitionStats, error) {
+	expected := &ExpectedPartitionStats{
+		arg0: arg0,
+		commonExpectation: commonExpectation{
+			db: db.DB,
+		},
+	}
+	if err := db.client.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	if expected.callback != nil {
+		return expected.callback(ctx, arg0)
+	}
+	return expected.ret0, expected.wait(ctx)
 }
 
 func (db *driverDB) Purge(ctx context.Context, arg0 map[string][]string) (*driver.PurgeResult, error) {
