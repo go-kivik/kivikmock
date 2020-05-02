@@ -1482,3 +1482,60 @@ func TestRevsDiffString(t *testing.T) {
 
 	tests.Run(t, testStringer)
 }
+
+func TestPartitionStatsString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input: &ExpectedPartitionStats{commonExpectation: commonExpectation{db: &DB{name: "foo"}}},
+		expected: `call to DB(foo#0).PartitionStats() which:
+	- has any name`,
+	})
+	tests.Add("name", stringerTest{
+		input: &ExpectedPartitionStats{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg0: "foo"},
+		expected: `call to DB(foo#0).PartitionStats() which:
+	- with name: foo`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedPartitionStats{commonExpectation: commonExpectation{db: &DB{name: "foo"}, err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).PartitionStats() which:
+	- has any name
+	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedPartitionStats{commonExpectation: commonExpectation{db: &DB{name: "foo"}, delay: time.Second}},
+		expected: `call to DB(foo#0).PartitionStats() which:
+	- has any name
+	- should delay for: 1s`,
+	})
+	tests.Add("return", stringerTest{
+		input: &ExpectedPartitionStats{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, ret0: &driver.PartitionStats{DBName: "foo"}},
+		expected: `call to DB(foo#0).PartitionStats() which:
+	- has any name
+	- should return: {"DBName":"foo","DocCount":0,"DeletedDocCount":0,"Partition":"","ActiveSize":0,"ExternalSize":0,"RawResponse":null}`,
+	})
+	tests.Run(t, testStringer)
+}
+
+func TestSecurityString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input:    &ExpectedSecurity{commonExpectation: commonExpectation{db: &DB{name: "foo"}}},
+		expected: `call to DB(foo#0).Security()`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedSecurity{commonExpectation: commonExpectation{db: &DB{name: "foo"}, err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).Security() which:
+	- should return error: foo err`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedSecurity{commonExpectation: commonExpectation{db: &DB{name: "foo"}, delay: time.Second}},
+		expected: `call to DB(foo#0).Security() which:
+	- should delay for: 1s`,
+	})
+	tests.Add("return", stringerTest{
+		input: &ExpectedSecurity{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, ret0: &driver.Security{Admins: driver.Members{Names: []string{"bob", "alice"}}}},
+		expected: `call to DB(foo#0).Security() which:
+	- should return: {"admins":{"names":["bob","alice"]},"members":{}}`,
+	})
+	tests.Run(t, testStringer)
+}

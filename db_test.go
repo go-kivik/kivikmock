@@ -2769,3 +2769,41 @@ func TestRevsDiff(t *testing.T) {
 
 	tests.Run(t, testMock)
 }
+
+func TestPartitionStats(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("error", mockTest{
+		setup: func(m *Client) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPartitionStats().WillReturnError(errors.New("foo err"))
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			_, err := db.PartitionStats(context.TODO(), "foo")
+			testy.Error(t, "foo err", err)
+		},
+	})
+	tests.Add("success", mockTest{
+		setup: func(m *Client) {
+			db := m.NewDB()
+			m.ExpectDB().WillReturn(db)
+			db.ExpectPartitionStats().
+				WithName("foo").
+				WillReturn(&driver.PartitionStats{
+					DBName:    "foo",
+					Partition: "foo",
+				})
+		},
+		test: func(t *testing.T, c *kivik.Client) {
+			db := c.DB(context.TODO(), "foo")
+			stats, err := db.PartitionStats(context.TODO(), "foo")
+			testy.Error(t, "", err)
+			if d := testy.DiffAsJSON(testy.Snapshot(t), stats); d != nil {
+				t.Error(d)
+			}
+		},
+	})
+
+	tests.Run(t, testMock)
+}
