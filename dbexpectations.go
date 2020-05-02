@@ -580,7 +580,11 @@ func (e *ExpectedQuery) WithView(view string) *ExpectedQuery {
 }
 
 func (e *ExpectedSecurity) String() string {
-	return dbStringer("Security", &e.commonExpectation, 0, nil, nil)
+	var rets []string
+	if e.ret0 != nil {
+		rets = append(rets, fmt.Sprintf("should return: %s", jsonDoc(e.ret0)))
+	}
+	return dbStringer("Security", &e.commonExpectation, 0, nil, rets)
 }
 
 func (e *ExpectedSetSecurity) String() string {
