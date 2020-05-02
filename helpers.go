@@ -10,12 +10,16 @@ import (
 )
 
 // ToDocumentT is deprecated.
+//
+// Deprecated: use DocumentT instead.
 func ToDocumentT(t *testing.T, i interface{}) *driver.Document {
 	t.Helper()
 	return DocumentT(t, i)
 }
 
 // ToDocument is deprecated.
+//
+// Deprecated: use Document instead.
 func ToDocument(i interface{}) (*driver.Document, error) {
 	return Document(i)
 }

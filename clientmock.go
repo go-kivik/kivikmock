@@ -10,6 +10,8 @@ import (
 )
 
 // MockClient is deprecated
+//
+// Deprecated: Use Client instead.
 type MockClient = Client
 
 // Client allows configuring the mock kivik client.
