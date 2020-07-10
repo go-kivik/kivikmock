@@ -13,14 +13,16 @@ type driverClient struct {
 	*Client
 }
 
-var _ driver.Client = &driverClient{}
-var _ driver.ClientCloser = &driverClient{}
-var _ driver.Authenticator = &driverClient{}
-var _ driver.Cluster = &driverClient{}
-var _ driver.DBsStatser = &driverClient{}
-var _ driver.Pinger = &driverClient{}
-var _ driver.Sessioner = &driverClient{}
-var _ driver.Configer = &driverClient{}
+var (
+	_ driver.Client        = &driverClient{}
+	_ driver.ClientCloser  = &driverClient{}
+	_ driver.Authenticator = &driverClient{}
+	_ driver.Cluster       = &driverClient{}
+	_ driver.DBsStatser    = &driverClient{}
+	_ driver.Pinger        = &driverClient{}
+	_ driver.Sessioner     = &driverClient{}
+	_ driver.Configer      = &driverClient{}
+)
 
 func (c *driverClient) Authenticate(ctx context.Context, authenticator interface{}) error {
 	expected := &ExpectedAuthenticate{
