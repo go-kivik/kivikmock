@@ -11,8 +11,10 @@ import (
 	"github.com/go-kivik/kivik/v4/driver"
 )
 
-var _ = &driver.Attachment{}
-var _ = reflect.Int
+var (
+	_ = &driver.Attachment{}
+	_ = reflect.Int
+)
 
 // ExpectedCompact represents an expectation for a call to DB.Compact().
 type ExpectedCompact struct {

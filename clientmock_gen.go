@@ -7,8 +7,10 @@ import (
 	"github.com/go-kivik/kivik/v4/driver"
 )
 
-var _ = kivik.EndKeySuffix // To ensure a reference to kivik package
-var _ = &driver.Attachment{}
+var (
+	_ = kivik.EndKeySuffix // To ensure a reference to kivik package
+	_ = &driver.Attachment{}
+)
 
 // ExpectAllDBs queues an expectation that AllDBs will be called.
 func (c *Client) ExpectAllDBs() *ExpectedAllDBs {
@@ -122,6 +124,13 @@ func (c *Client) ExpectDBsStats() *ExpectedDBsStats {
 // ExpectGetReplications queues an expectation that GetReplications will be called.
 func (c *Client) ExpectGetReplications() *ExpectedGetReplications {
 	e := &ExpectedGetReplications{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
+// ExpectMembership queues an expectation that Membership will be called.
+func (c *Client) ExpectMembership() *ExpectedMembership {
+	e := &ExpectedMembership{}
 	c.expected = append(c.expected, e)
 	return e
 }

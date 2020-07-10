@@ -238,6 +238,17 @@ func (c *driverClient) GetReplications(ctx context.Context, options map[string]i
 	return driverReplications(expected.ret0), expected.wait(ctx)
 }
 
+func (c *driverClient) Membership(ctx context.Context) (*driver.ClusterMembership, error) {
+	expected := &ExpectedMembership{}
+	if err := c.nextExpectation(expected); err != nil {
+		return nil, err
+	}
+	if expected.callback != nil {
+		return expected.callback(ctx)
+	}
+	return expected.ret0, expected.wait(ctx)
+}
+
 func (c *driverClient) Replicate(ctx context.Context, arg0 string, arg1 string, options map[string]interface{}) (driver.Replication, error) {
 	expected := &ExpectedReplicate{
 		arg0: arg0,

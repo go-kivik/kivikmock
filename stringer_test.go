@@ -241,6 +241,25 @@ func TestClusterStatusString(t *testing.T) {
 	tests.Run(t, testStringer)
 }
 
+func TestMembershipString(t *testing.T) {
+	tests := testy.NewTable()
+	tests.Add("empty", stringerTest{
+		input:    &ExpectedMembership{},
+		expected: `call to Membership()`,
+	})
+	tests.Add("error", stringerTest{
+		input: &ExpectedMembership{commonExpectation: commonExpectation{err: errors.New("foo error")}},
+		expected: `call to Membership() which:
+	- should return error: foo error`,
+	})
+	tests.Add("delay", stringerTest{
+		input: &ExpectedMembership{commonExpectation: commonExpectation{delay: time.Second}},
+		expected: `call to Membership() which:
+	- should delay for: 1s`,
+	})
+	tests.Run(t, testStringer)
+}
+
 func TestDBExistsString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", stringerTest{
