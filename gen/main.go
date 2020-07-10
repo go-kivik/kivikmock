@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"sort"
 
-	kivik "github.com/go-kivik/kivik/v3"
+	"github.com/go-kivik/kivik/v3"
 	"github.com/go-kivik/kivik/v3/driver"
 )
 
@@ -45,6 +45,7 @@ type fullClient interface {
 	driver.Pinger
 	driver.Sessioner
 	driver.Cluster
+	driver.Cluster2
 	driver.ClientCloser
 	driver.Authenticator
 	driver.ClientReplicator
