@@ -126,6 +126,13 @@ func (c *Client) ExpectGetReplications() *ExpectedGetReplications {
 	return e
 }
 
+// ExpectMembership queues an expectation that Membership will be called.
+func (c *Client) ExpectMembership() *ExpectedMembership {
+	e := &ExpectedMembership{}
+	c.expected = append(c.expected, e)
+	return e
+}
+
 // ExpectReplicate queues an expectation that Replicate will be called.
 func (c *Client) ExpectReplicate() *ExpectedReplicate {
 	e := &ExpectedReplicate{}

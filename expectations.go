@@ -111,6 +111,15 @@ func (e *ExpectedClusterStatus) String() string {
 		errorString(e.err)
 }
 
+func (e *ExpectedMembership) String() string {
+	extra := delayString(e.delay) + errorString(e.err)
+	msg := "call to Membership()"
+	if extra != "" {
+		msg += " which:" + extra
+	}
+	return msg
+}
+
 // WithAction specifies the action to be matched. Note that this expectation
 // is compared with the actual action's marshaled JSON output, so it is not
 // essential that the data types match exactly, in a Go sense.
