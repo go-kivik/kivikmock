@@ -21,8 +21,10 @@ type driverRows struct {
 	*Rows
 }
 
-var _ driver.Rows = &driverRows{}
-var _ driver.RowsWarner = &driverRows{}
+var (
+	_ driver.Rows       = &driverRows{}
+	_ driver.RowsWarner = &driverRows{}
+)
 
 func (r *driverRows) Offset() int64     { return r.offset }
 func (r *driverRows) UpdateSeq() string { return r.updateSeq }

@@ -10,9 +10,11 @@ type driverDB struct {
 	*DB
 }
 
-var _ driver.DB = &driverDB{}
-var _ driver.BulkGetter = &driverDB{}
-var _ driver.OptsFinder = &driverDB{}
+var (
+	_ driver.DB         = &driverDB{}
+	_ driver.BulkGetter = &driverDB{}
+	_ driver.OptsFinder = &driverDB{}
+)
 
 func (db *driverDB) Close(ctx context.Context) error {
 	expected := &ExpectedDBClose{
