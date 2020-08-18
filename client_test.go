@@ -9,8 +9,8 @@ import (
 
 	"gitlab.com/flimzy/testy"
 
-	couchdb "github.com/go-kivik/couchdb/v4"
-	kivik "github.com/go-kivik/kivik/v4"
+	"github.com/go-kivik/couchdb/v4"
+	"github.com/go-kivik/kivik/v4"
 	"github.com/go-kivik/kivik/v4/driver"
 )
 
@@ -620,13 +620,13 @@ func TestDB(t *testing.T) {
 			m.ExpectDB().WithName("foo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Err()
+			err := c.DB("foo").Err()
 			testy.Error(t, "", err)
 		},
 	})
 	tests.Add("unexpected", mockTest{
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Err()
+			err := c.DB("foo").Err()
 			testy.Error(t, "call to DB() was not expected, all expectations already fulfilled", err)
 		},
 	})
@@ -635,7 +635,7 @@ func TestDB(t *testing.T) {
 			m.ExpectDB().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo", kivik.Options{"foo": 123}).Err()
+			err := c.DB("foo", kivik.Options{"foo": 123}).Err()
 			testy.Error(t, "", err)
 		},
 	})
@@ -644,21 +644,12 @@ func TestDB(t *testing.T) {
 			m.ExpectDB().WillReturn(m.NewDB())
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "asd")
+			db := c.DB("asd")
 			err := db.Err()
 			testy.Error(t, "", err)
 			if db.Name() != "asd" {
 				t.Errorf("Unexpected db name: %s", db.Name())
 			}
-		},
-	})
-	tests.Add("delay", mockTest{
-		setup: func(m *Client) {
-			m.ExpectDB().WillDelay(time.Second)
-		},
-		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(newCanceledContext(), "foo").Err()
-			testy.Error(t, "context canceled", err)
 		},
 	})
 	tests.Run(t, testMock)

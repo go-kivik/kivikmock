@@ -21,7 +21,7 @@ func TestCloseDB(t *testing.T) {
 			db.ExpectClose().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Close(context.TODO())
+			err := c.DB("foo").Close(context.TODO())
 			testy.Error(t, "foo err", err)
 		},
 		err: "",
@@ -32,7 +32,7 @@ func TestCloseDB(t *testing.T) {
 			m.ExpectDB().WillReturn(db)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Close(context.TODO())
+			err := c.DB("foo").Close(context.TODO())
 			testy.Error(t, "call to DB.Close() was not expected, all expectations already fulfilled", err)
 		},
 	})
@@ -43,7 +43,7 @@ func TestCloseDB(t *testing.T) {
 			db.ExpectClose().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Close(newCanceledContext())
+			err := c.DB("foo").Close(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -57,8 +57,8 @@ func TestCloseDB(t *testing.T) {
 			foo.ExpectClose()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			err := foo.Close(context.TODO())
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -73,7 +73,7 @@ func TestCloseDB(t *testing.T) {
 			})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Close(context.TODO())
+			err := c.DB("foo").Close(context.TODO())
 			testy.Error(t, "custom error", err)
 		},
 	})
@@ -89,7 +89,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			db.ExpectAllDocs().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.AllDocs(context.TODO())
 			testy.Error(t, "foo err", err)
 		},
@@ -100,7 +100,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			m.ExpectDB().WillReturn(db)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.AllDocs(context.TODO())
 			testy.Error(t, "call to DB.AllDocs() was not expected, all expectations already fulfilled", err)
 		},
@@ -112,7 +112,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			db.ExpectAllDocs().WillReturn(NewRows().CloseError(errors.New("bar err")))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.AllDocs(context.TODO())
 			testy.Error(t, "", err)
 			testy.Error(t, "bar err", rows.Close())
@@ -125,7 +125,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			db.ExpectAllDocs().WillReturn(NewRows().Offset(123))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.AllDocs(context.TODO())
 			testy.Error(t, "", err)
 			if o := rows.Offset(); o != 123 {
@@ -140,7 +140,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			db.ExpectAllDocs().WillReturn(NewRows().TotalRows(123))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.AllDocs(context.TODO())
 			testy.Error(t, "", err)
 			if o := rows.TotalRows(); o != 123 {
@@ -155,7 +155,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			db.ExpectAllDocs().WillReturn(NewRows().UpdateSeq("1-xxx"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.AllDocs(context.TODO())
 			testy.Error(t, "", err)
 			if o := rows.UpdateSeq(); o != "1-xxx" {
@@ -170,7 +170,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			db.ExpectAllDocs().WillReturn(NewRows().Warning("Caution!"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.AllDocs(context.TODO())
 			testy.Error(t, "", err)
 			if o := rows.Warning(); o != "Caution!" {
@@ -188,7 +188,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 				AddRow(&driver.Row{ID: "baz"}))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.AllDocs(context.TODO())
 			testy.Error(t, "", err)
 			ids := []string{}
@@ -210,7 +210,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 				AddRowError(errors.New("foo err")))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.AllDocs(context.TODO())
 			testy.Error(t, "", err)
 			ids := []string{}
@@ -231,7 +231,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			db.ExpectAllDocs().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.AllDocs(context.TODO())
 			testy.ErrorRE(t, `map\[foo:123]`, err)
 		},
@@ -243,7 +243,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			db.ExpectAllDocs().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.AllDocs(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
@@ -261,7 +261,7 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 		test: func(t *testing.T, c *kivik.Client) {
 			ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 			defer cancel()
-			rows, err := c.DB(ctx, "foo").AllDocs(ctx)
+			rows, err := c.DB("foo").AllDocs(ctx)
 			testy.Error(t, "", err)
 			ids := []string{}
 			for rows.Next() {
@@ -284,8 +284,8 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			foo.ExpectAllDocs()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.AllDocs(context.TODO())
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -303,7 +303,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 			db.ExpectBulkGet().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.BulkGet(context.TODO(), []kivik.BulkGetReference{})
 			testy.Error(t, "foo err", err)
 		},
@@ -314,7 +314,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 			m.ExpectDB().WillReturn(db)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.BulkGet(context.TODO(), []kivik.BulkGetReference{})
 			testy.Error(t, "call to DB.BulkGet() was not expected, all expectations already fulfilled", err)
 		},
@@ -329,7 +329,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 				AddRow(&driver.Row{ID: "baz"}))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.BulkGet(context.TODO(), []kivik.BulkGetReference{})
 			testy.Error(t, "", err)
 			ids := []string{}
@@ -349,7 +349,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 			db.ExpectBulkGet().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.BulkGet(context.TODO(), []kivik.BulkGetReference{})
 			testy.ErrorRE(t, `map\[foo:123]`, err)
 		},
@@ -361,7 +361,7 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 			db.ExpectBulkGet().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.BulkGet(newCanceledContext(), []kivik.BulkGetReference{})
 			testy.Error(t, "context canceled", err)
 		},
@@ -376,8 +376,8 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 			foo.ExpectBulkGet()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.BulkGet(context.TODO(), []kivik.BulkGetReference{})
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -395,7 +395,7 @@ func TestFind(t *testing.T) {
 			db.ExpectFind().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Find(context.TODO(), nil)
 			testy.Error(t, "foo err", err)
 		},
@@ -407,7 +407,7 @@ func TestFind(t *testing.T) {
 			db.ExpectFind().WithQuery(123)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Find(context.TODO(), 321)
 			testy.ErrorRE(t, "has query: 123", err)
 		},
@@ -422,7 +422,7 @@ func TestFind(t *testing.T) {
 				AddRow(&driver.Row{ID: "baz"}))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.Find(context.TODO(), 7)
 			testy.Error(t, "", err)
 			ids := []string{}
@@ -442,7 +442,7 @@ func TestFind(t *testing.T) {
 			db.ExpectFind().WithQuery(map[string]interface{}{"foo": "123"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Find(context.TODO(), map[string]string{"foo": "123"})
 			testy.ErrorRE(t, "", err)
 		},
@@ -454,7 +454,7 @@ func TestFind(t *testing.T) {
 			db.ExpectFind().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Find(newCanceledContext(), 0)
 			testy.Error(t, "context canceled", err)
 		},
@@ -469,8 +469,8 @@ func TestFind(t *testing.T) {
 			foo.ExpectFind()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.Find(context.TODO(), 1)
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -488,7 +488,7 @@ func TestCreateIndex(t *testing.T) {
 			db.ExpectCreateIndex().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").CreateIndex(context.TODO(), "foo", "bar", 123)
+			err := c.DB("foo").CreateIndex(context.TODO(), "foo", "bar", 123)
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -499,7 +499,7 @@ func TestCreateIndex(t *testing.T) {
 			db.ExpectCreateIndex().WithIndex(321)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").CreateIndex(context.TODO(), "foo", "bar", 123)
+			err := c.DB("foo").CreateIndex(context.TODO(), "foo", "bar", 123)
 			testy.ErrorRE(t, "has index: 321", err)
 		},
 	})
@@ -510,7 +510,7 @@ func TestCreateIndex(t *testing.T) {
 			db.ExpectCreateIndex().WithDDocID("moo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").CreateIndex(context.TODO(), "foo", "bar", 123)
+			err := c.DB("foo").CreateIndex(context.TODO(), "foo", "bar", 123)
 			testy.ErrorRE(t, "has ddoc: moo", err)
 		},
 	})
@@ -521,7 +521,7 @@ func TestCreateIndex(t *testing.T) {
 			db.ExpectCreateIndex().WithName("moo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").CreateIndex(context.TODO(), "foo", "bar", 123)
+			err := c.DB("foo").CreateIndex(context.TODO(), "foo", "bar", 123)
 			testy.ErrorRE(t, "has name: moo", err)
 		},
 	})
@@ -532,7 +532,7 @@ func TestCreateIndex(t *testing.T) {
 			db.ExpectCreateIndex().WithIndex("moo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").CreateIndex(context.TODO(), "foo", "bar", "moo")
+			err := c.DB("foo").CreateIndex(context.TODO(), "foo", "bar", "moo")
 			testy.Error(t, "", err)
 		},
 	})
@@ -543,7 +543,7 @@ func TestCreateIndex(t *testing.T) {
 			db.ExpectCreateIndex().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").CreateIndex(newCanceledContext(), "foo", "bar", "moo")
+			err := c.DB("foo").CreateIndex(newCanceledContext(), "foo", "bar", "moo")
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -557,8 +557,8 @@ func TestCreateIndex(t *testing.T) {
 			foo.ExpectCreateIndex()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			err := foo.CreateIndex(context.TODO(), "foo", "bar", 123)
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -576,7 +576,7 @@ func TestGetIndexes(t *testing.T) {
 			db.ExpectGetIndexes().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").GetIndexes(context.TODO())
+			_, err := c.DB("foo").GetIndexes(context.TODO())
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -590,7 +590,7 @@ func TestGetIndexes(t *testing.T) {
 			})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			indexes, err := c.DB(context.TODO(), "foo").GetIndexes(context.TODO())
+			indexes, err := c.DB("foo").GetIndexes(context.TODO())
 			testy.Error(t, "", err)
 			expected := []kivik.Index{
 				{Name: "foo"},
@@ -607,7 +607,7 @@ func TestGetIndexes(t *testing.T) {
 			m.ExpectDB().WillReturn(db)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").GetIndexes(context.TODO())
+			_, err := c.DB("foo").GetIndexes(context.TODO())
 			testy.Error(t, "call to DB.GetIndexes() was not expected, all expectations already fulfilled", err)
 		},
 	})
@@ -618,7 +618,7 @@ func TestGetIndexes(t *testing.T) {
 			db.ExpectGetIndexes().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").GetIndexes(newCanceledContext())
+			_, err := c.DB("foo").GetIndexes(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -632,8 +632,8 @@ func TestGetIndexes(t *testing.T) {
 			foo.ExpectGetIndexes()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.GetIndexes(context.TODO())
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -651,7 +651,7 @@ func TestDeleteIndex(t *testing.T) {
 			db.ExpectDeleteIndex().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").DeleteIndex(context.TODO(), "foo", "bar")
+			err := c.DB("foo").DeleteIndex(context.TODO(), "foo", "bar")
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -662,7 +662,7 @@ func TestDeleteIndex(t *testing.T) {
 			db.ExpectDeleteIndex().WithDDoc("oink")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").DeleteIndex(context.TODO(), "foo", "bar")
+			err := c.DB("foo").DeleteIndex(context.TODO(), "foo", "bar")
 			testy.ErrorRE(t, "has ddoc: oink", err)
 		},
 	})
@@ -673,7 +673,7 @@ func TestDeleteIndex(t *testing.T) {
 			db.ExpectDeleteIndex().WithName("oink")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").DeleteIndex(context.TODO(), "foo", "bar")
+			err := c.DB("foo").DeleteIndex(context.TODO(), "foo", "bar")
 			testy.ErrorRE(t, "has name: oink", err)
 		},
 	})
@@ -684,7 +684,7 @@ func TestDeleteIndex(t *testing.T) {
 			db.ExpectDeleteIndex().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").DeleteIndex(newCanceledContext(), "foo", "bar")
+			err := c.DB("foo").DeleteIndex(newCanceledContext(), "foo", "bar")
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -698,8 +698,8 @@ func TestDeleteIndex(t *testing.T) {
 			foo.ExpectDeleteIndex()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			err := foo.DeleteIndex(context.TODO(), "foo", "bar")
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -717,7 +717,7 @@ func TestExplain(t *testing.T) {
 			db.ExpectExplain().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Explain(context.TODO(), "foo")
+			_, err := c.DB("foo").Explain(context.TODO(), "foo")
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -727,7 +727,7 @@ func TestExplain(t *testing.T) {
 			m.ExpectDB().WillReturn(db)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Explain(context.TODO(), "foo")
+			_, err := c.DB("foo").Explain(context.TODO(), "foo")
 			testy.Error(t, "call to DB.Explain() was not expected, all expectations already fulfilled", err)
 		},
 	})
@@ -738,7 +738,7 @@ func TestExplain(t *testing.T) {
 			db.ExpectExplain().WithQuery(map[string]string{"foo": "bar"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Explain(context.TODO(), map[string]interface{}{"foo": "bar"})
+			_, err := c.DB("foo").Explain(context.TODO(), map[string]interface{}{"foo": "bar"})
 			testy.Error(t, "", err)
 		},
 	})
@@ -749,7 +749,7 @@ func TestExplain(t *testing.T) {
 			db.ExpectExplain().WillReturn(&driver.QueryPlan{DBName: "foo"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			plan, err := c.DB(context.TODO(), "foo").Explain(context.TODO(), map[string]interface{}{"foo": "bar"})
+			plan, err := c.DB("foo").Explain(context.TODO(), map[string]interface{}{"foo": "bar"})
 			testy.Error(t, "", err)
 			expected := &kivik.QueryPlan{DBName: "foo"}
 			if d := testy.DiffInterface(expected, plan); d != nil {
@@ -764,7 +764,7 @@ func TestExplain(t *testing.T) {
 			db.ExpectExplain().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Explain(newCanceledContext(), 123)
+			_, err := c.DB("foo").Explain(newCanceledContext(), 123)
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -778,8 +778,8 @@ func TestExplain(t *testing.T) {
 			foo.ExpectExplain()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.Explain(context.TODO(), 123)
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -797,7 +797,7 @@ func TestCreateDoc(t *testing.T) {
 			db.ExpectCreateDoc().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, _, err := c.DB(context.TODO(), "foo").CreateDoc(context.TODO(), "foo")
+			_, _, err := c.DB("foo").CreateDoc(context.TODO(), "foo")
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -810,7 +810,7 @@ func TestCreateDoc(t *testing.T) {
 				db.ExpectCreateDoc().WillReturn(docID, rev)
 			},
 			test: func(t *testing.T, c *kivik.Client) {
-				i, r, err := c.DB(context.TODO(), "foo").CreateDoc(context.TODO(), "foo")
+				i, r, err := c.DB("foo").CreateDoc(context.TODO(), "foo")
 				testy.Error(t, "", err)
 				if i != docID || r != rev {
 					t.Errorf("Unexpected docID/Rev: %s/%s", i, r)
@@ -825,7 +825,7 @@ func TestCreateDoc(t *testing.T) {
 			db.ExpectCreateDoc().WithDoc("foo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, _, err := c.DB(context.TODO(), "foo").CreateDoc(context.TODO(), "bar")
+			_, _, err := c.DB("foo").CreateDoc(context.TODO(), "bar")
 			testy.ErrorRE(t, `has doc: "foo"`, err)
 		},
 	})
@@ -836,7 +836,7 @@ func TestCreateDoc(t *testing.T) {
 			db.ExpectCreateDoc().WithOptions(map[string]interface{}{"foo": "bar"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, _, err := c.DB(context.TODO(), "foo").CreateDoc(context.TODO(), "bar", map[string]interface{}{})
+			_, _, err := c.DB("foo").CreateDoc(context.TODO(), "bar", map[string]interface{}{})
 			testy.ErrorRE(t, `has options: map\[foo:bar]`, err)
 		},
 	})
@@ -847,7 +847,7 @@ func TestCreateDoc(t *testing.T) {
 			db.ExpectCreateDoc().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, _, err := c.DB(context.TODO(), "foo").CreateDoc(newCanceledContext(), 123)
+			_, _, err := c.DB("foo").CreateDoc(newCanceledContext(), 123)
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -861,8 +861,8 @@ func TestCreateDoc(t *testing.T) {
 			foo.ExpectCreateDoc()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, _, err := foo.CreateDoc(context.TODO(), 123)
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -880,7 +880,7 @@ func TestCompact(t *testing.T) {
 			db.ExpectCompact().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Compact(context.TODO())
+			err := c.DB("foo").Compact(context.TODO())
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -891,7 +891,7 @@ func TestCompact(t *testing.T) {
 			db.ExpectCompact().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Compact(newCanceledContext())
+			err := c.DB("foo").Compact(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -901,7 +901,7 @@ func TestCompact(t *testing.T) {
 			m.ExpectDB().WillReturn(db)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Compact(context.TODO())
+			err := c.DB("foo").Compact(context.TODO())
 			testy.Error(t, "call to DB.Compact() was not expected, all expectations already fulfilled", err)
 		},
 	})
@@ -917,7 +917,7 @@ func TestCompactView(t *testing.T) {
 			db.ExpectCompactView().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").CompactView(context.TODO(), "foo")
+			err := c.DB("foo").CompactView(context.TODO(), "foo")
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -928,7 +928,7 @@ func TestCompactView(t *testing.T) {
 			db.ExpectCompactView().WithDDoc("foo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").CompactView(context.TODO(), "foo")
+			err := c.DB("foo").CompactView(context.TODO(), "foo")
 			testy.Error(t, "", err)
 		},
 	})
@@ -939,7 +939,7 @@ func TestCompactView(t *testing.T) {
 			db.ExpectCompactView().WithDDoc("foo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").CompactView(context.TODO(), "bar")
+			err := c.DB("foo").CompactView(context.TODO(), "bar")
 			testy.ErrorRE(t, "has ddocID: foo", err)
 		},
 	})
@@ -950,7 +950,7 @@ func TestCompactView(t *testing.T) {
 			db.ExpectCompactView().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").CompactView(newCanceledContext(), "foo")
+			err := c.DB("foo").CompactView(newCanceledContext(), "foo")
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -964,8 +964,8 @@ func TestCompactView(t *testing.T) {
 			foo.ExpectCompactView()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			err := foo.CompactView(context.TODO(), "foo")
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -983,7 +983,7 @@ func TestViewCleanup(t *testing.T) {
 			db.ExpectViewCleanup().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").ViewCleanup(context.TODO())
+			err := c.DB("foo").ViewCleanup(context.TODO())
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -994,7 +994,7 @@ func TestViewCleanup(t *testing.T) {
 			db.ExpectViewCleanup().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").ViewCleanup(newCanceledContext())
+			err := c.DB("foo").ViewCleanup(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -1004,7 +1004,7 @@ func TestViewCleanup(t *testing.T) {
 			m.ExpectDB().WillReturn(db)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").ViewCleanup(context.TODO())
+			err := c.DB("foo").ViewCleanup(context.TODO())
 			testy.Error(t, "call to DB.ViewCleanup() was not expected, all expectations already fulfilled", err)
 		},
 	})
@@ -1020,7 +1020,7 @@ func TestPut(t *testing.T) {
 			db.ExpectPut().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Put(context.TODO(), "foo", 123)
+			_, err := c.DB("foo").Put(context.TODO(), "foo", 123)
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -1031,7 +1031,7 @@ func TestPut(t *testing.T) {
 			db.ExpectPut().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Put(newCanceledContext(), "foo", 123)
+			_, err := c.DB("foo").Put(newCanceledContext(), "foo", 123)
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -1041,7 +1041,7 @@ func TestPut(t *testing.T) {
 			m.ExpectDB().WillReturn(db)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Put(context.TODO(), "foo", 123)
+			_, err := c.DB("foo").Put(context.TODO(), "foo", 123)
 			testy.Error(t, "call to DB.Put() was not expected, all expectations already fulfilled", err)
 		},
 	})
@@ -1055,8 +1055,8 @@ func TestPut(t *testing.T) {
 			foo.ExpectPut()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.Put(context.TODO(), "foo", 123)
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -1069,7 +1069,7 @@ func TestPut(t *testing.T) {
 			db.ExpectPut().WithDocID("foo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Put(context.TODO(), "bar", 123)
+			_, err := c.DB("foo").Put(context.TODO(), "bar", 123)
 			testy.ErrorRE(t, "has docID: foo", err)
 		},
 	})
@@ -1080,7 +1080,7 @@ func TestPut(t *testing.T) {
 			db.ExpectPut().WithDoc(map[string]string{"foo": "bar"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Put(context.TODO(), "foo", 123)
+			_, err := c.DB("foo").Put(context.TODO(), "foo", 123)
 			testy.ErrorRE(t, "has docID: foo", err)
 		},
 	})
@@ -1091,7 +1091,7 @@ func TestPut(t *testing.T) {
 			db.ExpectPut().WithOptions(map[string]interface{}{"foo": "bar"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Put(context.TODO(), "foo", 123, map[string]interface{}{"foo": 123})
+			_, err := c.DB("foo").Put(context.TODO(), "foo", 123, map[string]interface{}{"foo": 123})
 			testy.ErrorRE(t, "has docID: foo", err)
 		},
 	})
@@ -1102,7 +1102,7 @@ func TestPut(t *testing.T) {
 			db.ExpectPut().WillReturn("oink")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			result, err := c.DB(context.TODO(), "foo").Put(context.TODO(), "foo", 123)
+			result, err := c.DB("foo").Put(context.TODO(), "foo", 123)
 			testy.ErrorRE(t, "", err)
 			if result != "oink" {
 				t.Errorf("Unexpected result: %s", result)
@@ -1121,7 +1121,7 @@ func TestGetMeta(t *testing.T) {
 			db.ExpectGetMeta().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, _, err := c.DB(context.TODO(), "foo").GetMeta(context.TODO(), "foo")
+			_, _, err := c.DB("foo").GetMeta(context.TODO(), "foo")
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -1132,7 +1132,7 @@ func TestGetMeta(t *testing.T) {
 			db.ExpectGetMeta().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, _, err := c.DB(context.TODO(), "foo").GetMeta(newCanceledContext(), "foo")
+			_, _, err := c.DB("foo").GetMeta(newCanceledContext(), "foo")
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -1142,7 +1142,7 @@ func TestGetMeta(t *testing.T) {
 			m.ExpectDB().WillReturn(db)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, _, err := c.DB(context.TODO(), "foo").GetMeta(context.TODO(), "foo")
+			_, _, err := c.DB("foo").GetMeta(context.TODO(), "foo")
 			testy.Error(t, "call to DB.GetMeta() was not expected, all expectations already fulfilled", err)
 		},
 	})
@@ -1156,8 +1156,8 @@ func TestGetMeta(t *testing.T) {
 			foo.ExpectGetMeta()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, _, err := foo.GetMeta(context.TODO(), "foo")
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -1170,7 +1170,7 @@ func TestGetMeta(t *testing.T) {
 			db.ExpectGetMeta().WithDocID("foo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, _, err := c.DB(context.TODO(), "foo").GetMeta(context.TODO(), "bar")
+			_, _, err := c.DB("foo").GetMeta(context.TODO(), "bar")
 			testy.ErrorRE(t, "has docID: foo", err)
 		},
 	})
@@ -1181,7 +1181,7 @@ func TestGetMeta(t *testing.T) {
 			db.ExpectGetMeta().WithOptions(map[string]interface{}{"foo": "bar"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, _, err := c.DB(context.TODO(), "foo").GetMeta(context.TODO(), "foo", map[string]interface{}{"foo": 123})
+			_, _, err := c.DB("foo").GetMeta(context.TODO(), "foo", map[string]interface{}{"foo": 123})
 			testy.ErrorRE(t, "has docID: foo", err)
 		},
 	})
@@ -1192,7 +1192,7 @@ func TestGetMeta(t *testing.T) {
 			db.ExpectGetMeta().WillReturn(123, "1-oink")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			size, rev, err := c.DB(context.TODO(), "foo").GetMeta(context.TODO(), "foo")
+			size, rev, err := c.DB("foo").GetMeta(context.TODO(), "foo")
 			testy.ErrorRE(t, "", err)
 			if size != 123 {
 				t.Errorf("Unexpected size: %d", size)
@@ -1214,7 +1214,7 @@ func TestFlush(t *testing.T) {
 			db.ExpectFlush().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Flush(context.TODO())
+			err := c.DB("foo").Flush(context.TODO())
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -1225,7 +1225,7 @@ func TestFlush(t *testing.T) {
 			db.ExpectFlush().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Flush(newCanceledContext())
+			err := c.DB("foo").Flush(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -1239,8 +1239,8 @@ func TestFlush(t *testing.T) {
 			foo.ExpectFlush()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			err := foo.Flush(context.TODO())
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -1258,7 +1258,7 @@ func TestDeleteAttachment(t *testing.T) {
 			db.ExpectDeleteAttachment().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
+			_, err := c.DB("foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -1269,7 +1269,7 @@ func TestDeleteAttachment(t *testing.T) {
 			db.ExpectDeleteAttachment().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").DeleteAttachment(newCanceledContext(), "foo", "1-foo", "foo.txt")
+			_, err := c.DB("foo").DeleteAttachment(newCanceledContext(), "foo", "1-foo", "foo.txt")
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -1283,8 +1283,8 @@ func TestDeleteAttachment(t *testing.T) {
 			foo.ExpectDeleteAttachment()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -1297,7 +1297,7 @@ func TestDeleteAttachment(t *testing.T) {
 			db.ExpectDeleteAttachment().WithDocID("bar")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
+			_, err := c.DB("foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
 			testy.ErrorRE(t, "has docID: bar", err)
 		},
 	})
@@ -1308,7 +1308,7 @@ func TestDeleteAttachment(t *testing.T) {
 			db.ExpectDeleteAttachment().WithRev("2-asd")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
+			_, err := c.DB("foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
 			testy.ErrorRE(t, "has rev: 2-asd", err)
 		},
 	})
@@ -1319,7 +1319,7 @@ func TestDeleteAttachment(t *testing.T) {
 			db.ExpectDeleteAttachment().WithFilename("bar.txt")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
+			_, err := c.DB("foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
 			testy.ErrorRE(t, "has filename: bar.txt", err)
 		},
 	})
@@ -1330,7 +1330,7 @@ func TestDeleteAttachment(t *testing.T) {
 			db.ExpectDeleteAttachment().WithOptions(map[string]interface{}{"foo": "baz"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
+			_, err := c.DB("foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
 			testy.ErrorRE(t, `has options: map\[foo:baz]`, err)
 		},
 	})
@@ -1341,7 +1341,7 @@ func TestDeleteAttachment(t *testing.T) {
 			db.ExpectDeleteAttachment().WillReturn("2-fds")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			rev, err := c.DB(context.TODO(), "foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
+			rev, err := c.DB("foo").DeleteAttachment(context.TODO(), "foo", "1-foo", "foo.txt")
 			testy.Error(t, "", err)
 			if rev != "2-fds" {
 				t.Errorf("Unexpected rev: %s", rev)
@@ -1360,7 +1360,7 @@ func TestDelete(t *testing.T) {
 			db.ExpectDelete().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Delete(context.TODO(), "foo", "1-foo")
+			_, err := c.DB("foo").Delete(context.TODO(), "foo", "1-foo")
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -1371,7 +1371,7 @@ func TestDelete(t *testing.T) {
 			db.ExpectDelete().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Delete(newCanceledContext(), "foo", "1-foo")
+			_, err := c.DB("foo").Delete(newCanceledContext(), "foo", "1-foo")
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -1385,8 +1385,8 @@ func TestDelete(t *testing.T) {
 			foo.ExpectDelete()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.Delete(context.TODO(), "foo", "1-foo")
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -1399,7 +1399,7 @@ func TestDelete(t *testing.T) {
 			db.ExpectDelete().WithDocID("bar")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Delete(context.TODO(), "foo", "1-foo")
+			_, err := c.DB("foo").Delete(context.TODO(), "foo", "1-foo")
 			testy.ErrorRE(t, "has docID: bar", err)
 		},
 	})
@@ -1410,7 +1410,7 @@ func TestDelete(t *testing.T) {
 			db.ExpectDelete().WithRev("2-lkj")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Delete(context.TODO(), "foo", "1-foo")
+			_, err := c.DB("foo").Delete(context.TODO(), "foo", "1-foo")
 			testy.ErrorRE(t, "has rev: 2-lkj", err)
 		},
 	})
@@ -1421,7 +1421,7 @@ func TestDelete(t *testing.T) {
 			db.ExpectDelete().WithOptions(map[string]interface{}{"foo": "baz"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Delete(context.TODO(), "foo", "1-foo")
+			_, err := c.DB("foo").Delete(context.TODO(), "foo", "1-foo")
 			testy.ErrorRE(t, `has options: map\[foo:baz]`, err)
 		},
 	})
@@ -1432,7 +1432,7 @@ func TestDelete(t *testing.T) {
 			db.ExpectDelete().WillReturn("2-uio")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			rev, err := c.DB(context.TODO(), "foo").Delete(context.TODO(), "foo", "1-foo")
+			rev, err := c.DB("foo").Delete(context.TODO(), "foo", "1-foo")
 			testy.Error(t, "", err)
 			if rev != "2-uio" {
 				t.Errorf("Unexpected rev: %s", rev)
@@ -1451,7 +1451,7 @@ func TestCopy(t *testing.T) {
 			db.ExpectCopy().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Copy(context.TODO(), "foo", "bar")
+			_, err := c.DB("foo").Copy(context.TODO(), "foo", "bar")
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -1462,7 +1462,7 @@ func TestCopy(t *testing.T) {
 			db.ExpectCopy().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Copy(newCanceledContext(), "foo", "bar")
+			_, err := c.DB("foo").Copy(newCanceledContext(), "foo", "bar")
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -1476,8 +1476,8 @@ func TestCopy(t *testing.T) {
 			foo.ExpectCopy()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.Copy(context.TODO(), "foo", "1-foo")
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -1490,7 +1490,7 @@ func TestCopy(t *testing.T) {
 			db.ExpectCopy().WithTargetID("bar")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Copy(context.TODO(), "foo", "bar")
+			_, err := c.DB("foo").Copy(context.TODO(), "foo", "bar")
 			testy.ErrorRE(t, "has targetID: bar", err)
 		},
 	})
@@ -1501,7 +1501,7 @@ func TestCopy(t *testing.T) {
 			db.ExpectCopy().WithSourceID("baz")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Copy(context.TODO(), "foo", "bar")
+			_, err := c.DB("foo").Copy(context.TODO(), "foo", "bar")
 			testy.ErrorRE(t, "has sourceID: baz", err)
 		},
 	})
@@ -1512,7 +1512,7 @@ func TestCopy(t *testing.T) {
 			db.ExpectCopy().WithOptions(map[string]interface{}{"foo": "baz"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").Copy(context.TODO(), "foo", "bar")
+			_, err := c.DB("foo").Copy(context.TODO(), "foo", "bar")
 			testy.ErrorRE(t, `has options: map\[foo:baz]`, err)
 		},
 	})
@@ -1523,7 +1523,7 @@ func TestCopy(t *testing.T) {
 			db.ExpectCopy().WillReturn("2-oiu")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			rev, err := c.DB(context.TODO(), "foo").Copy(context.TODO(), "foo", "bar")
+			rev, err := c.DB("foo").Copy(context.TODO(), "foo", "bar")
 			testy.Error(t, "", err)
 			if rev != "2-oiu" {
 				t.Errorf("Unexpected rev: %s", rev)
@@ -1542,7 +1542,7 @@ func TestGet(t *testing.T) {
 			db.ExpectGet().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Get(context.TODO(), "foo").Err
+			err := c.DB("foo").Get(context.TODO(), "foo").Err
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -1553,7 +1553,7 @@ func TestGet(t *testing.T) {
 			db.ExpectGet().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Get(newCanceledContext(), "foo").Err
+			err := c.DB("foo").Get(newCanceledContext(), "foo").Err
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -1567,8 +1567,8 @@ func TestGet(t *testing.T) {
 			foo.ExpectGet()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			err := foo.Get(context.TODO(), "foo").Err
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -1581,7 +1581,7 @@ func TestGet(t *testing.T) {
 			db.ExpectGet().WithDocID("bar")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Get(context.TODO(), "foo").Err
+			err := c.DB("foo").Get(context.TODO(), "foo").Err
 			testy.ErrorRE(t, "has docID: bar", err)
 		},
 	})
@@ -1592,7 +1592,7 @@ func TestGet(t *testing.T) {
 			db.ExpectGet().WithOptions(map[string]interface{}{"foo": "baz"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			err := c.DB(context.TODO(), "foo").Get(context.TODO(), "foo").Err
+			err := c.DB("foo").Get(context.TODO(), "foo").Err
 			testy.ErrorRE(t, `has options: map\[foo:baz]`, err)
 		},
 	})
@@ -1603,7 +1603,7 @@ func TestGet(t *testing.T) {
 			db.ExpectGet().WillReturn(&driver.Document{Rev: "2-bar"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			row := c.DB(context.TODO(), "foo").Get(context.TODO(), "foo")
+			row := c.DB("foo").Get(context.TODO(), "foo")
 			testy.Error(t, "", row.Err)
 			if rev := row.Rev; rev != "2-bar" {
 				t.Errorf("Unexpected rev: %s", rev)
@@ -1622,7 +1622,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 			db.ExpectGetAttachmentMeta().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").GetAttachmentMeta(context.TODO(), "foo", "foo.txt")
+			_, err := c.DB("foo").GetAttachmentMeta(context.TODO(), "foo", "foo.txt")
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -1633,7 +1633,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 			db.ExpectGetAttachmentMeta().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").GetAttachmentMeta(newCanceledContext(), "foo", "foo.txt")
+			_, err := c.DB("foo").GetAttachmentMeta(newCanceledContext(), "foo", "foo.txt")
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -1647,8 +1647,8 @@ func TestGetAttachmentMeta(t *testing.T) {
 			foo.ExpectGetAttachmentMeta()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.GetAttachmentMeta(context.TODO(), "foo", "foo.txt")
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -1661,7 +1661,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 			db.ExpectGetAttachmentMeta().WithDocID("bar")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").GetAttachmentMeta(context.TODO(), "foo", "foo.txt")
+			_, err := c.DB("foo").GetAttachmentMeta(context.TODO(), "foo", "foo.txt")
 			testy.ErrorRE(t, "has docID: bar", err)
 		},
 	})
@@ -1672,7 +1672,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 			db.ExpectGetAttachmentMeta().WithFilename("bar.jpg")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").GetAttachmentMeta(context.TODO(), "foo", "foo.txt")
+			_, err := c.DB("foo").GetAttachmentMeta(context.TODO(), "foo", "foo.txt")
 			testy.ErrorRE(t, "has filename: bar.jpg", err)
 		},
 	})
@@ -1683,7 +1683,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 			db.ExpectGetAttachmentMeta().WithOptions(map[string]interface{}{"foo": "baz"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").GetAttachmentMeta(context.TODO(), "foo", "foo.txt")
+			_, err := c.DB("foo").GetAttachmentMeta(context.TODO(), "foo", "foo.txt")
 			testy.ErrorRE(t, `has options: map\[foo:baz]`, err)
 		},
 	})
@@ -1694,7 +1694,7 @@ func TestGetAttachmentMeta(t *testing.T) {
 			db.ExpectGetAttachmentMeta().WillReturn(&driver.Attachment{Filename: "foo.txt"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			att, err := c.DB(context.TODO(), "foo").GetAttachmentMeta(context.TODO(), "foo", "foo.txt")
+			att, err := c.DB("foo").GetAttachmentMeta(context.TODO(), "foo", "foo.txt")
 			testy.Error(t, "", err)
 			if filename := att.Filename; filename != "foo.txt" {
 				t.Errorf("Unexpected filename: %s", filename)
@@ -1713,7 +1713,7 @@ func TestLocalDocs(t *testing.T) {
 			db.ExpectLocalDocs().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.LocalDocs(context.TODO(), nil)
 			testy.Error(t, "foo err", err)
 		},
@@ -1728,7 +1728,7 @@ func TestLocalDocs(t *testing.T) {
 				AddRow(&driver.Row{ID: "baz"}))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.LocalDocs(context.TODO())
 			testy.Error(t, "", err)
 			ids := []string{}
@@ -1748,7 +1748,7 @@ func TestLocalDocs(t *testing.T) {
 			db.ExpectLocalDocs().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.LocalDocs(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
@@ -1763,8 +1763,8 @@ func TestLocalDocs(t *testing.T) {
 			foo.ExpectLocalDocs()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.LocalDocs(context.TODO())
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -1782,7 +1782,7 @@ func TestPurge(t *testing.T) {
 			db.ExpectPurge().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Purge(context.TODO(), nil)
 			testy.Error(t, "foo err", err)
 		},
@@ -1794,7 +1794,7 @@ func TestPurge(t *testing.T) {
 			db.ExpectPurge().WillReturn(&driver.PurgeResult{Seq: 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			result, err := db.Purge(context.TODO(), nil)
 			testy.Error(t, "", err)
 			if seq := result.Seq; seq != 123 {
@@ -1809,7 +1809,7 @@ func TestPurge(t *testing.T) {
 			db.ExpectPurge().WithDocRevMap(map[string][]string{"foo": {"a", "b"}})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Purge(context.TODO(), nil)
 			testy.ErrorRE(t, "has docRevMap: map", err)
 		},
@@ -1821,7 +1821,7 @@ func TestPurge(t *testing.T) {
 			db.ExpectPurge().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Purge(newCanceledContext(), nil)
 			testy.Error(t, "context canceled", err)
 		},
@@ -1836,8 +1836,8 @@ func TestPurge(t *testing.T) {
 			foo.ExpectPurge()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.Purge(context.TODO(), nil)
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -1855,7 +1855,7 @@ func TestPutAttachment(t *testing.T) {
 			db.ExpectPutAttachment().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			_, err := c.DB("foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -1866,7 +1866,7 @@ func TestPutAttachment(t *testing.T) {
 			db.ExpectPutAttachment().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").PutAttachment(newCanceledContext(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			_, err := c.DB("foo").PutAttachment(newCanceledContext(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -1880,8 +1880,8 @@ func TestPutAttachment(t *testing.T) {
 			foo.ExpectPutAttachment()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -1894,7 +1894,7 @@ func TestPutAttachment(t *testing.T) {
 			db.ExpectPutAttachment().WithDocID("bar")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			_, err := c.DB("foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
 			testy.ErrorRE(t, "has docID: bar", err)
 		},
 	})
@@ -1905,7 +1905,7 @@ func TestPutAttachment(t *testing.T) {
 			db.ExpectPutAttachment().WithRev("2-bar")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			_, err := c.DB("foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
 			testy.ErrorRE(t, "has rev: 2-bar", err)
 		},
 	})
@@ -1916,7 +1916,7 @@ func TestPutAttachment(t *testing.T) {
 			db.ExpectPutAttachment().WithAttachment(&driver.Attachment{Filename: "bar.jpg"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			_, err := c.DB("foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
 			testy.ErrorRE(t, "has attachment: bar.jpg", err)
 		},
 	})
@@ -1927,7 +1927,7 @@ func TestPutAttachment(t *testing.T) {
 			db.ExpectPutAttachment().WithOptions(map[string]interface{}{"foo": "bar"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"}, map[string]interface{}{"foo": 123})
+			_, err := c.DB("foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"}, map[string]interface{}{"foo": 123})
 			testy.ErrorRE(t, "has docID: foo", err)
 		},
 	})
@@ -1938,7 +1938,7 @@ func TestPutAttachment(t *testing.T) {
 			db.ExpectPutAttachment().WillReturn("2-boo")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			result, err := c.DB(context.TODO(), "foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
+			result, err := c.DB("foo").PutAttachment(context.TODO(), "foo", "1-foo", &kivik.Attachment{Filename: "foo.txt"})
 			testy.ErrorRE(t, "", err)
 			if result != "2-boo" {
 				t.Errorf("Unexpected result: %s", result)
@@ -1957,7 +1957,7 @@ func TestQuery(t *testing.T) {
 			db.ExpectQuery().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Query(context.TODO(), "foo", "bar")
 			testy.Error(t, "foo err", err)
 		},
@@ -1972,7 +1972,7 @@ func TestQuery(t *testing.T) {
 				AddRow(&driver.Row{ID: "baz"}))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.Query(context.TODO(), "foo", "bar")
 			testy.Error(t, "", err)
 			ids := []string{}
@@ -1992,7 +1992,7 @@ func TestQuery(t *testing.T) {
 			db.ExpectQuery().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Query(newCanceledContext(), "foo", "bar")
 			testy.Error(t, "context canceled", err)
 		},
@@ -2007,8 +2007,8 @@ func TestQuery(t *testing.T) {
 			foo.ExpectQuery()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.Query(context.TODO(), "foo", "bar")
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -2021,7 +2021,7 @@ func TestQuery(t *testing.T) {
 			db.ExpectQuery().WithDDocID("bar")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Query(context.TODO(), "foo", "bar")
 			testy.ErrorRE(t, "has ddocID: bar", err)
 		},
@@ -2033,7 +2033,7 @@ func TestQuery(t *testing.T) {
 			db.ExpectQuery().WithView("baz")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Query(context.TODO(), "foo", "bar")
 			testy.ErrorRE(t, "has view: baz", err)
 		},
@@ -2055,7 +2055,7 @@ func TestSecurity(t *testing.T) {
 			db.ExpectSecurity().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Security(context.TODO())
 			testy.Error(t, "foo err", err)
 		},
@@ -2067,7 +2067,7 @@ func TestSecurity(t *testing.T) {
 			db.ExpectSecurity().WillReturn(driverSec)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			result, err := db.Security(context.TODO())
 			testy.Error(t, "", err)
 			if d := testy.DiffInterface(clientSec, result); d != nil {
@@ -2082,7 +2082,7 @@ func TestSecurity(t *testing.T) {
 			db.ExpectSecurity().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Security(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
@@ -2097,8 +2097,8 @@ func TestSecurity(t *testing.T) {
 			foo.ExpectSecurity()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.Security(context.TODO())
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -2116,7 +2116,7 @@ func TestSetSecurity(t *testing.T) {
 			db.ExpectSetSecurity().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			err := db.SetSecurity(context.TODO(), clientSec)
 			testy.Error(t, "foo err", err)
 		},
@@ -2128,7 +2128,7 @@ func TestSetSecurity(t *testing.T) {
 			db.ExpectSetSecurity().WithSecurity(driverSec)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			err := db.SetSecurity(context.TODO(), clientSec)
 			testy.Error(t, "", err)
 		},
@@ -2140,7 +2140,7 @@ func TestSetSecurity(t *testing.T) {
 			db.ExpectSetSecurity().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			err := db.SetSecurity(newCanceledContext(), clientSec)
 			testy.Error(t, "context canceled", err)
 		},
@@ -2155,8 +2155,8 @@ func TestSetSecurity(t *testing.T) {
 			foo.ExpectSetSecurity()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			err := foo.SetSecurity(context.TODO(), clientSec)
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -2174,7 +2174,7 @@ func TestStats(t *testing.T) {
 			db.ExpectStats().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Stats(context.TODO())
 			testy.Error(t, "foo err", err)
 		},
@@ -2186,7 +2186,7 @@ func TestStats(t *testing.T) {
 			db.ExpectStats().WillReturn(&driver.DBStats{Name: "foo"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			result, err := db.Stats(context.TODO())
 			testy.Error(t, "", err)
 			expected := &kivik.DBStats{Name: "foo"}
@@ -2202,7 +2202,7 @@ func TestStats(t *testing.T) {
 			db.ExpectStats().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Stats(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
@@ -2217,8 +2217,8 @@ func TestStats(t *testing.T) {
 			foo.ExpectStats()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.Stats(context.TODO())
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -2236,7 +2236,7 @@ func TestBulkDocs(t *testing.T) {
 			db.ExpectBulkDocs().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.BulkDocs(context.TODO(), []interface{}{1})
 			testy.Error(t, "foo err", err)
 		},
@@ -2247,7 +2247,7 @@ func TestBulkDocs(t *testing.T) {
 			m.ExpectDB().WillReturn(db)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.BulkDocs(context.TODO(), []interface{}{1})
 			testy.Error(t, "call to DB.BulkDocs() was not expected, all expectations already fulfilled", err)
 		},
@@ -2259,7 +2259,7 @@ func TestBulkDocs(t *testing.T) {
 			db.ExpectBulkDocs().WillReturn(NewBulkResults().CloseError(errors.New("bar err")))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.BulkDocs(context.TODO(), []interface{}{1})
 			testy.Error(t, "", err)
 			testy.Error(t, "bar err", rows.Close())
@@ -2275,7 +2275,7 @@ func TestBulkDocs(t *testing.T) {
 				AddResult(&driver.BulkResult{ID: "baz"}))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.BulkDocs(context.TODO(), []interface{}{1})
 			testy.Error(t, "", err)
 			ids := []string{}
@@ -2297,7 +2297,7 @@ func TestBulkDocs(t *testing.T) {
 				AddResultError(errors.New("foo err")))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.BulkDocs(context.TODO(), []interface{}{1})
 			testy.Error(t, "", err)
 			ids := []string{}
@@ -2318,7 +2318,7 @@ func TestBulkDocs(t *testing.T) {
 			db.ExpectBulkDocs().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.BulkDocs(context.TODO(), []interface{}{1})
 			testy.ErrorRE(t, `map\[foo:123]`, err)
 		},
@@ -2330,7 +2330,7 @@ func TestBulkDocs(t *testing.T) {
 			db.ExpectBulkDocs().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.BulkDocs(newCanceledContext(), []interface{}{1})
 			testy.Error(t, "context canceled", err)
 		},
@@ -2348,7 +2348,7 @@ func TestBulkDocs(t *testing.T) {
 		test: func(t *testing.T, c *kivik.Client) {
 			ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 			defer cancel()
-			rows, err := c.DB(ctx, "foo").BulkDocs(ctx, []interface{}{1})
+			rows, err := c.DB("foo").BulkDocs(ctx, []interface{}{1})
 			testy.Error(t, "", err)
 			ids := []string{}
 			for rows.Next() {
@@ -2371,8 +2371,8 @@ func TestBulkDocs(t *testing.T) {
 			foo.ExpectBulkDocs()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.BulkDocs(context.TODO(), []interface{}{1})
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -2390,7 +2390,7 @@ func TestGetAttachment(t *testing.T) {
 			db.ExpectGetAttachment().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").GetAttachment(context.TODO(), "foo", "bar")
+			_, err := c.DB("foo").GetAttachment(context.TODO(), "foo", "bar")
 			testy.Error(t, "foo err", err)
 		},
 	})
@@ -2401,7 +2401,7 @@ func TestGetAttachment(t *testing.T) {
 			db.ExpectGetAttachment().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").GetAttachment(newCanceledContext(), "foo", "bar")
+			_, err := c.DB("foo").GetAttachment(newCanceledContext(), "foo", "bar")
 			testy.Error(t, "context canceled", err)
 		},
 	})
@@ -2415,8 +2415,8 @@ func TestGetAttachment(t *testing.T) {
 			foo.ExpectGetAttachment()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.GetAttachment(context.TODO(), "foo", "bar")
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -2429,7 +2429,7 @@ func TestGetAttachment(t *testing.T) {
 			db.ExpectGetAttachment().WithDocID("bar")
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			_, err := c.DB(context.TODO(), "foo").GetAttachment(context.TODO(), "foo", "bar")
+			_, err := c.DB("foo").GetAttachment(context.TODO(), "foo", "bar")
 			testy.ErrorRE(t, "has docID: bar", err)
 		},
 	})
@@ -2440,7 +2440,7 @@ func TestGetAttachment(t *testing.T) {
 			db.ExpectGetAttachment().WillReturn(&driver.Attachment{Filename: "foo.txt"})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			att, err := c.DB(context.TODO(), "foo").GetAttachment(context.TODO(), "foo", "bar")
+			att, err := c.DB("foo").GetAttachment(context.TODO(), "foo", "bar")
 			testy.Error(t, "", err)
 			if name := att.Filename; name != "foo.txt" {
 				t.Errorf("Unexpected filename: %s", name)
@@ -2459,7 +2459,7 @@ func TestDesignDocs(t *testing.T) {
 			db.ExpectDesignDocs().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.DesignDocs(context.TODO(), nil)
 			testy.Error(t, "foo err", err)
 		},
@@ -2474,7 +2474,7 @@ func TestDesignDocs(t *testing.T) {
 				AddRow(&driver.Row{ID: "baz"}))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.DesignDocs(context.TODO())
 			testy.Error(t, "", err)
 			ids := []string{}
@@ -2494,7 +2494,7 @@ func TestDesignDocs(t *testing.T) {
 			db.ExpectDesignDocs().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.DesignDocs(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
@@ -2509,8 +2509,8 @@ func TestDesignDocs(t *testing.T) {
 			foo.ExpectDesignDocs()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.DesignDocs(context.TODO())
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -2528,7 +2528,7 @@ func TestChanges(t *testing.T) {
 			db.ExpectChanges().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Changes(context.TODO())
 			testy.Error(t, "foo err", err)
 		},
@@ -2539,7 +2539,7 @@ func TestChanges(t *testing.T) {
 			m.ExpectDB().WillReturn(db)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Changes(context.TODO())
 			testy.Error(t, "call to DB.Changes() was not expected, all expectations already fulfilled", err)
 		},
@@ -2551,7 +2551,7 @@ func TestChanges(t *testing.T) {
 			db.ExpectChanges().WillReturn(NewChanges().CloseError(errors.New("bar err")))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.Changes(context.TODO())
 			testy.Error(t, "", err)
 			testy.Error(t, "bar err", rows.Close())
@@ -2567,7 +2567,7 @@ func TestChanges(t *testing.T) {
 				AddChange(&driver.Change{ID: "baz"}))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.Changes(context.TODO())
 			testy.Error(t, "", err)
 			ids := []string{}
@@ -2589,7 +2589,7 @@ func TestChanges(t *testing.T) {
 				AddChangeError(errors.New("foo err")))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.Changes(context.TODO())
 			testy.Error(t, "", err)
 			ids := []string{}
@@ -2610,7 +2610,7 @@ func TestChanges(t *testing.T) {
 			db.ExpectChanges().WithOptions(map[string]interface{}{"foo": 123})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Changes(context.TODO())
 			testy.ErrorRE(t, `map\[foo:123]`, err)
 		},
@@ -2622,7 +2622,7 @@ func TestChanges(t *testing.T) {
 			db.ExpectChanges().WillDelay(time.Second)
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.Changes(newCanceledContext())
 			testy.Error(t, "context canceled", err)
 		},
@@ -2640,7 +2640,7 @@ func TestChanges(t *testing.T) {
 		test: func(t *testing.T, c *kivik.Client) {
 			ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 			defer cancel()
-			rows, err := c.DB(ctx, "foo").Changes(ctx)
+			rows, err := c.DB("foo").Changes(ctx)
 			testy.Error(t, "", err)
 			ids := []string{}
 			for rows.Next() {
@@ -2663,8 +2663,8 @@ func TestChanges(t *testing.T) {
 			foo.ExpectChanges()
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			foo := c.DB(context.TODO(), "foo")
-			_ = c.DB(context.TODO(), "bar")
+			foo := c.DB("foo")
+			_ = c.DB("bar")
 			_, err := foo.Changes(context.TODO())
 			testy.ErrorRE(t, `Expected: call to DB\(bar`, err)
 		},
@@ -2677,7 +2677,7 @@ func TestChanges(t *testing.T) {
 			db.ExpectChanges().WillReturn(NewChanges().LastSeq("1-asdf"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			ch, err := db.Changes(context.TODO())
 			testy.Error(t, "", err)
 			if o := ch.LastSeq(); o != "1-asdf" {
@@ -2692,7 +2692,7 @@ func TestChanges(t *testing.T) {
 			db.ExpectChanges().WillReturn(NewChanges().Pending(123))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			ch, err := db.Changes(context.TODO())
 			testy.Error(t, "", err)
 			if o := ch.Pending(); o != 123 {
@@ -2707,7 +2707,7 @@ func TestChanges(t *testing.T) {
 			db.ExpectChanges().WillReturn(NewChanges().ETag("etag-foo"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			ch, err := db.Changes(context.TODO())
 			testy.Error(t, "", err)
 			if o := ch.ETag(); o != "etag-foo" {
@@ -2728,7 +2728,7 @@ func TestRevsDiff(t *testing.T) {
 			db.ExpectRevsDiff().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.RevsDiff(context.TODO(), revMap)
 			testy.Error(t, "foo err", err)
 		},
@@ -2750,7 +2750,7 @@ func TestRevsDiff(t *testing.T) {
 					}))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			rows, err := db.RevsDiff(context.TODO(), revMap)
 			testy.Error(t, "", err)
 			results := map[string]interface{}{}
@@ -2779,7 +2779,7 @@ func TestPartitionStats(t *testing.T) {
 			db.ExpectPartitionStats().WillReturnError(errors.New("foo err"))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			_, err := db.PartitionStats(context.TODO(), "foo")
 			testy.Error(t, "foo err", err)
 		},
@@ -2796,7 +2796,7 @@ func TestPartitionStats(t *testing.T) {
 				})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB(context.TODO(), "foo")
+			db := c.DB("foo")
 			stats, err := db.PartitionStats(context.TODO(), "foo")
 			testy.Error(t, "", err)
 			if d := testy.DiffAsJSON(testy.Snapshot(t), stats); d != nil {

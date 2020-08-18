@@ -7,10 +7,8 @@ import (
 	"github.com/go-kivik/kivik/v4/driver"
 )
 
-var (
-	_ = kivik.EndKeySuffix // To ensure a reference to kivik package
-	_ = &driver.Attachment{}
-)
+var _ = kivik.EndKeySuffix // To ensure a reference to kivik package
+var _ = &driver.Attachment{}
 
 // ExpectAllDBs queues an expectation that AllDBs will be called.
 func (c *Client) ExpectAllDBs() *ExpectedAllDBs {
