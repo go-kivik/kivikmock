@@ -180,7 +180,7 @@ func (c *driverClient) ConfigSection(ctx context.Context, arg0 string, arg1 stri
 	return expected.ret0, expected.wait(ctx)
 }
 
-func (c *driverClient) DB(ctx context.Context, arg0 string, options map[string]interface{}) (driver.DB, error) {
+func (c *driverClient) DB(arg0 string, options map[string]interface{}) (driver.DB, error) {
 	expected := &ExpectedDB{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
@@ -194,9 +194,9 @@ func (c *driverClient) DB(ctx context.Context, arg0 string, options map[string]i
 	expected.ret0.name = arg0
 	expected.ret0.mu.Unlock()
 	if expected.callback != nil {
-		return expected.callback(ctx, arg0, options)
+		return expected.callback(arg0, options)
 	}
-	return &driverDB{DB: expected.ret0}, expected.wait(ctx)
+	return &driverDB{DB: expected.ret0}, expected.err
 }
 
 func (c *driverClient) DBUpdates(ctx context.Context) (driver.DBUpdates, error) {
