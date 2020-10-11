@@ -1,10 +1,12 @@
 bou.ke/monkey v1.0.1/go.mod h1:FgHuK96Rv2Nlf+0u1OOVDpCMdsWyOFmeeketDHE7LIg=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/go-kivik/couchdb/v4 v4.0.0-20200818191020-c997633e0a27 h1:IRCxs48pqGR1Ij/0YSVOm5hESXhqjI65P7YgipFbVno=
-github.com/go-kivik/couchdb/v4 v4.0.0-20200818191020-c997633e0a27/go.mod h1:Yt6ekeUAqAV/E6bLYvI6y9nIr8EQ22GYPLhEmGPXv/Y=
+github.com/go-kivik/couchdb/v4 v4.0.0-20201011105359-723a6da29d45 h1:2MH49HJA2aFeF4izsPfTUlDd9F+jwaMVaQ/8VkbrQOU=
+github.com/go-kivik/couchdb/v4 v4.0.0-20201011105359-723a6da29d45/go.mod h1:pCV5a/g+JMKyPkBTf9Co7sKLFOu0WVlZtjSh7vW3Y9w=
 github.com/go-kivik/kivik/v4 v4.0.0-20200818182325-bd69ec6a93ff h1:TJHdUwkjzFiIJo7TMYVeaTS3tlipZxnREkluVBUur6U=
 github.com/go-kivik/kivik/v4 v4.0.0-20200818182325-bd69ec6a93ff/go.mod h1:O2fxy5xMXO7vaVr2gQG38sYTj/mHwg5Md/8kP7qUZQk=
+github.com/go-kivik/kivik/v4 v4.0.0-20201011094523-ab1764d67e62 h1:BHpOPeyQQnx9SvGJDipUls95YTO5FTPFV/qik0NSfeo=
+github.com/go-kivik/kivik/v4 v4.0.0-20201011094523-ab1764d67e62/go.mod h1:O2fxy5xMXO7vaVr2gQG38sYTj/mHwg5Md/8kP7qUZQk=
 github.com/go-kivik/kiviktest/v4 v4.0.0-20200818183706-ea0963c26090 h1:yRNmZ4AYqrS0K7n74nkSDH9147RJgGJc3KaymMtzF6A=
 github.com/go-kivik/kiviktest/v4 v4.0.0-20200818183706-ea0963c26090/go.mod h1:GLTRT1U0HT8a031sZDxLV7R5pzB9FvS2XWEv0Ptgg3I=
 github.com/gopherjs/gopherjs v0.0.0-20180825215210-0210a2f0f73c/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
