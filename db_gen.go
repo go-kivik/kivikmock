@@ -165,8 +165,8 @@ func (db *driverDB) Flush(ctx context.Context) error {
 	return expected.wait(ctx)
 }
 
-func (db *driverDB) GetMeta(ctx context.Context, arg0 string, options map[string]interface{}) (int64, string, error) {
-	expected := &ExpectedGetMeta{
+func (db *driverDB) GetRev(ctx context.Context, arg0 string, options map[string]interface{}) (string, error) {
+	expected := &ExpectedGetRev{
 		arg0: arg0,
 		commonExpectation: commonExpectation{
 			db:      db.DB,
@@ -174,12 +174,12 @@ func (db *driverDB) GetMeta(ctx context.Context, arg0 string, options map[string
 		},
 	}
 	if err := db.client.nextExpectation(expected); err != nil {
-		return 0, "", err
+		return "", err
 	}
 	if expected.callback != nil {
 		return expected.callback(ctx, arg0, options)
 	}
-	return expected.ret0, expected.ret1, expected.wait(ctx)
+	return expected.ret0, expected.wait(ctx)
 }
 
 func (db *driverDB) Put(ctx context.Context, arg0 string, arg1 interface{}, options map[string]interface{}) (string, error) {

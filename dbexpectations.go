@@ -288,7 +288,7 @@ func (e *ExpectedPut) WithDoc(doc interface{}) *ExpectedPut {
 	return e
 }
 
-func (e *ExpectedGetMeta) String() string {
+func (e *ExpectedGetRev) String() string {
 	var opts []string
 	if e.arg0 == "" {
 		opts = append(opts, "has any docID")
@@ -296,17 +296,14 @@ func (e *ExpectedGetMeta) String() string {
 		opts = append(opts, fmt.Sprintf("has docID: %s", e.arg0))
 	}
 	var rets []string
-	if e.ret0 != 0 {
-		rets = append(rets, fmt.Sprintf("should return size: %d", e.ret0))
+	if e.ret0 != "" {
+		rets = append(rets, "should return rev: "+e.ret0)
 	}
-	if e.ret1 != "" {
-		rets = append(rets, "should return rev: "+e.ret1)
-	}
-	return dbStringer("GetMeta", &e.commonExpectation, withOptions, opts, rets)
+	return dbStringer("GetRev", &e.commonExpectation, withOptions, opts, rets)
 }
 
-// WithDocID sets the expectation for the docID passed to the DB.GetMeta() call.
-func (e *ExpectedGetMeta) WithDocID(docID string) *ExpectedGetMeta {
+// WithDocID sets the expectation for the docID passed to the DB.GetRev call.
+func (e *ExpectedGetRev) WithDocID(docID string) *ExpectedGetRev {
 	e.arg0 = docID
 	return e
 }

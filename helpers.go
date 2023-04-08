@@ -25,9 +25,9 @@ func DocumentT(t *testing.T, i interface{}) *driver.Document {
 // i is checked against the following list of types, in order. If no match
 // is found, an error is returned. Attachments is not populated by this method.
 //
-//    - string, []byte, or json.RawMessage (interpreted as a JSON string)
-//    - io.Reader (assumes JSON can be read from the stream)
-//    - any other JSON-marshalable object
+//   - string, []byte, or json.RawMessage (interpreted as a JSON string)
+//   - io.Reader (assumes JSON can be read from the stream)
+//   - any other JSON-marshalable object
 func Document(i interface{}) (*driver.Document, error) {
 	buf, err := toJSON(i)
 	if err != nil {

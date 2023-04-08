@@ -788,44 +788,37 @@ func TestPutString(t *testing.T) {
 	tests.Run(t, testStringer)
 }
 
-func TestGetMetaString(t *testing.T) {
+func TestGetRevString(t *testing.T) {
 	tests := testy.NewTable()
 	tests.Add("empty", stringerTest{
-		input: &ExpectedGetMeta{commonExpectation: commonExpectation{db: &DB{name: "foo"}}},
-		expected: `call to DB(foo#0).GetMeta() which:
+		input: &ExpectedGetRev{commonExpectation: commonExpectation{db: &DB{name: "foo"}}},
+		expected: `call to DB(foo#0).GetRev() which:
 	- has any docID
 	- has any options`,
 	})
 	tests.Add("docID", stringerTest{
-		input: &ExpectedGetMeta{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg0: "foo"},
-		expected: `call to DB(foo#0).GetMeta() which:
+		input: &ExpectedGetRev{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg0: "foo"},
+		expected: `call to DB(foo#0).GetRev() which:
 	- has docID: foo
 	- has any options`,
 	})
-	tests.Add("size", stringerTest{
-		input: &ExpectedGetMeta{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, ret0: 123},
-		expected: `call to DB(foo#0).GetMeta() which:
-	- has any docID
-	- has any options
-	- should return size: 123`,
-	})
 	tests.Add("rev", stringerTest{
-		input: &ExpectedGetMeta{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, ret1: "1-xxx"},
-		expected: `call to DB(foo#0).GetMeta() which:
+		input: &ExpectedGetRev{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, ret0: "1-xxx"},
+		expected: `call to DB(foo#0).GetRev() which:
 	- has any docID
 	- has any options
 	- should return rev: 1-xxx`,
 	})
 	tests.Add("error", stringerTest{
-		input: &ExpectedGetMeta{commonExpectation: commonExpectation{db: &DB{name: "foo"}, err: errors.New("foo err")}},
-		expected: `call to DB(foo#0).GetMeta() which:
+		input: &ExpectedGetRev{commonExpectation: commonExpectation{db: &DB{name: "foo"}, err: errors.New("foo err")}},
+		expected: `call to DB(foo#0).GetRev() which:
 	- has any docID
 	- has any options
 	- should return error: foo err`,
 	})
 	tests.Add("delay", stringerTest{
-		input: &ExpectedGetMeta{commonExpectation: commonExpectation{db: &DB{name: "foo"}, delay: time.Second}},
-		expected: `call to DB(foo#0).GetMeta() which:
+		input: &ExpectedGetRev{commonExpectation: commonExpectation{db: &DB{name: "foo"}, delay: time.Second}},
+		expected: `call to DB(foo#0).GetRev() which:
 	- has any docID
 	- has any options
 	- should delay for: 1s`,
@@ -1554,7 +1547,7 @@ func TestSecurityString(t *testing.T) {
 	tests.Add("return", stringerTest{
 		input: &ExpectedSecurity{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, ret0: &driver.Security{Admins: driver.Members{Names: []string{"bob", "alice"}}}},
 		expected: `call to DB(foo#0).Security() which:
-	- should return: {"admins":{"names":["bob","alice"]},"members":{}}`,
+	- should return: {"admins":{"names":["bob","alice"]}}`,
 	})
 	tests.Run(t, testStringer)
 }

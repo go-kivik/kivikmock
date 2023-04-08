@@ -100,9 +100,9 @@ func (db *DB) ExpectFlush() *ExpectedFlush {
 	return e
 }
 
-// ExpectGetMeta queues an expectation that DB.GetMeta will be called.
-func (db *DB) ExpectGetMeta() *ExpectedGetMeta {
-	e := &ExpectedGetMeta{
+// ExpectGetRev queues an expectation that DB.GetRev will be called.
+func (db *DB) ExpectGetRev() *ExpectedGetRev {
+	e := &ExpectedGetRev{
 		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
@@ -134,7 +134,6 @@ func (db *DB) ExpectViewCleanup() *ExpectedViewCleanup {
 func (db *DB) ExpectAllDocs() *ExpectedAllDocs {
 	e := &ExpectedAllDocs{
 		commonExpectation: commonExpectation{db: db},
-		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -155,7 +154,6 @@ func (db *DB) ExpectBulkDocs() *ExpectedBulkDocs {
 func (db *DB) ExpectBulkGet() *ExpectedBulkGet {
 	e := &ExpectedBulkGet{
 		commonExpectation: commonExpectation{db: db},
-		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -176,7 +174,6 @@ func (db *DB) ExpectChanges() *ExpectedChanges {
 func (db *DB) ExpectDesignDocs() *ExpectedDesignDocs {
 	e := &ExpectedDesignDocs{
 		commonExpectation: commonExpectation{db: db},
-		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -198,7 +195,6 @@ func (db *DB) ExpectExplain() *ExpectedExplain {
 func (db *DB) ExpectFind() *ExpectedFind {
 	e := &ExpectedFind{
 		commonExpectation: commonExpectation{db: db},
-		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -249,7 +245,6 @@ func (db *DB) ExpectGetIndexes() *ExpectedGetIndexes {
 func (db *DB) ExpectLocalDocs() *ExpectedLocalDocs {
 	e := &ExpectedLocalDocs{
 		commonExpectation: commonExpectation{db: db},
-		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -291,7 +286,6 @@ func (db *DB) ExpectPutAttachment() *ExpectedPutAttachment {
 func (db *DB) ExpectQuery() *ExpectedQuery {
 	e := &ExpectedQuery{
 		commonExpectation: commonExpectation{db: db},
-		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
@@ -302,7 +296,6 @@ func (db *DB) ExpectQuery() *ExpectedQuery {
 func (db *DB) ExpectRevsDiff() *ExpectedRevsDiff {
 	e := &ExpectedRevsDiff{
 		commonExpectation: commonExpectation{db: db},
-		ret0:              &Rows{},
 	}
 	db.count++
 	db.client.expected = append(db.client.expected, e)
