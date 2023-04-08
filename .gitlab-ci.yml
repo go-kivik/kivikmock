@@ -24,18 +24,6 @@ coverage:
         - go mod download
         - ./script/coverage.sh
 
-go-1.13:
-    <<: *go_test_template
-    image: golang:1.13
-
-go-1.14:
-    <<: *go_test_template
-    image: golang:1.14
-
-go-1.15:
-    <<: *go_test_template
-    image: golang:1.15
-
 go-1.16:
     <<: *go_test_template
     image: golang:1.16
