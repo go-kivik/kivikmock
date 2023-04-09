@@ -87,7 +87,7 @@ type fullDB interface {
 	driver.OptsFinder
 	driver.Flusher
 	driver.LocalDocer
-	driver.MetaGetter
+	driver.RevGetter
 	driver.Purger
 	driver.RevsDiffer
 	driver.PartitionedDB
