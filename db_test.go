@@ -3,6 +3,7 @@ package kivikmock
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -2743,11 +2744,11 @@ func TestRevsDiff(t *testing.T) {
 				WillReturn(NewRows().
 					AddRow(&driver.Row{
 						ID:    "foo",
-						Value: []byte(`{"missing":["1"],"possible_ancestors":["2"]}`),
+						Value: strings.NewReader(`{"missing":["1"],"possible_ancestors":["2"]}`),
 					}).
 					AddRow(&driver.Row{
 						ID:    "bar",
-						Value: []byte(`{"missing":["x"]}`),
+						Value: strings.NewReader(`{"missing":["x"]}`),
 					}))
 		},
 		test: func(t *testing.T, c *kivik.Client) {
