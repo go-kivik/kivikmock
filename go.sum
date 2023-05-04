@@ -74,13 +74,13 @@ github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeME
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
-github.com/go-kivik/couchdb/v4 v4.0.0-20230403193523-d950b18ca444 h1:FGuboxgxnPaBOn4+Ae2MZ1SLv94h1ViO0qUOGZjYmhU=
-github.com/go-kivik/couchdb/v4 v4.0.0-20230403193523-d950b18ca444/go.mod h1:sso6w7UGIs/VXMd7FAug18l5cCOQOYdp2eY8Pn8baAk=
-github.com/go-kivik/kivik/v4 v4.0.0-20230330195943-0fcd5e6f5451/go.mod h1:WXlDuyGPIcNq7ejCME+bqYl7vzH/KpM9FLRPfsYEjZI=
-github.com/go-kivik/kivik/v4 v4.0.0-20230331074407-d84254814834 h1:09mIQDbdTiN7hNz0oy+MgkQSVhHE5H1R8pXDhEvOoHk=
-github.com/go-kivik/kivik/v4 v4.0.0-20230331074407-d84254814834/go.mod h1:WXlDuyGPIcNq7ejCME+bqYl7vzH/KpM9FLRPfsYEjZI=
-github.com/go-kivik/kiviktest/v4 v4.0.0-20230330202035-a6ae53d9f5a9 h1:B/9qQ+FU0fU2olMijOAqifmkxPmbuFs/QeO2vfFn1vk=
-github.com/go-kivik/kiviktest/v4 v4.0.0-20230330202035-a6ae53d9f5a9/go.mod h1:JHiJf1f4syQ2EW6QKkf6zPlaBU6Je6b8o67Lrp45Mmw=
+github.com/go-kivik/couchdb/v4 v4.0.0-20230504192610-d8aa32feeb2f h1:QVwnkEWQSDU5rVwWNBnyaMgxvcfGyGonuN7nP4fNZj8=
+github.com/go-kivik/couchdb/v4 v4.0.0-20230504192610-d8aa32feeb2f/go.mod h1:Ca6Kh2C3Ko4RPgDP1fJ7FtRPbCXDfz5k2tKmrq7kj9Y=
+github.com/go-kivik/kivik/v4 v4.0.0-20230430194615-b7cdddca6372/go.mod h1:QpyDiYUPz1874EXJTfY8qZgLMzqqLQ22Pgmnplcjvng=
+github.com/go-kivik/kivik/v4 v4.0.0-20230501195040-a1047e6b252d h1:VEZrqXrSbP/Krs3bilfEKJlrJi+VtQWwG2HapjQ/lUw=
+github.com/go-kivik/kivik/v4 v4.0.0-20230501195040-a1047e6b252d/go.mod h1:QpyDiYUPz1874EXJTfY8qZgLMzqqLQ22Pgmnplcjvng=
+github.com/go-kivik/kiviktest/v4 v4.0.0-20230430201722-e2a6a7954793 h1:lFLWw4qg/vJi3QhoNM9itPbjHI71BIEQ9yOtP4c1g48=
+github.com/go-kivik/kiviktest/v4 v4.0.0-20230430201722-e2a6a7954793/go.mod h1:E+BS0orKufwbkBRfIbnoSol9P0GoRSKkOPCzt9ba7ME=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/gogo/protobuf v1.3.2/go.mod h1:P1XiOD3dCwIKUDQYPy72D8LYyHL2YPYrpS2s69NZV8Q=
 github.com/golang-jwt/jwt v3.2.2+incompatible/go.mod h1:8pz2t5EyA70fFQQSrl6XZXzqecmYZeUEB8OUGHkxJ+I=
@@ -126,6 +126,7 @@ github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.3/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.4/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
+github.com/google/go-cmp v0.5.6 h1:BKbKCqvP6I+rmFHt06ZmyQtvB8xAkWdhFyr0ZUNZcxQ=
 github.com/google/go-cmp v0.5.6/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/martian v2.1.0+incompatible/go.mod h1:9I4somxYTbIHy5NJKHRl3wXiIaQGbYVAs8BPL6v8lEs=
@@ -262,8 +263,6 @@ github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
-gitlab.com/flimzy/testy v0.9.1/go.mod h1:4Yy2aelUY6IgRmd3jHgGWewZLNMQZWQTlwyuMW642Mc=
-gitlab.com/flimzy/testy v0.12.2/go.mod h1:9wPR98kErJw1lrq/aIJ8UZ6A0Dn7CHU0T6Qx4b2FiyQ=
 gitlab.com/flimzy/testy v0.12.4 h1:J2plNCG5d9FWfik30yOZrajcPrWbiDHrk0qw1nMstNU=
 gitlab.com/flimzy/testy v0.12.4/go.mod h1:9wPR98kErJw1lrq/aIJ8UZ6A0Dn7CHU0T6Qx4b2FiyQ=
 go.etcd.io/etcd/api/v3 v3.5.0/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQcPvs=
