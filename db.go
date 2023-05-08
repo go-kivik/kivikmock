@@ -13,7 +13,7 @@ type driverDB struct {
 var (
 	_ driver.DB         = &driverDB{}
 	_ driver.BulkGetter = &driverDB{}
-	_ driver.OptsFinder = &driverDB{}
+	_ driver.Finder     = &driverDB{}
 )
 
 func (db *driverDB) Close(ctx context.Context) error {

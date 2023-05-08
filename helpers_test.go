@@ -18,42 +18,33 @@ func TestDocument(t *testing.T) {
 	}
 	tests := testy.NewTable()
 	tests.Add("simple doc", tst{
-		i: map[string]string{"foo": "bar"},
-		expected: &driver.Document{
-			ContentLength: 14,
-		},
-		content: []byte(`{"foo":"bar"}`),
+		i:        map[string]string{"foo": "bar"},
+		expected: &driver.Document{},
+		content:  []byte(`{"foo":"bar"}`),
 	})
 	tests.Add("Unmarshalable", tst{
 		i:   func() {},
 		err: "json: unsupported type: func()",
 	})
 	tests.Add("raw string", tst{
-		i: `{"foo":"bar"}`,
-		expected: &driver.Document{
-			ContentLength: 13,
-		},
-		content: []byte(`{"foo":"bar"}`),
+		i:        `{"foo":"bar"}`,
+		expected: &driver.Document{},
+		content:  []byte(`{"foo":"bar"}`),
 	})
 	tests.Add("raw bytes", tst{
-		i: []byte(`{"foo":"bar"}`),
-		expected: &driver.Document{
-			ContentLength: 13,
-		},
-		content: []byte(`{"foo":"bar"}`),
+		i:        []byte(`{"foo":"bar"}`),
+		expected: &driver.Document{},
+		content:  []byte(`{"foo":"bar"}`),
 	})
 	tests.Add("json.RawMessage", tst{
-		i: json.RawMessage(`{"foo":"bar"}`),
-		expected: &driver.Document{
-			ContentLength: 13,
-		},
-		content: []byte(`{"foo":"bar"}`),
+		i:        json.RawMessage(`{"foo":"bar"}`),
+		expected: &driver.Document{},
+		content:  []byte(`{"foo":"bar"}`),
 	})
 	tests.Add("rev", tst{
 		i: `{"_rev":"1-xxx"}`,
 		expected: &driver.Document{
-			ContentLength: 16,
-			Rev:           "1-xxx",
+			Rev: "1-xxx",
 		},
 		content: []byte(`{"_rev":"1-xxx"}`),
 	})

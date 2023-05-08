@@ -199,13 +199,17 @@ func (c *driverClient) DB(arg0 string, options map[string]interface{}) (driver.D
 	return &driverDB{DB: expected.ret0}, expected.err
 }
 
-func (c *driverClient) DBUpdates(ctx context.Context) (driver.DBUpdates, error) {
-	expected := &ExpectedDBUpdates{}
+func (c *driverClient) DBUpdates(ctx context.Context, options map[string]interface{}) (driver.DBUpdates, error) {
+	expected := &ExpectedDBUpdates{
+		commonExpectation: commonExpectation{
+			options: options,
+		},
+	}
 	if err := c.nextExpectation(expected); err != nil {
 		return nil, err
 	}
 	if expected.callback != nil {
-		return expected.callback(ctx)
+		return expected.callback(ctx, options)
 	}
 	return &driverDBUpdates{Context: ctx, Updates: expected.ret0}, expected.wait(ctx)
 }

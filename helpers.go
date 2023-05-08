@@ -40,10 +40,9 @@ func Document(i interface{}) (*driver.Document, error) {
 		return nil, err
 	}
 	return &driver.Document{
-		ContentLength: int64(len(buf)),
-		Rev:           meta.Rev,
-		Body:          ioutil.NopCloser(bytes.NewReader(buf)),
-		Attachments:   nil,
+		Rev:         meta.Rev,
+		Body:        ioutil.NopCloser(bytes.NewReader(buf)),
+		Attachments: nil,
 	}, nil
 }
 

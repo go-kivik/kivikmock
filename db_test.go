@@ -198,7 +198,8 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			testy.Error(t, "", rows.Err())
 			ids := []string{}
 			for rows.Next() {
-				ids = append(ids, rows.ID())
+				id, _ := rows.ID()
+				ids = append(ids, id)
 			}
 			expected := []string{"foo", "bar", "baz"}
 			if d := testy.DiffInterface(expected, ids); d != nil {
@@ -220,7 +221,8 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			testy.Error(t, "", rows.Err())
 			ids := []string{}
 			for rows.Next() {
-				ids = append(ids, rows.ID())
+				id, _ := rows.ID()
+				ids = append(ids, id)
 			}
 			expected := []string{"foo"}
 			if d := testy.DiffInterface(expected, ids); d != nil {
@@ -270,7 +272,8 @@ func TestAllDocs(t *testing.T) { // nolint: gocyclo
 			testy.Error(t, "", rows.Err())
 			ids := []string{}
 			for rows.Next() {
-				ids = append(ids, rows.ID())
+				id, _ := rows.ID()
+				ids = append(ids, id)
 			}
 			expected := []string{"foo"}
 			if d := testy.DiffInterface(expected, ids); d != nil {
@@ -339,7 +342,8 @@ func TestBulkGet(t *testing.T) { // nolint: gocyclo
 			testy.Error(t, "", rows.Err())
 			ids := []string{}
 			for rows.Next() {
-				ids = append(ids, rows.ID())
+				id, _ := rows.ID()
+				ids = append(ids, id)
 			}
 			expected := []string{"foo", "bar", "baz"}
 			if d := testy.DiffInterface(expected, ids); d != nil {
@@ -432,7 +436,8 @@ func TestFind(t *testing.T) {
 			testy.Error(t, "", rows.Err())
 			ids := []string{}
 			for rows.Next() {
-				ids = append(ids, rows.ID())
+				id, _ := rows.ID()
+				ids = append(ids, id)
 			}
 			expected := []string{"foo", "bar", "baz"}
 			if d := testy.DiffInterface(expected, ids); d != nil {
@@ -1607,7 +1612,7 @@ func TestGet(t *testing.T) {
 		test: func(t *testing.T, c *kivik.Client) {
 			row := c.DB("foo").Get(context.TODO(), "foo")
 			testy.Error(t, "", row.Err())
-			if rev := row.Rev(); rev != "2-bar" {
+			if rev, _ := row.Rev(); rev != "2-bar" {
 				t.Errorf("Unexpected rev: %s", rev)
 			}
 		},
@@ -1735,7 +1740,8 @@ func TestLocalDocs(t *testing.T) {
 			testy.Error(t, "", rows.Err())
 			ids := []string{}
 			for rows.Next() {
-				ids = append(ids, rows.ID())
+				id, _ := rows.ID()
+				ids = append(ids, id)
 			}
 			expected := []string{"foo", "bar", "baz"}
 			if d := testy.DiffInterface(expected, ids); d != nil {
@@ -1979,7 +1985,8 @@ func TestQuery(t *testing.T) {
 			testy.Error(t, "", rows.Err())
 			ids := []string{}
 			for rows.Next() {
-				ids = append(ids, rows.ID())
+				id, _ := rows.ID()
+				ids = append(ids, id)
 			}
 			expected := []string{"foo", "bar", "baz"}
 			if d := testy.DiffInterface(expected, ids); d != nil {
@@ -2481,7 +2488,8 @@ func TestDesignDocs(t *testing.T) {
 			testy.Error(t, "", rows.Err())
 			ids := []string{}
 			for rows.Next() {
-				ids = append(ids, rows.ID())
+				id, _ := rows.ID()
+				ids = append(ids, id)
 			}
 			expected := []string{"foo", "bar", "baz"}
 			if d := testy.DiffInterface(expected, ids); d != nil {
@@ -2682,7 +2690,12 @@ func TestChanges(t *testing.T) {
 			db := c.DB("foo")
 			ch, err := db.Changes(context.TODO())
 			testy.Error(t, "", err)
-			if o := ch.LastSeq(); o != "1-asdf" {
+			_ = ch.Next()
+			meta, err := ch.Metadata()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if o := meta.LastSeq; o != "1-asdf" {
 				t.Errorf("Unexpected last_seq: %s", o)
 			}
 		},
@@ -2697,7 +2710,12 @@ func TestChanges(t *testing.T) {
 			db := c.DB("foo")
 			ch, err := db.Changes(context.TODO())
 			testy.Error(t, "", err)
-			if o := ch.Pending(); o != 123 {
+			_ = ch.Next()
+			meta, err := ch.Metadata()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if o := meta.Pending; o != 123 {
 				t.Errorf("Unexpected pending: %d", o)
 			}
 		},
@@ -2761,7 +2779,8 @@ func TestRevsDiff(t *testing.T) {
 				if err := rows.ScanValue(&val); err != nil {
 					t.Fatal(err)
 				}
-				results[rows.ID()] = val
+				id, _ := rows.ID()
+				results[id] = val
 			}
 			if d := testy.DiffAsJSON(testy.Snapshot(t), results); d != nil {
 				t.Error(d)
