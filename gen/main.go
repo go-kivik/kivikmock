@@ -84,7 +84,7 @@ type fullDB interface {
 	driver.Copier
 	driver.DBCloser
 	driver.DesignDocer
-	driver.OptsFinder
+	driver.Finder
 	driver.Flusher
 	driver.LocalDocer
 	driver.RevGetter
