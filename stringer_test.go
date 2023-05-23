@@ -1267,11 +1267,11 @@ func TestBulkDocsString(t *testing.T) {
 	tests.Add("return value", stringerTest{
 		input: &ExpectedBulkDocs{
 			commonExpectation: commonExpectation{db: &DB{name: "foo"}},
-			ret0: &BulkResults{iter: iter{items: []*item{
-				{item: &driver.BulkResult{}},
-				{item: &driver.BulkResult{}},
-				{item: &driver.BulkResult{}},
-			}}},
+			ret0: []driver.BulkResult{
+				{},
+				{},
+				{},
+			},
 		},
 		expected: `call to DB(foo#0).BulkDocs() which:
 	- has any docs

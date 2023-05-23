@@ -129,12 +129,6 @@ func NewRows() *Rows {
 	return &Rows{}
 }
 
-// NewBulkResults returns a new, empty set of bulk results, which can be
-// returned by the DB.BulkDocs() expectation.
-func NewBulkResults() *BulkResults {
-	return &BulkResults{}
-}
-
 // NewChanges returns a new, empty changes set, which can be returned by the
 // DB.Changes() expectation.
 func NewChanges() *Changes {

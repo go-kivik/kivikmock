@@ -2261,35 +2261,23 @@ func TestBulkDocs(t *testing.T) {
 			testy.Error(t, "call to DB.BulkDocs() was not expected, all expectations already fulfilled", err)
 		},
 	})
-	tests.Add("rows close error", mockTest{
-		setup: func(m *Client) {
-			db := m.NewDB()
-			m.ExpectDB().WillReturn(db)
-			db.ExpectBulkDocs().WillReturn(NewBulkResults().CloseError(errors.New("bar err")))
-		},
-		test: func(t *testing.T, c *kivik.Client) {
-			db := c.DB("foo")
-			rows, err := db.BulkDocs(context.TODO(), []interface{}{1})
-			testy.Error(t, "", err)
-			testy.Error(t, "bar err", rows.Close())
-		},
-	})
 	tests.Add("results", mockTest{
 		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectBulkDocs().WillReturn(NewBulkResults().
-				AddResult(&driver.BulkResult{ID: "foo"}).
-				AddResult(&driver.BulkResult{ID: "bar"}).
-				AddResult(&driver.BulkResult{ID: "baz"}))
+			db.ExpectBulkDocs().WillReturn([]driver.BulkResult{
+				{ID: "foo"},
+				{ID: "bar"},
+				{ID: "baz"},
+			})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB("foo")
 			rows, err := db.BulkDocs(context.TODO(), []interface{}{1})
 			testy.Error(t, "", err)
 			ids := []string{}
-			for rows.Next() {
-				ids = append(ids, rows.ID())
+			for _, row := range rows {
+				ids = append(ids, row.ID)
 			}
 			expected := []string{"foo", "bar", "baz"}
 			if d := testy.DiffInterface(expected, ids); d != nil {
@@ -2301,23 +2289,29 @@ func TestBulkDocs(t *testing.T) {
 		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectBulkDocs().WillReturn(NewBulkResults().
-				AddResult(&driver.BulkResult{ID: "foo"}).
-				AddResultError(errors.New("foo err")))
+			db.ExpectBulkDocs().WillReturn([]driver.BulkResult{
+				{ID: "foo"},
+				{Error: errors.New("foo err")},
+			})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			db := c.DB("foo")
 			rows, err := db.BulkDocs(context.TODO(), []interface{}{1})
 			testy.Error(t, "", err)
 			ids := []string{}
-			for rows.Next() {
-				ids = append(ids, rows.ID())
+			var rowErr error
+			for _, row := range rows {
+				if row.Error != nil {
+					rowErr = row.Error
+					continue
+				}
+				ids = append(ids, row.ID)
 			}
 			expected := []string{"foo"}
 			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
-			testy.Error(t, "foo err", rows.Err())
+			testy.Error(t, "foo err", rowErr)
 		},
 	})
 	tests.Add("options", mockTest{
@@ -2348,11 +2342,9 @@ func TestBulkDocs(t *testing.T) {
 		setup: func(m *Client) {
 			db := m.NewDB()
 			m.ExpectDB().WillReturn(db)
-			db.ExpectBulkDocs().WillReturn(NewBulkResults().
-				AddDelay(time.Millisecond).
-				AddResult(&driver.BulkResult{ID: "foo"}).
-				AddDelay(time.Second).
-				AddResult(&driver.BulkResult{ID: "bar"}))
+			db.ExpectBulkDocs().WillDelay(time.Second).WillReturn([]driver.BulkResult{
+				{ID: "foo"},
+			})
 		},
 		test: func(t *testing.T, c *kivik.Client) {
 			ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
@@ -2360,14 +2352,14 @@ func TestBulkDocs(t *testing.T) {
 			rows, err := c.DB("foo").BulkDocs(ctx, []interface{}{1})
 			testy.Error(t, "", err)
 			ids := []string{}
-			for rows.Next() {
-				ids = append(ids, rows.ID())
+			for _, row := range rows {
+				ids = append(ids, row.ID)
 			}
 			expected := []string{"foo"}
 			if d := testy.DiffInterface(expected, ids); d != nil {
 				t.Error(d)
 			}
-			testy.Error(t, "context deadline exceeded", rows.Err())
+			testy.Error(t, "context deadline exceeded", err)
 		},
 	})
 	tests.Add("wrong db", mockTest{
