@@ -60,26 +60,6 @@ func (db *DB) ExpectCreateIndex() *ExpectedCreateIndex {
 	return e
 }
 
-// ExpectDelete queues an expectation that DB.Delete will be called.
-func (db *DB) ExpectDelete() *ExpectedDelete {
-	e := &ExpectedDelete{
-		commonExpectation: commonExpectation{db: db},
-	}
-	db.count++
-	db.client.expected = append(db.client.expected, e)
-	return e
-}
-
-// ExpectDeleteAttachment queues an expectation that DB.DeleteAttachment will be called.
-func (db *DB) ExpectDeleteAttachment() *ExpectedDeleteAttachment {
-	e := &ExpectedDeleteAttachment{
-		commonExpectation: commonExpectation{db: db},
-	}
-	db.count++
-	db.client.expected = append(db.client.expected, e)
-	return e
-}
-
 // ExpectDeleteIndex queues an expectation that DB.DeleteIndex will be called.
 func (db *DB) ExpectDeleteIndex() *ExpectedDeleteIndex {
 	e := &ExpectedDeleteIndex{
@@ -163,6 +143,26 @@ func (db *DB) ExpectBulkGet() *ExpectedBulkGet {
 // ExpectChanges queues an expectation that DB.Changes will be called.
 func (db *DB) ExpectChanges() *ExpectedChanges {
 	e := &ExpectedChanges{
+		commonExpectation: commonExpectation{db: db},
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectDelete queues an expectation that DB.Delete will be called.
+func (db *DB) ExpectDelete() *ExpectedDelete {
+	e := &ExpectedDelete{
+		commonExpectation: commonExpectation{db: db},
+	}
+	db.count++
+	db.client.expected = append(db.client.expected, e)
+	return e
+}
+
+// ExpectDeleteAttachment queues an expectation that DB.DeleteAttachment will be called.
+func (db *DB) ExpectDeleteAttachment() *ExpectedDeleteAttachment {
+	e := &ExpectedDeleteAttachment{
 		commonExpectation: commonExpectation{db: db},
 	}
 	db.count++
