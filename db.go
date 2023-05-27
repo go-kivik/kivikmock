@@ -1,8 +1,6 @@
 package kivikmock
 
 import (
-	"context"
-
 	"github.com/go-kivik/kivik/v4/driver"
 )
 
@@ -16,7 +14,7 @@ var (
 	_ driver.Finder     = &driverDB{}
 )
 
-func (db *driverDB) Close(ctx context.Context) error {
+func (db *driverDB) Close() error {
 	expected := &ExpectedDBClose{
 		commonExpectation: commonExpectation{db: db.DB},
 	}
@@ -24,7 +22,7 @@ func (db *driverDB) Close(ctx context.Context) error {
 		return err
 	}
 	if expected.callback != nil {
-		return expected.callback(ctx)
+		return expected.callback()
 	}
-	return expected.wait(ctx)
+	return expected.err
 }

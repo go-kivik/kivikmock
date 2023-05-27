@@ -17,6 +17,13 @@ type driverDBUpdates struct {
 	*Updates
 }
 
+func coalesceDBUpdates(updates *Updates) *Updates {
+	if updates != nil {
+		return updates
+	}
+	return &Updates{}
+}
+
 var _ driver.DBUpdates = &driverDBUpdates{}
 
 func (u *driverDBUpdates) Next(update *driver.DBUpdate) error {

@@ -191,7 +191,7 @@ func (db *driverDB) AllDocs(ctx context.Context, options map[string]interface{})
 	if expected.callback != nil {
 		return expected.callback(ctx, options)
 	}
-	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
+	return &driverRows{Context: ctx, Rows: coalesceRows(expected.ret0)}, expected.wait(ctx)
 }
 
 func (db *driverDB) BulkDocs(ctx context.Context, arg0 []interface{}, options map[string]interface{}) ([]driver.BulkResult, error) {
@@ -225,7 +225,7 @@ func (db *driverDB) BulkGet(ctx context.Context, arg0 []driver.BulkGetReference,
 	if expected.callback != nil {
 		return expected.callback(ctx, arg0, options)
 	}
-	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
+	return &driverRows{Context: ctx, Rows: coalesceRows(expected.ret0)}, expected.wait(ctx)
 }
 
 func (db *driverDB) Changes(ctx context.Context, options map[string]interface{}) (driver.Changes, error) {
@@ -241,7 +241,7 @@ func (db *driverDB) Changes(ctx context.Context, options map[string]interface{})
 	if expected.callback != nil {
 		return expected.callback(ctx, options)
 	}
-	return &driverChanges{Context: ctx, Changes: expected.ret0}, expected.wait(ctx)
+	return &driverChanges{Context: ctx, Changes: coalesceChanges(expected.ret0)}, expected.wait(ctx)
 }
 
 func (db *driverDB) Delete(ctx context.Context, arg0 string, options map[string]interface{}) (string, error) {
@@ -292,7 +292,7 @@ func (db *driverDB) DesignDocs(ctx context.Context, options map[string]interface
 	if expected.callback != nil {
 		return expected.callback(ctx, options)
 	}
-	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
+	return &driverRows{Context: ctx, Rows: coalesceRows(expected.ret0)}, expected.wait(ctx)
 }
 
 func (db *driverDB) Explain(ctx context.Context, arg0 interface{}, options map[string]interface{}) (*driver.QueryPlan, error) {
@@ -326,7 +326,7 @@ func (db *driverDB) Find(ctx context.Context, arg0 interface{}, options map[stri
 	if expected.callback != nil {
 		return expected.callback(ctx, arg0, options)
 	}
-	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
+	return &driverRows{Context: ctx, Rows: coalesceRows(expected.ret0)}, expected.wait(ctx)
 }
 
 func (db *driverDB) Get(ctx context.Context, arg0 string, options map[string]interface{}) (*driver.Document, error) {
@@ -411,7 +411,7 @@ func (db *driverDB) LocalDocs(ctx context.Context, options map[string]interface{
 	if expected.callback != nil {
 		return expected.callback(ctx, options)
 	}
-	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
+	return &driverRows{Context: ctx, Rows: coalesceRows(expected.ret0)}, expected.wait(ctx)
 }
 
 func (db *driverDB) PartitionStats(ctx context.Context, arg0 string) (*driver.PartitionStats, error) {
@@ -479,7 +479,7 @@ func (db *driverDB) Query(ctx context.Context, arg0 string, arg1 string, options
 	if expected.callback != nil {
 		return expected.callback(ctx, arg0, arg1, options)
 	}
-	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
+	return &driverRows{Context: ctx, Rows: coalesceRows(expected.ret0)}, expected.wait(ctx)
 }
 
 func (db *driverDB) RevsDiff(ctx context.Context, arg0 interface{}) (driver.Rows, error) {
@@ -495,7 +495,7 @@ func (db *driverDB) RevsDiff(ctx context.Context, arg0 interface{}) (driver.Rows
 	if expected.callback != nil {
 		return expected.callback(ctx, arg0)
 	}
-	return &driverRows{Context: ctx, Rows: expected.ret0}, expected.wait(ctx)
+	return &driverRows{Context: ctx, Rows: coalesceRows(expected.ret0)}, expected.wait(ctx)
 }
 
 func (db *driverDB) Security(ctx context.Context) (*driver.Security, error) {

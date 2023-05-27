@@ -211,7 +211,7 @@ func (c *driverClient) DBUpdates(ctx context.Context, options map[string]interfa
 	if expected.callback != nil {
 		return expected.callback(ctx, options)
 	}
-	return &driverDBUpdates{Context: ctx, Updates: expected.ret0}, expected.wait(ctx)
+	return &driverDBUpdates{Context: ctx, Updates: coalesceDBUpdates(expected.ret0)}, expected.wait(ctx)
 }
 
 func (c *driverClient) DBsStats(ctx context.Context, arg0 []string) ([]*driver.DBStats, error) {

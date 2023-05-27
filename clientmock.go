@@ -19,9 +19,9 @@ type Client struct {
 	newdbcount int
 }
 
-// nextExpectation accepts the expected value `e`, checks that this is a valid
-// expectation, and if so, populates e with the matching expectation. If the
-// expectation is not expected, an error is returned.
+// nextExpectation accepts the expected value actual, checks that this is a
+// valid expectation, and if so, populates actual with the matching expectation.
+// If the expectation is not expected, an error is returned.
 func (c *Client) nextExpectation(actual expectation) error {
 	c.drv.Lock()
 	defer c.drv.Unlock()

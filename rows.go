@@ -16,6 +16,13 @@ type Rows struct {
 	warning   string
 }
 
+func coalesceRows(rows *Rows) *Rows {
+	if rows != nil {
+		return rows
+	}
+	return &Rows{}
+}
+
 type driverRows struct {
 	context.Context
 	*Rows

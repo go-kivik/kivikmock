@@ -189,13 +189,13 @@ func (m *Method) ExpectedReturns() string {
 	for i, arg := range m.Returns {
 		switch arg.String() {
 		case "driver.Rows":
-			args = append(args, fmt.Sprintf("&driverRows{Context: ctx, Rows: expected.ret%d}", i))
+			args = append(args, fmt.Sprintf("&driverRows{Context: ctx, Rows: coalesceRows(expected.ret%d)}", i))
 		case "driver.Changes":
-			args = append(args, fmt.Sprintf("&driverChanges{Context: ctx, Changes: expected.ret%d}", i))
+			args = append(args, fmt.Sprintf("&driverChanges{Context: ctx, Changes: coalesceChanges(expected.ret%d)}", i))
 		case "driver.DB":
 			args = append(args, fmt.Sprintf("&driverDB{DB: expected.ret%d}", i))
 		case "driver.DBUpdates":
-			args = append(args, fmt.Sprintf("&driverDBUpdates{Context:ctx, Updates: expected.ret%d}", i))
+			args = append(args, fmt.Sprintf("&driverDBUpdates{Context:ctx, Updates: coalesceDBUpdates(expected.ret%d)}", i))
 		case "driver.Replication":
 			args = append(args, fmt.Sprintf("&driverReplication{Replication: expected.ret%d}", i))
 		case "[]driver.Replication":

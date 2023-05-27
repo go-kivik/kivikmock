@@ -28,7 +28,7 @@ func TestCloseMethod(t *testing.T) {
 	tests.Add("empty", methodTest{
 		input:    &ExpectedClose{},
 		standard: "Close()",
-		verbose:  "Close(ctx)",
+		verbose:  "Close()",
 	})
 	tests.Run(t, testMethod)
 }
