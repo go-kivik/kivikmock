@@ -868,7 +868,6 @@ func TestDeleteAttachmentString(t *testing.T) {
 		input: &ExpectedDeleteAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}}},
 		expected: `call to DB(foo#0).DeleteAttachment() which:
 	- has any docID
-	- has any rev
 	- has any filename
 	- has any options`,
 	})
@@ -876,23 +875,13 @@ func TestDeleteAttachmentString(t *testing.T) {
 		input: &ExpectedDeleteAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg0: "foo"},
 		expected: `call to DB(foo#0).DeleteAttachment() which:
 	- has docID: foo
-	- has any rev
-	- has any filename
-	- has any options`,
-	})
-	tests.Add("rev", stringerTest{
-		input: &ExpectedDeleteAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg1: "1-foo"},
-		expected: `call to DB(foo#0).DeleteAttachment() which:
-	- has any docID
-	- has rev: 1-foo
 	- has any filename
 	- has any options`,
 	})
 	tests.Add("filename", stringerTest{
-		input: &ExpectedDeleteAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg2: "foo.txt"},
+		input: &ExpectedDeleteAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg1: "foo.txt"},
 		expected: `call to DB(foo#0).DeleteAttachment() which:
 	- has any docID
-	- has any rev
 	- has filename: foo.txt
 	- has any options`,
 	})
@@ -900,7 +889,6 @@ func TestDeleteAttachmentString(t *testing.T) {
 		input: &ExpectedDeleteAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, ret0: "2-bar"},
 		expected: `call to DB(foo#0).DeleteAttachment() which:
 	- has any docID
-	- has any rev
 	- has any filename
 	- has any options
 	- should return rev: 2-bar`,
@@ -914,35 +902,24 @@ func TestDeleteString(t *testing.T) {
 		input: &ExpectedDelete{commonExpectation: commonExpectation{db: &DB{name: "foo"}}},
 		expected: `call to DB(foo#0).Delete() which:
 	- has any docID
-	- has any rev
 	- has any options`,
 	})
 	tests.Add("docID", stringerTest{
 		input: &ExpectedDelete{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg0: "foo"},
 		expected: `call to DB(foo#0).Delete() which:
 	- has docID: foo
-	- has any rev
-	- has any options`,
-	})
-	tests.Add("rev", stringerTest{
-		input: &ExpectedDelete{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg1: "1-foo"},
-		expected: `call to DB(foo#0).Delete() which:
-	- has any docID
-	- has rev: 1-foo
 	- has any options`,
 	})
 	tests.Add("options", stringerTest{
 		input: &ExpectedDelete{commonExpectation: commonExpectation{db: &DB{name: "foo"}, options: map[string]interface{}{"foo": "bar"}}},
 		expected: `call to DB(foo#0).Delete() which:
 	- has any docID
-	- has any rev
 	- has options: map[foo:bar]`,
 	})
 	tests.Add("return", stringerTest{
 		input: &ExpectedDelete{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, ret0: "2-bar"},
 		expected: `call to DB(foo#0).Delete() which:
 	- has any docID
-	- has any rev
 	- has any options
 	- should return rev: 2-bar`,
 	})
@@ -1093,7 +1070,6 @@ func TestPutAttachmentString(t *testing.T) {
 		input: &ExpectedPutAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}}},
 		expected: `call to DB(foo#0).PutAttachment() which:
 	- has any docID
-	- has any rev
 	- has any attachment
 	- has any options`,
 	})
@@ -1101,23 +1077,13 @@ func TestPutAttachmentString(t *testing.T) {
 		input: &ExpectedPutAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg0: "foo"},
 		expected: `call to DB(foo#0).PutAttachment() which:
 	- has docID: foo
-	- has any rev
-	- has any attachment
-	- has any options`,
-	})
-	tests.Add("rev", stringerTest{
-		input: &ExpectedPutAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg1: "1-foo"},
-		expected: `call to DB(foo#0).PutAttachment() which:
-	- has any docID
-	- has rev: 1-foo
 	- has any attachment
 	- has any options`,
 	})
 	tests.Add("attachment", stringerTest{
-		input: &ExpectedPutAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg2: &driver.Attachment{Filename: "foo.txt"}},
+		input: &ExpectedPutAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, arg1: &driver.Attachment{Filename: "foo.txt"}},
 		expected: `call to DB(foo#0).PutAttachment() which:
 	- has any docID
-	- has any rev
 	- has attachment: foo.txt
 	- has any options`,
 	})
@@ -1125,7 +1091,6 @@ func TestPutAttachmentString(t *testing.T) {
 		input: &ExpectedPutAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}, err: errors.New("foo err")}},
 		expected: `call to DB(foo#0).PutAttachment() which:
 	- has any docID
-	- has any rev
 	- has any attachment
 	- has any options
 	- should return error: foo err`,
@@ -1134,7 +1099,6 @@ func TestPutAttachmentString(t *testing.T) {
 		input: &ExpectedPutAttachment{commonExpectation: commonExpectation{db: &DB{name: "foo"}}, ret0: "2-bar"},
 		expected: `call to DB(foo#0).PutAttachment() which:
 	- has any docID
-	- has any rev
 	- has any attachment
 	- has any options
 	- should return rev: 2-bar`,
@@ -1267,11 +1231,11 @@ func TestBulkDocsString(t *testing.T) {
 	tests.Add("return value", stringerTest{
 		input: &ExpectedBulkDocs{
 			commonExpectation: commonExpectation{db: &DB{name: "foo"}},
-			ret0: &BulkResults{iter: iter{items: []*item{
-				{item: &driver.BulkResult{}},
-				{item: &driver.BulkResult{}},
-				{item: &driver.BulkResult{}},
-			}}},
+			ret0: []driver.BulkResult{
+				{},
+				{},
+				{},
+			},
 		},
 		expected: `call to DB(foo#0).BulkDocs() which:
 	- has any docs

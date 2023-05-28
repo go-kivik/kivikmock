@@ -25,15 +25,15 @@ func (c *driverClient) AllDBs(ctx context.Context, options map[string]interface{
 	return expected.ret0, expected.wait(ctx)
 }
 
-func (c *driverClient) Close(ctx context.Context) error {
+func (c *driverClient) Close() error {
 	expected := &ExpectedClose{}
 	if err := c.nextExpectation(expected); err != nil {
 		return err
 	}
 	if expected.callback != nil {
-		return expected.callback(ctx)
+		return expected.callback()
 	}
-	return expected.wait(ctx)
+	return expected.err
 }
 
 func (c *driverClient) ClusterSetup(ctx context.Context, arg0 interface{}) error {
@@ -211,7 +211,7 @@ func (c *driverClient) DBUpdates(ctx context.Context, options map[string]interfa
 	if expected.callback != nil {
 		return expected.callback(ctx, options)
 	}
-	return &driverDBUpdates{Context: ctx, Updates: expected.ret0}, expected.wait(ctx)
+	return &driverDBUpdates{Context: ctx, Updates: coalesceDBUpdates(expected.ret0)}, expected.wait(ctx)
 }
 
 func (c *driverClient) DBsStats(ctx context.Context, arg0 []string) ([]*driver.DBStats, error) {

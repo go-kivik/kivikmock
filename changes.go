@@ -20,6 +20,13 @@ type driverChanges struct {
 	*Changes
 }
 
+func coalesceChanges(changes *Changes) *Changes {
+	if changes != nil {
+		return changes
+	}
+	return &Changes{}
+}
+
 var _ driver.Changes = &driverChanges{}
 
 func (r *driverChanges) Next(res *driver.Change) error {

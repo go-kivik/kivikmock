@@ -19,9 +19,9 @@ type Client struct {
 	newdbcount int
 }
 
-// nextExpectation accepts the expected value `e`, checks that this is a valid
-// expectation, and if so, populates e with the matching expectation. If the
-// expectation is not expected, an error is returned.
+// nextExpectation accepts the expected value actual, checks that this is a
+// valid expectation, and if so, populates actual with the matching expectation.
+// If the expectation is not expected, an error is returned.
 func (c *Client) nextExpectation(actual expectation) error {
 	c.drv.Lock()
 	defer c.drv.Unlock()
@@ -127,12 +127,6 @@ func (c *Client) NewDB() *DB {
 // the row-returning expectations.
 func NewRows() *Rows {
 	return &Rows{}
-}
-
-// NewBulkResults returns a new, empty set of bulk results, which can be
-// returned by the DB.BulkDocs() expectation.
-func NewBulkResults() *BulkResults {
-	return &BulkResults{}
 }
 
 // NewChanges returns a new, empty changes set, which can be returned by the
