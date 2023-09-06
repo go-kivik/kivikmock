@@ -1,3 +1,7 @@
+This code has moved to [github.com/go-kivik/kivik/v4/mockdb](https://github.com/go-kivik/kivik/tree/master/mockdb).
+
+<hr>
+
 [![Build Status](https://travis-ci.org/go-kivik/kivikmock.svg?branch=master)](https://travis-ci.org/go-kivik/kivikmock) [![Codecov](https://img.shields.io/codecov/c/github/go-kivik/kivikmock.svg?style=flat)](https://codecov.io/gh/go-kivik/kivikmock) [![Go Report Card](https://goreportcard.com/badge/github.com/go-kivik/kivikmock)](https://goreportcard.com/report/github.com/go-kivik/kivikmock) [![GoDoc](https://godoc.org/github.com/go-kivik/kivikmock?status.svg)](http://godoc.org/github.com/go-kivik/kivikmock) [![Website](https://img.shields.io/website-up-down-green-red/http/shields.io.svg?label=website&colorB=007fff)](http://kivik.io)
 
 # Kivikmock
