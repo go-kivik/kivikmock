@@ -9,24 +9,20 @@ stages:
 
 linter:
     stage: test
-    image: golangci/golangci-lint:v1.52.2
+    image: golangci/golangci-lint:v1.54.2
     script:
         - go mod download
         - golangci-lint run ./...
 
 coverage:
     stage: test
-    image: golang:1.20
+    image: golang:1.21
     services: []
     before_script:
         - ""
     script:
         - go mod download
         - ./script/coverage.sh
-
-go-1.16:
-    <<: *go_test_template
-    image: golang:1.16
 
 go-1.17:
     <<: *go_test_template
@@ -44,6 +40,10 @@ go-1.20:
     <<: *go_test_template
     image: golang:1.20
 
+go-1.21:
+    <<: *go_test_template
+    image: golang:1.21
+
 go-rc:
     <<: *go_test_template
     stage: test
@@ -51,27 +51,21 @@ go-rc:
     allow_failure: true
 
 .gopherjs_test: &gopherjs_test_template
-  <<: *go_test_template
-  before_script:
-    - curl -sL https://deb.nodesource.com/setup_12.x | bash -
-    - apt-get update -qq && apt-get install -y nodejs
-  script:
-    - npm install -g npm@7.5.2 && npm update
-    - npm install
-    - npm install source-map-support
-    - mkdir -p /tmp/src
-    - ( cd /tmp && go install github.com/gopherjs/gopherjs@${GOPHERJS_TAG} )
-    - npm install -S https://github.com/gopherjs/gopherjs#${GOPHERJS_TAG} && node -r syscall
-    - gopherjs test ./...
-
-gopherjs-1.16:
-  <<: *gopherjs_test_template
-  image: golang:1.16
-  variables:
-    GOPHERJS_TAG: 1.16.4+go1.16.7
+    <<: *go_test_template
+    before_script:
+        - curl -sL https://deb.nodesource.com/setup_12.x | bash -
+        - apt-get update -qq && apt-get install -y nodejs
+    script:
+        - npm install -g npm@7.5.2 && npm update
+        - npm install
+        - npm install source-map-support
+        - mkdir -p /tmp/src
+        - ( cd /tmp && go install github.com/gopherjs/gopherjs@${GOPHERJS_TAG} )
+        - npm install -S https://github.com/gopherjs/gopherjs#${GOPHERJS_TAG} && node -r syscall
+        - gopherjs test ./...
 
 gopherjs-1.17:
-  <<: *gopherjs_test_template
-  image: golang:1.17
-  variables:
-    GOPHERJS_TAG: v1.17.2+go1.17.9
+    <<: *gopherjs_test_template
+    image: golang:1.17
+    variables:
+        GOPHERJS_TAG: v1.17.2+go1.17.9
