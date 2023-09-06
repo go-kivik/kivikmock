@@ -28,7 +28,7 @@ var dbSkips = map[string]struct{}{
 
 func main() {
 	initTemplates(os.Args[1])
-	if err := os.Mkdir("./other", 0777); err != nil && !os.IsExist(err) {
+	if err := os.Mkdir("./other", 0o777); err != nil && !os.IsExist(err) {
 		panic(err)
 	}
 	if err := client(); err != nil {
@@ -91,6 +91,8 @@ type fullDB interface {
 	driver.Purger
 	driver.RevsDiffer
 	driver.PartitionedDB
+	driver.SecurityDB
+	driver.OldGetter
 }
 
 func db() error {

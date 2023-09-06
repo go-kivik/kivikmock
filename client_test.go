@@ -9,8 +9,8 @@ import (
 
 	"gitlab.com/flimzy/testy"
 
-	"github.com/go-kivik/couchdb/v4"
 	"github.com/go-kivik/kivik/v4"
+	"github.com/go-kivik/kivik/v4/couchdb"
 	"github.com/go-kivik/kivik/v4/driver"
 )
 
