@@ -47,21 +47,21 @@ go-rc:
     allow_failure: true
 
 .gopherjs_test: &gopherjs_test_template
-  <<: *go_test_template
-  before_script:
-    - curl -sL https://deb.nodesource.com/setup_12.x | bash -
-    - apt-get update -qq && apt-get install -y nodejs
-  script:
-    - npm install -g npm@7.5.2 && npm update
-    - npm install
-    - npm install source-map-support
-    - mkdir -p /tmp/src
-    - ( cd /tmp && go install github.com/gopherjs/gopherjs@${GOPHERJS_TAG} )
-    - npm install -S https://github.com/gopherjs/gopherjs#${GOPHERJS_TAG} && node -r syscall
-    - gopherjs test ./...
+    <<: *go_test_template
+    before_script:
+        - curl -sL https://deb.nodesource.com/setup_12.x | bash -
+        - apt-get update -qq && apt-get install -y nodejs
+    script:
+        - npm install -g npm@7.5.2 && npm update
+        - npm install
+        - npm install source-map-support
+        - mkdir -p /tmp/src
+        - ( cd /tmp && go install github.com/gopherjs/gopherjs@${GOPHERJS_TAG} )
+        - npm install -S https://github.com/gopherjs/gopherjs#${GOPHERJS_TAG} && node -r syscall
+        - gopherjs test ./...
 
 gopherjs-1.17:
-  <<: *gopherjs_test_template
-  image: golang:1.17
-  variables:
-    GOPHERJS_TAG: v1.17.2+go1.17.9
+    <<: *gopherjs_test_template
+    image: golang:1.17
+    variables:
+        GOPHERJS_TAG: v1.17.2+go1.17.9
